@@ -1,3 +1,6 @@
+set export := true
+set dotenv-load := true
+
 help:
     just --list
 
@@ -14,7 +17,6 @@ test:
     mkdir build || true && cmake . build -DBUILD_TESTS=ON
     make
     ./tests/testSuiteUi
-    just clean-cmake
 
 clean:
     just clean-cmake
@@ -27,3 +29,8 @@ clean-cmake:
         tests/CTestTestfile.cmake tests/_deps/ tests/lib/ tests/testSuite tests/*.cmake tests/Makefile
     rm -rf src/bin/ src/build/ src/CMakeCache.txt src/CMakeFiles/ src/cmake_install.cmake \
         src/CTestTestfile.cmake src/_deps/ src/lib/ src/testSuite src/*.cmake src/Makefile
+
+clean-nix:
+    rm -rf .direnv
+    nix-collect-garbage -d
+    echo "Env has been cleaned. Run direnv reload to re-download everything."
