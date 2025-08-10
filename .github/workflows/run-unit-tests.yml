@@ -11,6 +11,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Build tests
         run: | ## TODO: Future-proof by using nix and just
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HEE_KEY }}" > ~/.ssh/hee
+          chmod 600 ~/.ssh/hee
+          ssh-add ~/.ssh/hee
+          rm ~/.ssh/hee
           cmake . -DBUILD_TESTS=ON
           make
       - name: Exec unit tests
