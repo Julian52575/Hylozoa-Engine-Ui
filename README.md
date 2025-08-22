@@ -12,6 +12,7 @@
 
 ## Getting started
 - Run `direnv allow` _or `nix-shell`_ and wait for Nix to configure the environment.
+- If is not working, run `eval "$(direnv hook bash)"` or `eval "$(direnv hook zsh)"` in your terminal and try again.
 - You now have access to the specific versions of the tools we use, only within this directory !
 
 > [!TIP]
