@@ -2,7 +2,7 @@
 
 ## Dependencies 
 - [Nix](https://nixos.org/download/)
-  - Follow the instructions from the official website or [this helper](https://docs.determinate.systems/).
+  - Follow the instructions from the official website **OR** follow the steps used by our github actions workflows !
   - Nix runs the developer environment by managing variables and installing dependencies.
 - Optional: [nix-direnv](https://github.com/nix-community/nix-direnv)
   - The recommand install requires [home-manager](https://nix-community.github.io/home-manager/index.xhtml#ch-installation).
