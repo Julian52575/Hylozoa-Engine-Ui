@@ -18,11 +18,24 @@ type FileData = {
 
 function Node({ node, style, dragHandle } : NodeRendererProps<FileData>) {
   return (
-    <div style={style} ref={dragHandle} onClick={() => node.toggle()} className='flex items-center gap-1 hover:bg-primary/10 px-2 w-max rounded cursor-pointer select-none'>
-      {node.isLeaf ? <FaFile /> : 
-        (node.isOpen ? <FaChevronDown /> : <FaChevronRight />)}
-      {node.data.name}
-    </div>
+     <ContextMenu>
+        <ContextMenuTrigger
+                asChild
+                onContextMenu={(e) => e.stopPropagation()}
+        >
+            <div style={style} ref={dragHandle} onClick={() => node.toggle()} className='flex items-center gap-1 hover:bg-primary/10 px-2 w-max rounded cursor-pointer select-none'>
+                {node.isLeaf ? <FaFile /> : (node.isOpen ? <FaChevronDown size={10} /> : <FaChevronRight size={10} />)}
+                <div className="font-normal text-sm">
+                    {node.data.name}
+                </div>
+            </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+            <div>
+                {node.data.name} Options
+            </div>
+        </ContextMenuContent>
+    </ContextMenu>
   );
 }
 
@@ -66,25 +79,18 @@ export function FolderDisplayer() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
-            <ContextMenu>
-                <ContextMenuTrigger className='flex h-full px-2 py-1 overflow-auto'>
-                    <Tree 
-                        indent={10}
-                        searchTerm={searchTerm}
-                        searchMatch={
-                            (node, term) => node.data.name.toLowerCase().includes(term.toLowerCase())
-                        }
-                        data={data} 
-                    >
-                        {Node}
-                    </Tree>
-                </ContextMenuTrigger>
-                <ContextMenuContent className="w-48">
-                    <div>
-                        hello
-                    </div>
-                </ContextMenuContent>
-            </ContextMenu>
+            <div className='flex h-full px-2 py-1 overflow-auto'>
+                <Tree 
+                    indent={10}
+                    searchTerm={searchTerm}
+                    searchMatch={
+                        (node, term) => node.data.name.toLowerCase().includes(term.toLowerCase())
+                    }
+                    initialData={data} 
+                >
+                    {Node}
+                </Tree>
+            </div>
         </div>
     )
 }
