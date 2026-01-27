@@ -141,10 +141,16 @@ function ProjectsMenuGroup() {
             <MenubarContent>
                 <MenubarGroup>
                     <MenubarItem>
-                        Project 1
+                        Run Project <MenubarShortcut>⌘R</MenubarShortcut>
                     </MenubarItem>
                     <MenubarItem>
-                        Project 2
+                        Run Scene <MenubarShortcut>⇧⌘R</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarItem>
+                        Build Project <MenubarShortcut>⇧⌘B</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarItem>
+                        Build Project & Run <MenubarShortcut>⇧⌘Br</MenubarShortcut>
                     </MenubarItem>
                 </MenubarGroup>
             </MenubarContent>

@@ -121,3 +121,6 @@
     @apply bg-background text-foreground;
   }
 }
+body {
+  -webkit-font-smoothing: antialiased;
+}

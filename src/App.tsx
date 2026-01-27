@@ -4,6 +4,9 @@ import {Hierarchie} from "@/components/layout/Hierarchie";
 import {FolderDisplayer} from "@/components/layout/FolderDisplayer";
 import { ConsoleDisplayer } from "@/components/layout/ConsoleDisplayer";
 import { MainScene } from "@/components/layout/MainScene";
+import { Inspector } from "@/components/layout/Inspector";
+import { Toolbar } from "@/components/layout/Toolbar";
+import { Viewport } from "@/components/layout/Viewport";
 
 import {
   ResizableHandle,
@@ -35,12 +38,12 @@ function App() {
         <ResizablePanel>
           <ResizablePanelGroup orientation="vertical">
             <ResizablePanel minSize={50} defaultSize={100}>
-              <div className="w-full h-full bg-green-500 flex flex-col">
-                <div className="flex-1 bg-red-500">
-                  Toolbar
+              <div className="w-full h-full flex flex-col">
+                <div className="flex-1 border-b border-zinc-300">
+                  <Toolbar />
                 </div>
-                <div className="flex-1 bg-pink-500">
-                  Viewport controls
+                <div className="flex-1">
+                  <Viewport />
                 </div>
               </div>
             </ResizablePanel>
@@ -56,10 +59,8 @@ function App() {
         </ResizablePanel>
         <ResizableHandle className="h-full w-0.5 bg-primary/20 cursor-col-resize" />
 
-        <ResizablePanel minSize={150} defaultSize={300} className="flex flex-col bg-blue-500">
-          <div>
-            Inspector
-          </div>
+        <ResizablePanel minSize={150} defaultSize={300}>
+          <Inspector />
         </ResizablePanel>
 
       </ResizablePanelGroup>
