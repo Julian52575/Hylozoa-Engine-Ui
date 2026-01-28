@@ -19,7 +19,7 @@
         "minHeight": 700,
         "resizable": true,
         "fullscreen": false,
-        "maximized": false,
+        "maximized": true,
         "decorations": false,
         "alwaysOnTop": false,
         "transparent": false,
