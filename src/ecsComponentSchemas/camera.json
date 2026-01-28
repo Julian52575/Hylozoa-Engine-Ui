@@ -1,0 +1,27 @@
+{
+    "type": "camera",
+    "label" : "Camera",
+    "properties": {
+        "offset": {
+            "type": "vector2",
+            "label": "Offset",
+            "default": { "x": 0, "y": 1.6}
+        },
+        "anchorMode": {
+            "type": "string",
+            "label": "Anchor Mode",
+            "options": ["head", "eyes", "body", "feet"],
+            "default": "head"
+        },
+        "ignoreRotation": {
+            "type": "boolean",
+            "label": "Ignore Rotation",
+            "default": false
+        },
+        "text": {
+            "type": "string",
+            "label": "Text Mode",
+            "default": "none"
+        }
+    }
+}
