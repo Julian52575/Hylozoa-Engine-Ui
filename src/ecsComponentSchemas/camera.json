@@ -8,7 +8,7 @@
             "default": { "x": 0, "y": 1.6}
         },
         "anchorMode": {
-            "type": "string",
+            "type": "enum",
             "label": "Anchor Mode",
             "options": ["head", "eyes", "body", "feet"],
             "default": "head"
