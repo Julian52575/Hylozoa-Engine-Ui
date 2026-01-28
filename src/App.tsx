@@ -1,50 +1,51 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 
 import { Button } from "@/components/ui/button";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+type FileEntry = {
+  name: string;
+  path: string;
+  is_dir: boolean;
+  children?: FileEntry[];
+};
+
+function App() {
+  const [folder, setFolder] = useState("");
+  const [folderContent, setFolderContent] = useState<FileEntry | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function openFolder(path:string) {
+    try {
+      const folderContent = await invoke('read_dir_recursively', { path });
+      setFolderContent(folderContent as FileEntry);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : String(error));
+    }
   }
 
   return (
-    <main className="bg-red-500">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
+    <main className="flex flex-col">
       <form
-        className="row"
-        onSubmit={(e) => {
+        className="flex flex-col gap-4"
+        onSubmit={async (e) => {
           e.preventDefault();
-          greet();
+          await openFolder(folder);
         }}
       >
         <input
           id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
+          className="bg-white"
+          onChange={(e) => setFolder(e.currentTarget.value)}
+          placeholder="Enter a folder path"
         />
-        <Button type="submit">Greet</Button>
+        <Button type="submit">Open Folder</Button>
       </form>
-      <p>{greetMsg}</p>
+      {error && <p className="text-red-600">{error}</p>}
+      {folderContent && (
+        <pre className="mt-4">{JSON.stringify(folderContent, null, 2)}</pre>
+      )}
     </main>
   );
 }
