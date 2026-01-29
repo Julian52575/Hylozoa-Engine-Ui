@@ -153,6 +153,25 @@ function TextareaOption({ label, value }: { label: string, value: string }) {
     );
 }
 
+function NumberOPtion({ label, value }: { label: string, value: number }) {
+    return (
+        <div className="flex flex-col gap-2 p-3 bg-zinc-50/50 rounded-lg border border-zinc-200 transition-all hover:border-zinc-300">
+            <Label 
+                htmlFor={label}
+                className="text-sm font-semibold text-zinc-500 cursor-pointer px-1"
+            >
+                {label}
+            </Label>
+            <Input 
+                type="number" 
+                defaultValue={value} 
+                id={label} 
+                className="h-8 text-sm font-mono border-zinc-200 focus-visible:border-zinc-400 focus-visible:ring-zinc-400/30 transition-all bg-white"
+            />
+        </div>
+    );
+}
+
 export function Inspector() {
     return (
         <div className="w-full h-full flex flex-col">
@@ -167,6 +186,7 @@ export function Inspector() {
                 <CheckboxOption label="Enabled" checked={true} />
                 <Vector2 label="Zoom" x={0} y={0} linked={true} />
                 <TextareaOption label="Text" value={"Text here"} />
+                <NumberOPtion label="Priority" value={0} />
             </div>
         </div>
     );
