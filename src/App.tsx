@@ -1,51 +1,89 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
+import CytoscapeComponent from 'react-cytoscapejs';
+import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
 
-import { Button } from "@/components/ui/button";
+import { Routes, Route } from 'react-router-dom';
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+const GraphComponent = () => {
+  const elements = [
+    { data: { id: 'one', label: 'Node 1', color: '#4A90E2' }, position: { x: 0, y: 0 } },
+    { data: { id: 'two', label: 'Node 2', color: '#50E3C2' }, position: { x: 100, y: 0 } },
+    { data: { source: 'one', target: 'two', label: 'Edge from Node1 to Node2' } }
+  ];
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  const stylesheet = [
+    {
+      selector: 'node',
+      style: {
+        'background-color': 'data(color)',
+        'label': 'data(label)'
+      }
+    },
+    {
+      selector: 'edge',
+      style: {
+        'width': 1,
+        'line-color': '#A0A0A0'
+      }
+    }
+  ];
 
   return (
-    <main className="bg-red-500">
-      <h1>Welcome to Tauri + React</h1>
+    <CytoscapeComponent
+      elements={elements}
+      style={{ width: '100%', height: '100%' }}
+      stylesheet={stylesheet}
+      layout={{ name: 'preset' }}
+    />
+  );
+  
+};
 
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
+const OpenWindowButton = () => {
+  const createNewWindow = async () => {
+    const webview = new WebviewWindow('graph-window', {
+      url: '/graph',
+      title: 'Graph',
+      width: 800,
+      height: 600
+    });
+    webview.once('tauri://created', () => {
+      console.log('Graph window created');
+    });
 
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <Button type="submit">Greet</Button>
-      </form>
-      <p>{greetMsg}</p>
+    webview.once('tauri://error', (e) => {
+      console.error("Erreur lors de la création de la fenêtre:", e);
+    });
+  };
+  return (
+    <button onClick={createNewWindow} className="p-2 bg-blue-500 text-white rounded">
+      Open Graph Window
+    </button>
+  );
+};
+
+function GraphWindow() {
+  return (
+    <main className="h-screen w-full">
+      <GraphComponent />
     </main>
+  );
+}
+
+function Main(){
+  return (
+    <main className="h-screen w-full flex items-center justify-center">
+      <OpenWindowButton />
+    </main>
+  );
+}
+
+function App() {
+  
+  return (
+    <Routes>
+      <Route path="/" element={<Main />} />
+      <Route path="/graph" element={<GraphWindow />} />
+    </Routes>
   );
 }
 
