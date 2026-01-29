@@ -1,0 +1,16 @@
+{
+    "type" : "circleCollider",
+    "label" : "Circle Collider",
+    "properties" : {
+        "radius" : {
+            "type" : "number",
+            "label" : "Radius",
+            "default" : 0.5
+        },
+        "offset" : {
+            "type" : "vector2",
+            "label" : "Offset",
+            "default" : { "x" : 0, "y" : 0 }
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "type": "parent",
+    "label": "Parent",
+    "properties": {
+        "parentId": {
+            "type": "number",
+            "label": "Parent ID",
+            "default": -1
+        }
+    }
+}

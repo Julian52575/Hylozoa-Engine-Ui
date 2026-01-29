@@ -1,0 +1,11 @@
+{
+    "type": "id",
+    "label": "ID",
+    "properties": {
+        "value": {
+            "type": "number",
+            "label": "Value",
+            "default": -1
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "type" : "boxCollider",
+    "label" : "Box Collider",
+    "properties" : {
+        "size" : {
+            "type" : "vector2",
+            "label" : "Size",
+            "default" : { "x" : 1, "y" : 1 }
+        }
+    }
+}

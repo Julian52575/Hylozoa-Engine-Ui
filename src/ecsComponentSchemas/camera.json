@@ -22,6 +22,31 @@
             "type": "string",
             "label": "Text Mode",
             "default": "none"
+        },
+        "viewportSize" : {
+            "type": "vector2",
+            "label": "Viewport Size",
+            "default": { "x": 1920, "y": 1080}
+        },
+        "zoom": {
+            "type": "number",
+            "label": "Zoom",
+            "default": 1
+        },
+        "order" : {
+            "type": "number",
+            "label": "Order",
+            "default": 0
+        },
+        "isUI" : {
+            "type": "boolean",
+            "label": "Is UI",
+            "default": false
+        },
+        "cullingMask": {
+            "type": "number",
+            "label": "Culling Mask - Not correctly serialized for now",
+            "default": 1
         }
     }
 }

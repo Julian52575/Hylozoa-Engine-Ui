@@ -1,0 +1,52 @@
+{
+    "type" : "rigidBody",
+    "label" : "Rigid Body",
+    "properties" : {
+        "bodyType" : {
+            "type" : "enum",
+            "label" : "Body Type",
+            "options" : [ "static", "dynamic", "kinematic" ],
+            "default" : "static"
+        },
+        "gravityScale" : {
+            "type" : "number",
+            "label" : "Gravity Scale",
+            "default" : 1
+        },
+        "linearDamping" : {
+            "type" : "number",
+            "label" : "Linear Damping",
+            "default" : 0
+        },
+        "angularDamping" : {
+            "type" : "number",
+            "label" : "Angular Damping",
+            "default" : 0
+        },
+        "fixedRotation" : {
+            "type" : "boolean",
+            "label" : "Fixed Rotation",
+            "default" : false
+        },
+        "isBullet" : {
+            "type" : "boolean",
+            "label" : "Is Bullet",
+            "default" : false
+        },
+        "isAwake" : {
+            "type" : "boolean",
+            "label" : "Is Awake",
+            "default" : true
+        },
+        "isEnabled" : {
+            "type" : "boolean",
+            "label" : "Is Enabled",
+            "default" : true
+        },
+        "linearVelocity" : {
+            "type" : "vector2",
+            "label" : "Linear Velocity",
+            "default" : { "x" : 0, "y" : 0 }
+        }
+    }
+}
