@@ -12,41 +12,41 @@ struct FileEntry {
 
 #[command]
 fn read_dir_recursively(path: String) -> Result<FileEntry, String> {
-    let path_buf: PathBuf = PathBuf::from(&path);
-    if !path_buf.exists() || !path_buf.is_dir() {
+    let path_buf: PathBuf = PathBuf::from(&path)
+        .canonicalize()
+        .map_err(|e| format!("Failed to canonicalize path '{}': {}", path, e))?;
+
+    if !path_buf.is_dir() {
         return Err(format!("The path '{}' is not a valid directory.", path));
     }
 
-    fn read_dir(path: &PathBuf) -> FileEntry {
-        let mut children = Vec::new();
-        if path.is_dir(){
-            for entry in fs::read_dir(path).unwrap() {
-                let entry = entry.unwrap();
-                let entry_path = entry.path();
-                let is_dir = entry_path.is_dir();
-                let name = entry.file_name().into_string().unwrap_or_default();
-                let child = if is_dir {
-                    Some(read_dir(&entry_path))
-                } else {
-                    None
-                };
-                children.push(FileEntry {
-                    name,
-                    path: entry_path.to_string_lossy().to_string(),
-                    is_dir,
-                    children: child.map(|c| vec![c]).or(None),
-                });
+    fn process_path(path: PathBuf) -> FileEntry {
+        let name: String = path.file_name()
+            .map(|n: &std::ffi::OsStr| n.to_string_lossy().into_owned())
+            .unwrap_or_else(|| "".into());
+            
+        let is_dir: bool = path.is_dir();
+        let mut children: Option<Vec<FileEntry>> = None;
+
+        if is_dir {
+            if let Ok(entries) = fs::read_dir(&path) {
+                let mut child_vec: Vec<FileEntry> = Vec::new();
+                for entry in entries.flatten() {
+                    child_vec.push(process_path(entry.path()));
+                }
+                children = Some(child_vec);
             }
         }
+
         FileEntry {
-            name: path.file_name().unwrap_or_default().to_string_lossy().to_string(),
-            path: path.to_string_lossy().to_string(),
-            is_dir: true,
-            children: Some(children),
+            name,
+            path: path.to_string_lossy().into_owned(),
+            is_dir,
+            children,
         }
     }
 
-    Ok(read_dir(&path_buf))
+    Ok(process_path(path_buf))
 }
 
 

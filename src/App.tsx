@@ -25,9 +25,8 @@ function App() {
       if (!selected) {
         return;
       }
-      const path = Array.isArray(selected) ? selected[0] : selected;
-
-      const content = await invoke<FileEntry>('read_dir_recursively', { path });
+      
+      const content = await invoke<FileEntry>('read_dir_recursively', { path : selected });
       setFolderContent(content);
       setError(null);
     } catch (error) {
