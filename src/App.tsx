@@ -1,50 +1,67 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-
 import { Button } from "@/components/ui/button";
+import { useEngineStore,serializeEngineState } from "@/store/engineStore";
+import { useState } from "react";
+
+import { save } from '@tauri-apps/plugin-dialog';
+import { invoke } from '@tauri-apps/api/core';
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const engineStore = useEngineStore();
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+  const exportState = () => {
+    const state = engineStore;
+    const serialized = JSON.stringify(serializeEngineState(state), null, 2);
+    console.log("Exported Engine State:", serialized);
   }
 
+  const [listScenesId, setListScenesId] = useState<string[]>([]);
+  const addRandomScene = () => {
+    const id = (Math.random() * 10000).toFixed(0);
+    engineStore.addScene(id, `Scene ${id}`);
+    setListScenesId([...listScenesId, id]);
+    alert(`Added Scene with ID: ${id}`);
+  }
+
+  const addRandomEntityToRandomScene = () => {
+    if (listScenesId.length === 0) {
+      alert("No scenes available. Please add a scene first.");
+      return;
+    }
+    const randomSceneId = listScenesId[Math.floor(Math.random() * listScenesId.length)];
+    const entityId = (Math.random() * 10000).toFixed(0);
+    engineStore.addEntity(randomSceneId, { id: entityId, name: `Entity ${entityId}`, components: [] });
+    alert(`Added Entity with ID: ${entityId} to Scene ID: ${randomSceneId}`);
+  }
+
+  const handleSaveHlz = async () => {
+    const state = engineStore;
+    const serialized = JSON.stringify(serializeEngineState(state));
+
+    const filePath = await save({
+      title: 'Save HLZ File',
+      defaultPath: 'project.hlz',
+      filters: [{ name: 'HLZ Files', extensions: ['hlz'] }],
+    });
+    if (!filePath) return;
+
+    try {
+      await invoke('save_compressed_project', { path: filePath, data: serialized });
+      alert(`Project saved successfully to ${filePath}`);
+    }
+    catch (error) {
+      alert(`Failed to save project: ${error}`);
+    }
+  };
+
   return (
-    <main className="bg-red-500">
-      <h1>Welcome to Tauri + React</h1>
+    <main className="h-screen w-screen flex flex-col items-center justify-center space-y-4">
+      <h1>Welcome to using global state branch</h1>
 
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
+      <Button onClick={addRandomScene}>Add Random Scene</Button>
+      <Button onClick={addRandomEntityToRandomScene}>Add Random Entity to Random Scene</Button>
+      <Button onClick={handleSaveHlz}>Save Project as .hlz</Button>
+      <pre className="h-max overflow-auto">{JSON.stringify(engineStore, null, 2)}</pre>
 
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <Button type="submit">Greet</Button>
-      </form>
-      <p>{greetMsg}</p>
     </main>
   );
 }
