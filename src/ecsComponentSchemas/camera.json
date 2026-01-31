@@ -44,9 +44,9 @@
             "default": false
         },
         "cullingMask": {
-            "type": "number",
-            "label": "Culling Mask - Not correctly serialized for now",
-            "default": 1
+            "type": "list",
+            "label": "Culling Mask",
+            "default": ["All"]
         }
     }
 }
