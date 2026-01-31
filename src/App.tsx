@@ -8,12 +8,6 @@ import { invoke } from '@tauri-apps/api/core';
 function App() {
   const engineStore = useEngineStore();
 
-  const exportState = () => {
-    const state = engineStore;
-    const serialized = JSON.stringify(serializeEngineState(state), null, 2);
-    console.log("Exported Engine State:", serialized);
-  }
-
   const [listScenesId, setListScenesId] = useState<string[]>([]);
   const addRandomScene = () => {
     const id = (Math.random() * 10000).toFixed(0);
