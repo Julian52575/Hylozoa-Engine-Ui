@@ -9,13 +9,10 @@ import { VscChromeMaximize } from "react-icons/vsc";
 import { Button } from "@/components/ui/button";
 import {
   Menubar,
-  MenubarCheckboxItem,
   MenubarContent,
   MenubarGroup,
   MenubarItem,
   MenubarMenu,
-  MenubarRadioGroup,
-  MenubarRadioItem,
   MenubarSeparator,
   MenubarShortcut,
   MenubarSub,
