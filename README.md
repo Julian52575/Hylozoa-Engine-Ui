@@ -2,7 +2,7 @@
 
 ## Dependencies 
 - [Nix](https://nixos.org/download/)
-  - Follow the instructions from the official website or [this helper](https://docs.determinate.systems/).
+  - Follow the instructions from the official website **OR** follow the steps used by our github actions workflows !
   - Nix runs the developer environment by managing variables and installing dependencies.
 - Optional: [nix-direnv](https://github.com/nix-community/nix-direnv)
   - The recommand install requires [home-manager](https://nix-community.github.io/home-manager/index.xhtml#ch-installation).
@@ -58,9 +58,10 @@ Be careful of this before committing to this repository:
 - Make sure you are committing to a separate branch before merging.
   - Branches should follows this naming pattern: `{your name}-{issue-name}`
   - Note: An exception is made for `README.md` updates to `dev` and other **small hotfixes** that does not update the code base.
-- Once your branch is ready to merge, create a Pull Request
+- Create a Pull Request after the first commit to allow comments
   - Note: Do not target `main` directly. We want to update `dev` until it is ready for a release to `main`.
-- Be sure the test workflows complete succesfully before merging.
+- Resolve all the comments left of your Pull Request before merging.
+- **Be sure the test workflows complete succesfully before merging.**
 - You are free to keep the branch or delete it.
 
 -----
