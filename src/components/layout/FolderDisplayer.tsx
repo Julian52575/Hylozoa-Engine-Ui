@@ -13,7 +13,7 @@ import { useState } from 'react';
 type FileData = {
   id: string;
   name: string;
-  children?: FileData[]; // Optionnel pour les fichiers (leafs)
+  children?: FileData[];
 };
 
 function Node({ node, style, dragHandle } : NodeRendererProps<FileData>) {
