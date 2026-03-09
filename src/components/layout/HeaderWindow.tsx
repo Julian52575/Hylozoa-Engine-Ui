@@ -172,7 +172,7 @@ function FunctionsGroup() {
         
             
 
-export function HeaderWindow() {
+export function HeaderWindow({isHome = false}: {isHome: boolean}) {
     if (!isTauri()) {
         return null;
     }
@@ -193,7 +193,7 @@ export function HeaderWindow() {
             data-tauri-drag-region 
             className="h-10 w-full bg-primary sticky top-0 text-primary-foreground flex items-center justify-between"
         >
-            <FunctionsGroup />
+            {!isHome && <FunctionsGroup />}
             <span className="absolute left-1/2 -translate-x-1/2 text-sm pointer-events-none" aria-hidden>
                 {title}
             </span>
