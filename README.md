@@ -1,40 +1,57 @@
+# Hylozoa UI
+Tauri-based desktop editor built with **React**, **TypeScript** and **Vite**.
+
+This application is the **editor UI** for the Hylozoa game engine.  
+The engine itself is a native binary and is **not part of this repository**.
+
+---
+
+## Tech Stack
+
+- **Tauri** (Rust backend)
+- **React**
+- **TypeScript**
+- **Vite**
+
+---
+
+## Prerequisites
+
+### General
+- **Node.js** ≥ 18
+- **npm** ≥ 9
+- **Rust** (stable)
+
+
+### Tauri Requirements
+- **Cargo** (comes with Rust)
+- **Rust toolchain** with the following components:
+  - `cargo`
+  - `rustc`
+  - `cargo-tauri`
+  - `tauri-cli`
+- **Platform-specific dependencies**: see the [Tauri documentation](https://tauri.app/v1/guides/getting-started/prerequisites) for details.
+
+
+### How to start
+1. Clone the repository:
+   ```bash
+   git clone
+    ```
+2. Navigate to the project directory:
+   ```bash
+   cd hylozoa-ui
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the development server:
+   ```bash
+   npm run tauri dev
+   ```
 # Hylozoa Engine (UI)
 
-## Dependencies 
-- [Nix](https://nixos.org/download/)
-  - Follow the instructions from the official website **OR** follow the steps used by our github actions workflows !
-  - Nix runs the developer environment by managing variables and installing dependencies.
-- Optional: [nix-direnv](https://github.com/nix-community/nix-direnv)
-  - The recommand install requires [home-manager](https://nix-community.github.io/home-manager/index.xhtml#ch-installation).
-  - Call nix to load the dev environment when `cd`ing into the cloned repository's folder
-  
-### That's it! Nix handles everything else, no matter the OS!  
-
-## Getting started
-- Run `direnv allow` _or `nix-shell`_ and wait for Nix to configure the environment.
-- If is not working, run `eval "$(direnv hook bash)"` or `eval "$(direnv hook zsh)"` in your terminal and try again.
-- You now have access to the specific versions of the tools we use, only within this directory !
-
-> [!TIP]
-> Run `just help` to see the list of helper command available on this repository. Courtesy of [just](https://github.com/casey/just).  
-> These should cover all your needs.
------
-## To keep in mind
-Here are the rules and tips to be aware of when working on this repository.  
-
------
-### Pulling the Engine
-The `shell.nix` file has an environment variable named `HYLOZOA_ENGINE_GIT_TAG`.  
-This variable is read by the cmakes and defines what version of the engine will be pulled.  
-``` nix
-  ...
-# Env variables bellow
-  CXX = "clang++";
-  HYLOZOA_ENGINE_GIT_TAG = "dev"; #<- Change this
-  ...
-```
-> [!TIP]
-> This tag can be a branch (`main`), a commit hash (`79cfa54db154e5c8189c596e6eac56ab78ba6891`) or a release tag (`release-1.2.3`).
 
 -----
 ### Common submodule
