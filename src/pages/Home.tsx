@@ -20,6 +20,49 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
+import { open } from "@tauri-apps/plugin-dialog";
+import { invoke } from "@tauri-apps/api/core";
+import { useState } from "react";
+import { Import } from "lucide-react";
+
+
+type FileEntry = {
+  name: string;
+  path: string;
+  is_dir: boolean;
+  children?: FileEntry[];
+};
+
+
+
+function ImportFolderButton() {
+    const [folderContent, setFolderContent] = useState<FileEntry | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    async function openFolder() {
+        try {
+            const selected = await open({
+                directory: true,
+                multiple: false,
+            });
+            if (!selected) {
+                return;
+            }
+            const content = await invoke<FileEntry>('read_dir_recursively', { path : selected });
+            setFolderContent(content);
+            setError(null);
+        } catch (error) {
+        setError(error instanceof Error ? error.message : String(error));
+        }
+    }
+    return ( 
+        <Button onClick={openFolder}>
+            <FaFolderOpen/>
+            Import
+            {error && <p className="text-red-600">{error}</p>}
+        </Button>
+    );
+}
 
 interface ProjectCardProps {
     name: string;
@@ -83,10 +126,7 @@ export default function Home() {
           <FaPlus/>
           Create
         </Button>
-        <Button>
-          <FaFolderOpen/>
-          Import
-        </Button>
+        <ImportFolderButton />
         <Input placeholder="Search" />
         <div className="flex items-center gap-1">
           <Label className="text-sm">
