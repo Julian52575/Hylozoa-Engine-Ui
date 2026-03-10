@@ -15,7 +15,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 
-export default function Editor() {
+export default function EditorPage() {
     return (
     <div className="h-svh w-svw flex flex-col">
         <HeaderWindow isHome={false}/>

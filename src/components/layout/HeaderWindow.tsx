@@ -168,8 +168,11 @@ function FunctionsGroup() {
 }
         
             
+type headerWindowProps = {
+    isHome?: boolean;
+}
 
-export function HeaderWindow({isHome = false}: {isHome: boolean}) {
+export function HeaderWindow({isHome = false}: headerWindowProps) {
     if (!isTauri()) {
         return null;
     }

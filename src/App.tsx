@@ -1,48 +1,16 @@
-import CytoscapeComponent from 'react-cytoscapejs';
 import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { Routes, Route } from 'react-router-dom';
 
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import Home from "@/pages/Home";
-import Editor from "@/pages/Editor";
 import { Button } from "@/components/ui/button";
 import { useEngineStore,serializeEngineState } from "@/store/engineStore";
 import { save } from '@tauri-apps/plugin-dialog';
 
+import GraphPage from './pages/Graph';
+import HomePage from './pages/Home';
+import EditorPage from '@/pages/Editor';
 
-const GraphComponent = () => {
-  const elements = [
-    { data: { id: 'one', label: 'Node 1', color: '#4A90E2' }, position: { x: 0, y: 0 } },
-    { data: { id: 'two', label: 'Node 2', color: '#50E3C2' }, position: { x: 100, y: 0 } },
-    { data: { source: 'one', target: 'two', label: 'Edge from Node1 to Node2' } }
-  ];
-
-  const stylesheet = [
-    {
-      selector: 'node',
-      style: {
-        'background-color': 'data(color)',
-        'label': 'data(label)'
-      }
-    },
-    {
-      selector: 'edge',
-      style: {
-        'width': 1,
-        'line-color': '#A0A0A0'
-      }
-    }
-  ];
-  return (
-    <CytoscapeComponent
-        elements={elements}
-        style={{ width: '100%', height: '100%' }}
-        stylesheet={stylesheet}
-        layout={{ name: 'preset' }}
-      />
-  );
-};
 
 
 function Temp() {
@@ -123,31 +91,13 @@ const OpenWindowButton = () => {
   );
 };
 
-function GraphWindow() {
-  return (
-    <main className="h-screen w-full">
-      <GraphComponent />
-    </main>
-  );
-}
-
-
-
-function Main(){
-  return (
-    <main className="h-screen w-full flex items-center justify-center">
-      <OpenWindowButton />
-    </main>
-  )
-}
-
 function App() {
   
   return (
     <Routes>
-      <Route index element={<Home />} />
-      <Route path="/graph" element={<GraphWindow />} />
-      <Route path="/editor" element={<Editor />} />
+      <Route index element={<HomePage />} />
+      <Route path="/graph" element={<GraphPage />} />
+      <Route path="/editor" element={<EditorPage />} />
     </Routes>
   );
 }
