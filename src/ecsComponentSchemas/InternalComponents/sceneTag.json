@@ -1,0 +1,16 @@
+{
+    "type": "sceneTag",
+    "label": "Scene Tag",
+    "properties": {
+        "sceneName" : {
+            "type": "string",
+            "label": "Scene Name",
+            "default": ""
+        },
+        "sceneID" : {
+            "type": "number",
+            "label": "Scene ID",
+            "default": -1
+        }
+    }
+}

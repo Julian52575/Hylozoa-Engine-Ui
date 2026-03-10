@@ -1,0 +1,21 @@
+{
+    "type": "localTransform",
+    "label": "Local Transform",
+    "properties": {
+        "position": {
+            "type": "vector2",
+            "label": "Position",
+            "default": { "x": 0, "y": 0 }
+        },
+        "scale": {
+            "type": "vector2",
+            "label": "Scale",
+            "default": { "x": 1, "y": 1 }
+        },
+        "rotation": {
+            "type": "number",
+            "label": "Rotation",
+            "default": 0
+        }
+    }
+}

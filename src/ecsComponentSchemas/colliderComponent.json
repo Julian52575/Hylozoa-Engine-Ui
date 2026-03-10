@@ -1,0 +1,51 @@
+{
+    "type": "collider",
+    "label": "Base Collider",
+    "properties" : {
+        "density" : {
+            "type" : "number",
+            "label" : "Density",
+            "default" : 1
+        },
+        "friction" : {
+            "type" : "number",
+            "label" : "Friction",
+            "default" : 0.6
+        },
+        "restitution" : {
+            "type" : "number",
+            "label" : "Restitution",
+            "default" : 0
+        },
+        "rollingResistance" : {
+            "type" : "number",
+            "label" : "Rolling Resistance",
+            "default" : 0
+        },
+        "tangentSpeed" : {
+            "type" : "number",
+            "label" : "Tangent Speed",
+            "default" : 0
+        },
+        "isSensor" : {
+            "type" : "boolean",
+            "label" : "Is Sensor",
+            "default" : false
+        },
+        "enableContactEvents" : {
+            "type" : "boolean",
+            "label" : "Enable Contact Events",
+            "default" : false
+        },
+        "enableSensorEvents" : {
+            "type" : "boolean",
+            "label" : "Enable Sensor Events",
+            "default" : false
+        },
+        "enableHitEvents" : {
+            "type" : "boolean",
+            "label" : "Enable Hit Events",
+            "default" : false
+        }
+    }
+}
