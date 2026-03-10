@@ -23,7 +23,6 @@ import { useNavigate } from "react-router-dom";
 import { open } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
 import { useState } from "react";
-import { Import } from "lucide-react";
 
 
 type FileEntry = {
