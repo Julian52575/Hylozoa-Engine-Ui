@@ -1,13 +1,13 @@
 
-import { HeaderWindow } from "@/components/layout/HeaderWindow";
+import { HeaderWindow } from "@/components/HeaderWindow";
 
-import {Hierarchie} from "@/components/layout/Hierarchie";
-import {FolderDisplayer} from "@/components/layout/FolderDisplayer";
-import { ConsoleDisplayer } from "@/components/layout/ConsoleDisplayer";
-import { MainScene } from "@/components/layout/MainScene";
-import { Inspector } from "@/components/layout/Inspector";
-import { Toolbar } from "@/components/layout/Toolbar";
-import { Viewport } from "@/components/layout/Viewport";
+import {Hierarchie} from "@/components/editor/Hierarchie";
+import {FolderDisplayer} from "@/components/editor/FolderDisplayer";
+import { ConsoleDisplayer } from "@/components/editor/ConsoleDisplayer";
+import { MainScene } from "@/components/editor/MainScene";
+import { Inspector } from "@/components/editor/Inspector";
+import { Toolbar } from "@/components/editor/Toolbar";
+import { Viewport } from "@/components/editor/Viewport";
 
 import {
   ResizableHandle,

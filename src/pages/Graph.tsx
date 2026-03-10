@@ -1,5 +1,5 @@
-import GraphComponent from "@/components/layout/Graph";
-import { HeaderWindow } from "@/components/layout/HeaderWindow";
+import GraphComponent from "@/components/graph";
+import { HeaderWindow } from "@/components/HeaderWindow";
 
 export default function GraphPage() {
     return (

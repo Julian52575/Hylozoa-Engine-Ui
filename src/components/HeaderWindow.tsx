@@ -23,7 +23,7 @@ import {
 
 import { isTauri } from "@tauri-apps/api/core";
 
-import Logo from "../../assets/logo.webp";
+import Logo from "../assets/logo.webp";
 
 function ButtonsWindowHandler() {
     const appWindow = getCurrentWindow();
