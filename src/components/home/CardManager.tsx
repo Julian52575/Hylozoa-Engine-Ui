@@ -61,6 +61,11 @@ export function CardContainer({
 }: CardContainerProps) {
     return (
         <div className="flex-[0.85] overflow-auto flex flex-col gap-1 p-4">
+            {projects.length === 0 && (
+                <div className="flex-1 flex flex-col items-center justify-center gap-4">
+                    <span className="text-lg text-zinc-600">Sorry, you have no projects with this name.</span>
+                </div>
+            )}
             {projects.map((project) => (
                 <ProjectCard 
                     key={project.folderPath} 
@@ -69,6 +74,7 @@ export function CardContainer({
                     isSelected={projectSelected?.folderPath === project.folderPath}
                 />
             ))}
+            
         </div>
     );
 }

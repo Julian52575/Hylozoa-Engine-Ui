@@ -58,14 +58,20 @@ export function Home({
     };
 
     return (
-        <div>
+        <div className="flex-1 overflow-hidden">
             <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} sortOption={sortOption} setSortOption={setSortOption} />
-            <div className="flex-1 flex flex-row">
-                <CardContainer 
-                    projects={sortedProjects} 
-                    projectSelected={projectSelected} 
-                    setProjectSelected={setProjectSelected} 
-                />
+            <div className="flex-1 h-full flex flex-row">
+                {projects.length === 0 ? (
+                    <div className="flex-1 flex flex-col items-center justify-center gap-4">
+                        <span className="text-lg text-zinc-600">No projects found. Create or import a project to get started.</span>
+                    </div>
+                ) : (
+                    <CardContainer 
+                        projects={sortedProjects} 
+                        projectSelected={projectSelected} 
+                        setProjectSelected={setProjectSelected} 
+                    />
+                )}
                 <ButtonsContainer 
                     onEditProject={handleProjectClick}
                     onRemoveProject={handleRemoveProject}
