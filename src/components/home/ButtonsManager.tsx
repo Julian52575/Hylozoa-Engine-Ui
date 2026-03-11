@@ -25,9 +25,13 @@ function ButtonAction({
 
 export default function ButtonsContainer({
     onEditProject,
+    onPlayProject,
+    onRenameProject,
     onRemoveProject,
 } : {
     onEditProject?: () => void;
+    onPlayProject?: () => void;
+    onRenameProject?: () => void;
     onRemoveProject?: () => void;
 }) {
     return (
@@ -40,10 +44,12 @@ export default function ButtonsContainer({
             <ButtonAction
                 icon={FaPlay}
                 label="Run"
+                onClick={onPlayProject}
             />
             <ButtonAction
                 icon={LuTextCursor}
                 label="Rename"
+                onClick={onRenameProject}
             />
             <ButtonAction
                 icon={FaTrash}
