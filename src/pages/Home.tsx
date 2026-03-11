@@ -51,6 +51,7 @@ import {
 
 
 function ImportFolderButton() {
+    const projectStore = useProjectStore();
 
     async function openProject() {
         try {
@@ -64,7 +65,21 @@ function ImportFolderButton() {
             if (!selected) {
                 return;
             }
-            // setPath(selected);
+            const name = selected.split("/").pop()?.replace(".hlz", "") || "Imported Project";
+            const path = selected.split("/").slice(0, -1).join("/");
+            if (projectStore.projects.map(p => p.folderPath).includes(path)) {
+              toast.error("This projet folder is already imported.");
+              return;
+            }
+            const newProject: Project = {
+              name: name,
+              folderPath: path,
+              version: "1.0.0",
+              modifiedDate: new Date(),
+              logo: "assets/logo.webp",
+              isFavorite: false,
+            };
+            projectStore.addProject(newProject);
             toast.success("Project file selected successfully.");
         } catch (error) {
             toast.error("Failed to open project file.");
