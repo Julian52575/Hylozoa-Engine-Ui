@@ -23,8 +23,6 @@ import {
 
 import { isTauri } from "@tauri-apps/api/core";
 
-import Logo from "../assets/logo.webp";
-
 function ButtonsWindowHandler() {
     const appWindow = getCurrentWindow();
     const [isMaximized, setIsMaximized] = useState(false);
@@ -156,13 +154,17 @@ function ProjectsMenuGroup() {
 }
 
 
-function FunctionsGroup() {
+function FunctionsGroup({ isHome }: { isHome: boolean }) {
     return (
         <Menubar className="w-72 bg-transparent border-0">
-            <img src={Logo} alt="App Logo" className="size-6 m-2 select-none pointer-events-none" />
-            <FileMenuGroup />
-            <WindowsMenuGroup />
-            <ProjectsMenuGroup />
+            <img src={"assets/logo.webp"} alt="App Logo" className="size-6 m-2 select-none pointer-events-none" />
+            {!isHome && 
+                <div className="flex">
+                    <FileMenuGroup />
+                    <WindowsMenuGroup />
+                    <ProjectsMenuGroup />
+                </div>
+            }
         </Menubar>
     )
 }
@@ -193,7 +195,7 @@ export function HeaderWindow({isHome = false}: headerWindowProps) {
             data-tauri-drag-region 
             className="h-10 w-full bg-primary sticky top-0 text-primary-foreground flex items-center justify-between"
         >
-            {!isHome && <FunctionsGroup />}
+            <FunctionsGroup isHome={isHome} />
             <span className="absolute left-1/2 -translate-x-1/2 text-sm pointer-events-none" aria-hidden>
                 {title}
             </span>
