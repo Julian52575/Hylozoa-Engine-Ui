@@ -20,7 +20,7 @@ export function ProjectCard({
       `} 
       onClick={() => onClick(project)}
     >
-      <FaStar className="inline w-5" color={project.isFavorite ? "gold" : "gray"} />
+      <FaStar className={`inline hover:text-yellow-500 ${project.isFavorite ? "text-yellow-500" : "text-gray-500"}`} />
       <img
         src={project.logo}
         alt="Project Thumbnail"
