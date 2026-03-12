@@ -10,6 +10,8 @@ import { save } from '@tauri-apps/plugin-dialog';
 import GraphPage from './pages/Graph';
 import HomePage from './pages/Home';
 import EditorPage from '@/pages/Editor';
+import { useSchemaStore } from './store/useSchemaStore';
+import { useEffect } from 'react';
 
 
 function Temp() {
@@ -30,7 +32,7 @@ function Temp() {
     }
     const randomSceneId = listScenesId[Math.floor(Math.random() * listScenesId.length)];
     const entityId = (Math.random() * 10000).toFixed(0);
-    engineStore.addEntity(randomSceneId, { id: entityId, name: `Entity ${entityId}`, components: [] });
+    engineStore.addEntityToScene(randomSceneId, { id: entityId, name: `Entity ${entityId}`, type: "default", components: {} });
     alert(`Added Entity with ID: ${entityId} to Scene ID: ${randomSceneId}`);
   }
 
@@ -91,12 +93,26 @@ const OpenWindowButton = () => {
 };
 
 function App() {
+  const loadSchemas = useSchemaStore((s) => s.loadSchemas);
   
+  useEffect(() => {
+    loadSchemas();
+  }, [loadSchemas]);
+  
+  // Temporary code to add a scene and an entity for testing purposes
+  const engineStore = useEngineStore();
+  useEffect(() => {
+    engineStore.addScene("1", "Scene 1");
+    engineStore.addEntityToScene("1", { id: "entity-1", name: "Entity 1", type: "node", components: {} });
+  }, []);
+
+
+
   return (
     <Routes>
-      <Route index element={<HomePage />} />
+      <Route path='/home' element={<HomePage />} />
       <Route path="/graph" element={<GraphPage />} />
-      <Route path="/editor" element={<EditorPage />} />
+      <Route index element={<EditorPage />} />
     </Routes>
   );
 }

@@ -2,10 +2,18 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
-interface Entity {
+export interface Component {
     id: string;
     name: string;
-    components:any[];
+    type: string;
+    props: Record<string, any>;
+}
+
+export interface Entity {
+    id: string;
+    name: string;
+    type: string;
+    components: Record<string, Component>;
 }
 
 interface SceneState {
@@ -21,8 +29,10 @@ interface EngineState {
 
     addScene: (id:string, name: string) => void;
     removeScene: (id:string) => void;
-    addEntity: (sceneId: string, entity: Entity) => void;
-    removeEntity: (sceneId: string, entityId: string) => void;
+    addEntityToScene: (sceneId: string, entity: Entity) => void;
+    removeEntityFromScene: (sceneId: string, entityId: string) => void;
+    addComponentToEntity: (sceneId: string, entityId: string, component: Component) => void;
+    removeComponentFromEntity: (sceneId: string, entityId: string, componentId: string) => void;
 }
 
 
@@ -49,6 +59,7 @@ export const loadEngineState = (data: any): void => {
             entities[entityData.id] = {
                 id: entityData.id,
                 name: entityData.name,
+                type: entityData.type,
                 components: entityData.components,
             };
         });
@@ -74,7 +85,7 @@ export const useEngineStore = create<EngineState>()(
                     state.scenes[id] = { id, name, entities: {} };
                     state.currentSceneId = id;
                 }),
-            addEntity: (sceneId: string, entity: Entity) => 
+            addEntityToScene: (sceneId: string, entity: Entity) => 
                 set((state: EngineState) => {
                     const scene = state.scenes[sceneId];
                     if (scene) {
@@ -89,11 +100,31 @@ export const useEngineStore = create<EngineState>()(
                         state.currentSceneId = remainingIds.length > 0 ? remainingIds[0] : null;
                     }
                 }),
-            removeEntity: (sceneId: string, entityId: string) => 
+            removeEntityFromScene: (sceneId: string, entityId: string) => 
                 set((state: EngineState) => {
                     const scene = state.scenes[sceneId];
                     if (scene) {
                         delete scene.entities[entityId];
+                    }
+                }),
+            addComponentToEntity: (sceneId: string, entityId: string, component: Component) => 
+                set((state: EngineState) => {
+                    const scene = state.scenes[sceneId];
+                    if (scene) {
+                        const entity = scene.entities[entityId];
+                        if (entity) {
+                            entity.components[component.id] = component;
+                        }
+                    }
+                }),
+            removeComponentFromEntity: (sceneId: string, entityId: string, componentId: string) => 
+                set((state: EngineState) => {
+                    const scene = state.scenes[sceneId];
+                    if (scene) {
+                        const entity = scene.entities[entityId];
+                        if (entity) {
+                            delete entity.components[componentId];
+                        }
                     }
                 }),
         })),

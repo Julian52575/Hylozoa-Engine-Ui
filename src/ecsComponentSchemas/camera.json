@@ -19,7 +19,7 @@
             "default": false
         },
         "text": {
-            "type": "string",
+            "type": "text",
             "label": "Text Mode",
             "default": "none"
         },
