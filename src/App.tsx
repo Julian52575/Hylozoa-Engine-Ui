@@ -94,17 +94,18 @@ const OpenWindowButton = () => {
 
 function App() {
   const loadSchemas = useSchemaStore((s) => s.loadSchemas);
+  const addScene = useEngineStore((s) => s.addScene);
+  const addEntityToScene = useEngineStore((s) => s.addEntityToScene);
   
   useEffect(() => {
     loadSchemas();
   }, [loadSchemas]);
   
   // Temporary code to add a scene and an entity for testing purposes
-  const engineStore = useEngineStore();
   useEffect(() => {
-    engineStore.addScene("1", "Scene 1");
-    engineStore.addEntityToScene("1", { id: "entity-1", name: "Entity 1", type: "node", components: {} });
-  }, []);
+    addScene("1", "Scene 1");
+    addEntityToScene("1", { id: "entity-1", name: "Entity 1", type: "node", components: {} });
+  }, [addScene, addEntityToScene]);
 
 
 

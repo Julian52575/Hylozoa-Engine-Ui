@@ -1,51 +1,26 @@
 {
     "type": "collider",
     "label": "Base Collider",
-    "properties" : {
-        "density" : {
-            "type" : "number",
-            "label" : "Density",
-            "default" : 1
-        },
-        "friction" : {
-            "type" : "number",
-            "label" : "Friction",
-            "default" : 0.6
-        },
-        "restitution" : {
-            "type" : "number",
-            "label" : "Restitution",
-            "default" : 0
-        },
-        "rollingResistance" : {
-            "type" : "number",
-            "label" : "Rolling Resistance",
-            "default" : 0
-        },
-        "tangentSpeed" : {
-            "type" : "number",
-            "label" : "Tangent Speed",
-            "default" : 0
-        },
-        "isSensor" : {
-            "type" : "boolean",
-            "label" : "Is Sensor",
-            "default" : false
-        },
-        "enableContactEvents" : {
-            "type" : "boolean",
-            "label" : "Enable Contact Events",
-            "default" : false
-        },
-        "enableSensorEvents" : {
-            "type" : "boolean",
-            "label" : "Enable Sensor Events",
-            "default" : false
-        },
-        "enableHitEvents" : {
-            "type" : "boolean",
-            "label" : "Enable Hit Events",
-            "default" : false
-        }
+    "schema":{
+        "density" : { "type" : "number", "label" : "Density" },
+        "friction" : { "type" : "number", "label" : "Friction" },
+        "restitution" : { "type" : "number", "label" : "Restitution" },
+        "rollingResistance" : { "type" : "number", "label" : "Rolling Resistance" },
+        "tangentSpeed" : { "type" : "number", "label" : "Tangent Speed" },
+        "isSensor" : { "type" : "boolean", "label" : "Is Sensor" },
+        "enableContactEvents" : { "type" : "boolean", "label" : "Enable Contact Events" },
+        "enableSensorEvents" : { "type" : "boolean", "label" : "Enable Sensor Events" },
+        "enableHitEvents" : { "type" : "boolean", "label" : "Enable Hit Events" }
+    },
+    "values": {
+        "density" : 1,
+        "friction" : 0.6,
+        "restitution" : 0,
+        "rollingResistance" : 0,
+        "tangentSpeed" : 0,
+        "isSensor" : false,
+        "enableContactEvents" : false,
+        "enableSensorEvents" : false,
+        "enableHitEvents" : false
     }
 }

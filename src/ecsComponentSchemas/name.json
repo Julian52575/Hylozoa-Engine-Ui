@@ -1,11 +1,10 @@
 {
     "type" : "name",
     "label" : "Name",
-    "properties" : {
-        "value" : {
-            "type" : "string",
-            "label" : "Value",
-            "default" : "New Entity"
-        }
+    "schema": {
+        "value" : {"type": "string", "label": "Value"}
+    },
+    "values": {
+        "value": "New Entity"
     }
 }

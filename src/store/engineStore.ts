@@ -1,136 +1,183 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 
 export interface Component {
-    id: string;
-    name: string;
-    type: string;
-    props: Record<string, any>;
+  id: string;
+  name: string;
+  type: string;
+  props: Record<string, any>;
 }
 
 export interface Entity {
-    id: string;
-    name: string;
-    type: string;
-    components: Record<string, Component>;
+  id: string;
+  name: string;
+  type: string;
+  components: Record<string, Component>;
 }
 
 interface SceneState {
-    id: string;
-    name: string;
-    entities: Record<string, Entity>;
+  id: string;
+  name: string;
+  entities: Record<string, Entity>;
 }
 
 interface EngineState {
-    version: string;
-    scenes: Record<string, SceneState>;
-    currentSceneId: string | null;
+  version: string;
+  scenes: Record<string, SceneState>;
+  currentSceneId: string | null;
 
-    addScene: (id:string, name: string) => void;
-    removeScene: (id:string) => void;
-    addEntityToScene: (sceneId: string, entity: Entity) => void;
-    removeEntityFromScene: (sceneId: string, entityId: string) => void;
-    addComponentToEntity: (sceneId: string, entityId: string, component: Component) => void;
-    removeComponentFromEntity: (sceneId: string, entityId: string, componentId: string) => void;
+  addScene: (id: string, name: string) => void;
+  removeScene: (id: string) => void;
+  addEntityToScene: (sceneId: string, entity: Entity) => void;
+  removeEntityFromScene: (sceneId: string, entityId: string) => void;
+  addComponentToEntity: (
+    sceneId: string,
+    entityId: string,
+    component: Component,
+  ) => void;
+  removeComponentFromEntity: (
+    sceneId: string,
+    entityId: string,
+    componentId: string,
+  ) => void;
+  updateComponentProps: (
+    sceneId: string,
+    entityId: string,
+    componentId: string,
+    newProps: Record<string, any>,
+  ) => void;
 }
 
-
 export const serializeEngineState = (state: EngineState): object => {
-    return {
-        version: state.version,
-        scenes : Object.values(state.scenes).map(scene => ({
-            id: scene.id,
-            name: scene.name,
-            Entities: Object.values(scene.entities).map(entity => ({
-                id: entity.id,
-                name: entity.name,
-                components: entity.components,
-            })),
-        }))
-    };
+  return {
+    version: state.version,
+    scenes: Object.values(state.scenes).map((scene) => ({
+      id: scene.id,
+      name: scene.name,
+      Entities: Object.values(scene.entities).map((entity) => ({
+        id: entity.id,
+        name: entity.name,
+        components: entity.components,
+      })),
+    })),
+  };
 };
 
 export const loadEngineState = (data: any): void => {
-    const scenes: Record<string, SceneState> = {};
-    data.scenes.forEach((sceneData: any) => {
-        const entities: Record<string, Entity> = {};
-        sceneData.Entities.forEach((entityData: any) => {
-            entities[entityData.id] = {
-                id: entityData.id,
-                name: entityData.name,
-                type: entityData.type,
-                components: entityData.components,
-            };
-        });
-        scenes[sceneData.id] = {
-            ...sceneData,
-            entities,
-        };
+  const scenes: Record<string, SceneState> = {};
+  data.scenes.forEach((sceneData: any) => {
+    const entities: Record<string, Entity> = {};
+    sceneData.Entities.forEach((entityData: any) => {
+      entities[entityData.id] = {
+        id: entityData.id,
+        name: entityData.name,
+        type: entityData.type,
+        components: entityData.components,
+      };
     });
-    useEngineStore.setState({
-        version: data.version,
-        scenes
-    });
+    scenes[sceneData.id] = {
+      ...sceneData,
+      entities,
+    };
+  });
+  useEngineStore.setState({
+    version: data.version,
+    scenes,
+  });
 };
 export const useEngineStore = create<EngineState>()(
-    persist(
-        immer((set, _) => ({
-            version: "1.0.0",
-            scenes: {},
-            currentSceneId: null,
+  persist(
+    immer((set, _) => ({
+      version: "1.0.0",
+      scenes: {},
+      currentSceneId: null,
 
-            addScene: (id : string, name: string) => 
-                set((state: EngineState) => {
-                    state.scenes[id] = { id, name, entities: {} };
-                    state.currentSceneId = id;
-                }),
-            addEntityToScene: (sceneId: string, entity: Entity) => 
-                set((state: EngineState) => {
-                    const scene = state.scenes[sceneId];
-                    if (scene) {
-                        scene.entities[entity.id] = entity;
-                    }
-                }),
-            removeScene: (id : string) => 
-                set((state: EngineState) => {
-                    delete state.scenes[id];
-                    if (state.currentSceneId === id) {
-                        const remainingIds = Object.keys(state.scenes);
-                        state.currentSceneId = remainingIds.length > 0 ? remainingIds[0] : null;
-                    }
-                }),
-            removeEntityFromScene: (sceneId: string, entityId: string) => 
-                set((state: EngineState) => {
-                    const scene = state.scenes[sceneId];
-                    if (scene) {
-                        delete scene.entities[entityId];
-                    }
-                }),
-            addComponentToEntity: (sceneId: string, entityId: string, component: Component) => 
-                set((state: EngineState) => {
-                    const scene = state.scenes[sceneId];
-                    if (scene) {
-                        const entity = scene.entities[entityId];
-                        if (entity) {
-                            entity.components[component.id] = component;
-                        }
-                    }
-                }),
-            removeComponentFromEntity: (sceneId: string, entityId: string, componentId: string) => 
-                set((state: EngineState) => {
-                    const scene = state.scenes[sceneId];
-                    if (scene) {
-                        const entity = scene.entities[entityId];
-                        if (entity) {
-                            delete entity.components[componentId];
-                        }
-                    }
-                }),
-        })),
-        {
-            name: 'engine-storage',
-        }
-    )
+      addScene: (id: string, name: string) =>
+        set((state: EngineState) => {
+          state.scenes[id] = { id, name, entities: {} };
+          state.currentSceneId = id;
+        }),
+      addEntityToScene: (sceneId: string, entity: Entity) =>
+        set((state: EngineState) => {
+          const scene = state.scenes[sceneId];
+          if (scene) {
+            scene.entities[entity.id] = entity;
+          }
+        }),
+      removeScene: (id: string) =>
+        set((state: EngineState) => {
+          delete state.scenes[id];
+          if (state.currentSceneId === id) {
+            const remainingIds = Object.keys(state.scenes);
+            state.currentSceneId =
+              remainingIds.length > 0 ? remainingIds[0] : null;
+          }
+        }),
+      removeEntityFromScene: (sceneId: string, entityId: string) =>
+        set((state: EngineState) => {
+          const scene = state.scenes[sceneId];
+          if (scene) {
+            delete scene.entities[entityId];
+          }
+        }),
+      addComponentToEntity: (
+        sceneId: string,
+        entityId: string,
+        component: Component,
+      ) =>
+        set((state: EngineState) => {
+          const scene = state.scenes[sceneId];
+          if (scene) {
+            const entity = scene.entities[entityId];
+            if (entity) {
+              entity.components[component.id] = component;
+            }
+          }
+        }),
+      removeComponentFromEntity: (
+        sceneId: string,
+        entityId: string,
+        componentId: string,
+      ) =>
+        set((state: EngineState) => {
+          const scene = state.scenes[sceneId];
+          if (scene) {
+            const entity = scene.entities[entityId];
+            if (entity) {
+              delete entity.components[componentId];
+            }
+          }
+        }),
+      updateComponentProps: (
+        sceneId: string,
+        entityId: string,
+        componentId: string,
+        newProps: Record<string, any>,
+      ) =>
+        set((state: EngineState) => {
+          console.log(`Updating props`);
+          const scene = state.scenes[sceneId];
+          if (scene) {
+            console.log(`Found scene ${sceneId}`);
+            const entity = scene.entities[entityId];
+            if (entity) {
+              console.log(`Found entity ${entityId}`);
+              const component = entity.components[componentId];
+              if (component) {
+                console.log(`Found component ${componentId}`);
+                component.props = { ...component.props, ...newProps };
+                console.log(
+                  `Updated props for component ${componentId} of entity ${entityId} in scene ${sceneId}`,
+                  component.props,
+                );
+              }
+            }
+          }
+        }),
+    })),
+    {
+      name: "engine-storage",
+    },
+  ),
 );
-

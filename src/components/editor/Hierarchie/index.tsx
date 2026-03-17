@@ -8,26 +8,37 @@ import {
 } from "@/components/ui/context-menu";
 
 import { useSelectionStore } from "@/store/useSelectionStore";
-import { useState } from "react";
 
 import ComponentModal from "./ComponentModal";
 import IconDisplayer from "../IconDisplayer";
 import { useEngineStore } from "@/store/engineStore";
 import { useSchemaStore } from "@/store/useSchemaStore";
+import { Button } from "@/components/ui/button";
+import { useMemo } from "react";
 
 type NodeData = {
   id: string;
   name: string;
-  type: string; // e.g. "camera", "light", "mesh", etc.
-  children?: NodeData[]; // Optional for leaf nodes
+  type: string;
+  children?: NodeData[];
 };
 
 function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
+  const isSelected = useSelectionStore(
+    (state) => state.selectedComponentId === node.data.id,
+  );
   const handleNodeClick = () => {
     if (node.isLeaf) {
       useSelectionStore.getState().selectComponent(node.data.id);
-
-      //Temporary code to select entity if it's a leaf node (to be removed when we can select components in the inspector)
+      if (node.parent && node.parent.data.type === "entity") {
+        useSelectionStore.getState().selectEntity(node.parent.data.id);
+      } else {
+        useSelectionStore.getState().selectEntity(null);
+      }
+    }
+    else {
+        useSelectionStore.getState().selectEntity(node.data.id);
+        useSelectionStore.getState().selectComponent(null);
     }
   };
 
@@ -53,13 +64,13 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
               className="cursor-pointer"
             />
           )}
-          <IconDisplayer type={node.data.type} size={12} />
+          <IconDisplayer type={node.data.type} size={14} />
           <div
             className={`
-                            font-normal text-sm px-1 py-0.5 rounded-md
-                            hover:bg-primary/10 hover:cursor-pointer
-                            ${useSelectionStore.getState().selectedComponentId === node.data.id ? "bg-gray-200" : "bg-transparent"}
-                        `}
+                font-normal text-sm px-1 py-0.5 rounded-md
+                hover:bg-primary/10 hover:cursor-pointer
+                ${isSelected ? "bg-gray-200" : "bg-transparent"}
+            `}
             onClick={handleNodeClick}
           >
             {node.data.name}
@@ -67,103 +78,77 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
         </div>
       </ContextMenuTrigger>
       <ContextMenuContent>
-        <div>{node.data.type} Options</div>
+        {node.data.type === "entity" ? (
+          <ComponentModal
+            onValidate={(componentType) => {
+              const createDefaultComponent = useSchemaStore.getState().createDefaultComponent;
+              const newComponentProps = createDefaultComponent(componentType)?.values || {};
+              useEngineStore
+                .getState()
+                .addComponentToEntity(
+                  useEngineStore.getState().currentSceneId!,
+                  node.data.id,
+                  {
+                    id: `component-${Date.now()}`,
+                    name: componentType,
+                    type: componentType,
+                    props: newComponentProps,
+                  },
+                );              
+              node.open();
+            }}
+          />
+        ) : (
+          <div>{node.data.type} Options</div>
+        )}
       </ContextMenuContent>
     </ContextMenu>
   );
 }
 
 export function Hierarchie() {
-  const engineStore = useEngineStore();
-  const currentSceneId = engineStore.currentSceneId;
-  const currentEntities = currentSceneId
-    ? engineStore.scenes[currentSceneId]?.entities
-    : null;
-  const initialData: NodeData[] = currentEntities
-    ? [Object.values(currentEntities)[0] as NodeData]
-    : [];
-  const [data, setData] = useState<NodeData[]>(() => {
-    if (!initialData || initialData.length === 0) {
-      return [];
-    }
-    const root = {
-      ...initialData[0],
-      children: initialData[0].children || [],
-    };
-    return [root];
-  });
-  useSelectionStore.getState().selectEntity(initialData[0]?.id || null);
+  const currentSceneId = useEngineStore((state) => state.currentSceneId);
+  const entities = useEngineStore((state) =>
+    currentSceneId ? state.scenes[currentSceneId]?.entities : {},
+  );
 
-  const handleAddComponent = (componentType: string) => {
-    const Component: NodeData = {
-      id: `entity-${Date.now()}`,
-      name: componentType,
-      type: componentType,
-    };
-    setData((prev) => {
-      if (prev.length === 0) return [Component];
+  const treeData: NodeData[] = useMemo(() => {
+    if (!currentSceneId) return [];
 
-      const newData = [...prev];
-      const sceneNode = { ...newData[0] };
-      sceneNode.children = [...(sceneNode.children || []), Component];
-      newData[0] = sceneNode;
-      return newData;
+    return Object.values(entities).map((entity) => ({
+      id: entity.id,
+      name: entity.name,
+      type: "entity",
+      children: Object.values(entity.components).map((comp) => ({
+        id: comp.id,
+        name: comp.name,
+        type: comp.type,
+      })),
+    }));
+  }, [entities, currentSceneId]);
+
+  const addEntityToScene = useEngineStore((state) => state.addEntityToScene);
+  const addComponentToEntity = useEngineStore((state) => state.addComponentToEntity);
+
+  const handleAddEntity = () => {
+    const id = `entity-${Date.now()}`;
+    addEntityToScene(currentSceneId!, {
+      id: id,
+      name: `Entity ${Object.keys(useEngineStore.getState().scenes[currentSceneId!].entities).length + 1}`,
+      type: "entity",
+      components: {},
     });
-    const componentSchema =
-      useSchemaStore.getState().schemas[componentType].properties;
-    engineStore.addComponentToEntity(currentSceneId!, initialData[0].id, {
-      id: Component.id,
-      name: Component.name,
-      type: Component.type,
-      props: componentSchema,
-    });
-  };
-
-  const handleMove = ({
-    dragIds,
-    parentId,
-    index,
-  }: {
-    dragIds: string[];
-    parentId: string | null;
-    index: number;
-  }) => {
-    const newData = JSON.parse(JSON.stringify(data));
-    let draggedNode: NodeData | null = null;
-    const removeNode = (list: NodeData[]) => {
-      for (let i = 0; i < list.length; i++) {
-        if (list[i].id === dragIds[0]) {
-          draggedNode = list.splice(i, 1)[0];
-          return true;
-        }
-        if (list[i].children) {
-          if (removeNode(list[i].children!)) return true;
-        }
-      }
-      return false;
-    };
-    removeNode(newData);
-    if (draggedNode) {
-      if (parentId === null) {
-        newData.splice(index, 0, draggedNode);
-      } else {
-        const insertNode = (list: NodeData[]) => {
-          for (let node of list) {
-            if (node.id === parentId) {
-              if (!node.children) node.children = [];
-              node.children.splice(index, 0, draggedNode!);
-              return true;
-            }
-            if (node.children) {
-              if (insertNode(node.children)) return true;
-            }
-          }
-          return false;
-        };
-        insertNode(newData);
-      }
+    const createDefaultComponent = useSchemaStore.getState().createDefaultComponent;
+    const newTransform = createDefaultComponent('localTransform');
+    if (!newTransform) {
+      console.error("Failed to create default component for localTransform");
     }
-    setData(newData);
+    addComponentToEntity(currentSceneId!, id, {
+      id: `component-${Date.now()}`,
+      name: "localTransform",
+      type: "localTransform",
+      props: newTransform?.values || {},
+    });
   };
 
   return (
@@ -172,13 +157,17 @@ export function Hierarchie() {
       <ContextMenu>
         <ContextMenuTrigger asChild onContextMenu={(e) => e.stopPropagation()}>
           <div className="flex h-full px-2 py-1 overflow-auto">
-            <Tree data={data} onMove={handleMove}>
-              {Node}
-            </Tree>
+            <Tree data={treeData}>{Node}</Tree>
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent>
-          <ComponentModal onValidate={handleAddComponent} />
+          <Button
+            variant={"ghost"}
+            className="cursor-pointer w-full"
+            onClick={handleAddEntity}
+          >
+            Add Entity
+          </Button>
         </ContextMenuContent>
       </ContextMenu>
     </div>

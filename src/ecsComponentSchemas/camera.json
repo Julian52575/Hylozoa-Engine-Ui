@@ -1,52 +1,26 @@
 {
     "type": "camera",
     "label" : "Camera",
-    "properties": {
-        "offset": {
-            "type": "vector2",
-            "label": "Offset",
-            "default": { "x": 0, "y": 1.6}
-        },
-        "anchorMode": {
-            "type": "enum",
-            "label": "Anchor Mode",
-            "options": ["head", "eyes", "body", "feet"],
-            "default": "head"
-        },
-        "ignoreRotation": {
-            "type": "boolean",
-            "label": "Ignore Rotation",
-            "default": false
-        },
-        "text": {
-            "type": "text",
-            "label": "Text Mode",
-            "default": "none"
-        },
-        "viewportSize" : {
-            "type": "vector2",
-            "label": "Viewport Size",
-            "default": { "x": 1920, "y": 1080}
-        },
-        "zoom": {
-            "type": "number",
-            "label": "Zoom",
-            "default": 1
-        },
-        "order" : {
-            "type": "number",
-            "label": "Order",
-            "default": 0
-        },
-        "isUI" : {
-            "type": "boolean",
-            "label": "Is UI",
-            "default": false
-        },
-        "cullingMask": {
-            "type": "number",
-            "label": "Culling Mask - Not correctly serialized for now",
-            "default": 1
-        }
+    "schema":{
+        "offset": { "type": "vector2", "label": "Offset" },
+        "anchorMode": { "type": "enum", "label": "Anchor Mode", "options": ["head", "eyes", "body", "feet"] },
+        "ignoreRotation": { "type": "boolean", "label": "Ignore Rotation" },
+        "text": { "type": "text", "label": "Text Mode" },
+        "viewportSize" : { "type": "vector2", "label": "Viewport Size" },
+        "zoom": { "type": "number", "label": "Zoom" },
+        "order" : { "type": "number", "label": "Order" },
+        "isUI" : { "type": "boolean", "label": "Is UI" },
+        "cullingMask": { "type": "number", "label": "Culling Mask - Not correctly serialized for now" }
+    },
+    "values":{
+        "offset": { "x": 0, "y": 1.6},
+        "anchorMode": "head",
+        "ignoreRotation": false,
+        "text": "none",
+        "viewportSize" : { "x": 1920, "y": 1080},
+        "zoom": 1,
+        "order" : 0,
+        "isUI" : false,
+        "cullingMask": 1
     }
 }
