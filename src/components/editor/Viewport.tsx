@@ -4,7 +4,7 @@ import { RiDragMoveFill } from "react-icons/ri";
 import { TbRotateDot } from "react-icons/tb";
 import { IoMdResize } from "react-icons/io";
 
-export function Viewport() {
+export function ViewportButtons() {
     return (
         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
             <div className="flex items-center justify-start flex-1 pl-4">

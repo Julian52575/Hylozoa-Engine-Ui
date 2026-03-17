@@ -6,7 +6,7 @@ import { ConsoleDisplayer } from "@/components/editor/ConsoleDisplayer";
 import { MainScene } from "@/components/editor/MainScene";
 import { Inspector } from "@/components/editor/Inspector";
 import { Toolbar } from "@/components/editor/Toolbar";
-import { Viewport } from "@/components/editor/Viewport";
+import { ViewportButtons } from "@/components/editor/Viewport";
 
 import {
   ResizableHandle,
@@ -46,7 +46,7 @@ export default function EditorPage() {
                   <Toolbar />
                 </div>
                 <div className="flex-1">
-                  <Viewport />
+                  <ViewportButtons />
                 </div>
               </div>
             </ResizablePanel>
