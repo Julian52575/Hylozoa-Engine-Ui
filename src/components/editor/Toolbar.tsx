@@ -4,18 +4,20 @@ import { FaPlus } from "react-icons/fa";
 import { FaPlay } from "react-icons/fa";
 import { FaStop } from "react-icons/fa";
 import { FaPause } from "react-icons/fa";
+import { useEngineStore } from "@/store/engineStore";
 
 function ScenesDisplayer() {
-  const scenes = ["SampleScene", "AnotherScene"];
+
+  const scenes = useEngineStore().scenes;
 
   return (
     <div className="w-full flex items-end justify-start h-8">
-      {scenes.map((scene) => (
+      {Object.values(scenes).map((scene) => (
         <div
-          key={scene}
+          key={scene.id}
           className="bg-primary/5 px-2 py-1 border-r border-primary/10 flex items-center gap-1 h-full"
         >
-          <span>{scene}</span>
+          <span>{scene.name}</span>
           <IoClose className="cursor-pointer" size={20} color="red" />
         </div>
       ))}

@@ -25,20 +25,11 @@ type NodeData = {
 
 function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
   const isSelected = useSelectionStore(
-    (state) => state.selectedComponentId === node.data.id,
+    (state) => state.selectedEntityId === node.data.id,
   );
   const handleNodeClick = () => {
-    if (node.isLeaf) {
-      useSelectionStore.getState().selectComponent(node.data.id);
-      if (node.parent && node.parent.data.type === "entity") {
-        useSelectionStore.getState().selectEntity(node.parent.data.id);
-      } else {
-        useSelectionStore.getState().selectEntity(null);
-      }
-    }
-    else {
+    if (!node.isLeaf) {
         useSelectionStore.getState().selectEntity(node.data.id);
-        useSelectionStore.getState().selectComponent(null);
     }
   };
 
@@ -86,7 +77,7 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
               useEngineStore
                 .getState()
                 .addComponentToEntity(
-                  useEngineStore.getState().currentSceneId!,
+                  useSelectionStore.getState().selectedSceneId!,
                   node.data.id,
                   {
                     id: `component-${Date.now()}`,
@@ -107,7 +98,7 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
 }
 
 export function Hierarchie() {
-  const currentSceneId = useEngineStore((state) => state.currentSceneId);
+  const currentSceneId = useSelectionStore((state) => state.selectedSceneId);
   const entities = useEngineStore((state) =>
     currentSceneId ? state.scenes[currentSceneId]?.entities : {},
   );
@@ -146,7 +137,7 @@ export function Hierarchie() {
     addComponentToEntity(currentSceneId!, id, {
       id: `component-${Date.now()}`,
       name: "localTransform",
-      type: "localTransform",
+      type: newTransform?.type || "localTransform",
       props: newTransform?.values || {},
     });
   };

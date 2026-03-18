@@ -25,7 +25,6 @@ interface SceneState {
 interface EngineState {
   version: string;
   scenes: Record<string, SceneState>;
-  currentSceneId: string | null;
 
   addScene: (id: string, name: string) => void;
   removeScene: (id: string) => void;
@@ -96,7 +95,6 @@ export const useEngineStore = create<EngineState>()(
       addScene: (id: string, name: string) =>
         set((state: EngineState) => {
           state.scenes[id] = { id, name, entities: {} };
-          state.currentSceneId = id;
         }),
       addEntityToScene: (sceneId: string, entity: Entity) =>
         set((state: EngineState) => {
@@ -108,11 +106,6 @@ export const useEngineStore = create<EngineState>()(
       removeScene: (id: string) =>
         set((state: EngineState) => {
           delete state.scenes[id];
-          if (state.currentSceneId === id) {
-            const remainingIds = Object.keys(state.scenes);
-            state.currentSceneId =
-              remainingIds.length > 0 ? remainingIds[0] : null;
-          }
         }),
       removeEntityFromScene: (sceneId: string, entityId: string) =>
         set((state: EngineState) => {

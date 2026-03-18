@@ -12,6 +12,7 @@ import HomePage from './pages/Home';
 import EditorPage from '@/pages/Editor';
 import { useSchemaStore } from './store/useSchemaStore';
 import { useEffect } from 'react';
+import { useSelectionStore } from './store/useSelectionStore';
 
 
 function Temp() {
@@ -95,7 +96,7 @@ const OpenWindowButton = () => {
 function App() {
   const loadSchemas = useSchemaStore((s) => s.loadSchemas);
   const addScene = useEngineStore((s) => s.addScene);
-  const addEntityToScene = useEngineStore((s) => s.addEntityToScene);
+  const setSelectedSceneId = useSelectionStore((s) => s.selectScene);
   
   useEffect(() => {
     loadSchemas();
@@ -104,8 +105,8 @@ function App() {
   // Temporary code to add a scene and an entity for testing purposes
   useEffect(() => {
     addScene("1", "Scene 1");
-    addEntityToScene("1", { id: "entity-1", name: "Entity 1", type: "node", components: {} });
-  }, [addScene, addEntityToScene]);
+    setSelectedSceneId("1");
+  }, [addScene, setSelectedSceneId]);
 
 
 

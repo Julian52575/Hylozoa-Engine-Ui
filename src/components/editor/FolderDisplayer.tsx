@@ -95,7 +95,6 @@ export function FolderDisplayer({path}: {path: string}) {
           searchMatch={(node, term) =>
             node.data.name.toLowerCase().includes(term.toLowerCase())
           }
-          //   initialData={data}
           data={data}
         >
           {Node}

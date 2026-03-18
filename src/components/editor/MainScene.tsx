@@ -21,8 +21,8 @@ interface EntityProps{
   };
   onClick: (id: string) => void;
   onRegister: (id: string, node: any) => void;
-  handleDragMove?: (e: any) => void;
-  handleDragEnd?: (e: any) => void;
+  onDragMove?: (e: any) => void;
+  onDragEnd?: (e: any) => void;
 }
 
 const Entity = ({
@@ -32,8 +32,8 @@ const Entity = ({
   transform,
   onClick,
   onRegister,
-  handleDragMove,
-  handleDragEnd,
+  onDragMove,
+  onDragEnd,
 }: EntityProps) => {
   const [img, setImg] = useState<HTMLImageElement | undefined>(undefined);
   const [calculatedSize, setCalculatedSize] = useState({ width: 0, height: 0 });
@@ -75,8 +75,8 @@ const Entity = ({
       draggable
       onClick={() => onClick(id)}
       onDragStart={() => {isDragging.current = true}}
-      onDragMove={handleDragMove}
-      onDragEnd={(e) => {isDragging.current = false; handleDragEnd && handleDragEnd(e)}}
+      onDragMove={onDragMove}
+      onDragEnd={(e) => {isDragging.current = false; onDragEnd && onDragEnd(e)}}
 
     />
   );
@@ -116,10 +116,22 @@ function Displayer({
 
   const handleDragEnd = (e: any) => {
     const node = e.target;
+    const entityId = node.id();
+    const sceneId = useSelectionStore.getState().selectedSceneId;
+    if (!sceneId) return;
+
+    const entity = useEngineStore.getState().scenes[sceneId]?.entities[entityId];
+    if (!entity) return;
+
+    const transformComponent = Object.values(entity.components).find(
+      (c) => c.type === "localTransform",
+    );
+    if (!transformComponent) return;
+
     useEngineStore.getState().updateComponentProps(
-      useEngineStore.getState().currentSceneId!,
-      node.id(),
-      "localTransform",
+      sceneId,
+      entityId,
+      transformComponent.id,
       {
         position: { x: node.x(), y: node.y() },
       },
@@ -138,17 +150,19 @@ function Displayer({
       }}
     >
       <Layer>
-        {entities?.map((entity) => (
-          <Entity
-            key={entity.id}
-            id={entity.id}
-            src={Logo}
-            position={entity.components.localTransform?.props.position || { x: 50, y: 50 }}
-            onClick={handleSelection}
-            onRegister={addToRefs}
-            handleDragEnd={handleDragEnd}
-          />
-        ))}
+        {entities?.map((entity) => {
+          const transform = Object.values(entity.components).find((c) => c.type === "localTransform");
+          return (
+            <Entity
+              key={entity.id}
+              id={entity.id}
+              src={Logo}
+              position={transform?.props.position || { x: 50, y: 50 }}
+              onClick={handleSelection}
+              onRegister={addToRefs}
+              onDragEnd={handleDragEnd}
+            />
+        )})}
         {selectedId && <Transformer ref={trRef} />}
       </Layer>
     </Stage>
@@ -173,7 +187,7 @@ export function MainScene() {
     return () => observer.disconnect();
   }, []);
 
-  const currentSceneId = useEngineStore((state) => state.currentSceneId);
+  const currentSceneId = useSelectionStore((state) => state.selectedSceneId);
   const entities = useEngineStore((state) =>
     currentSceneId ? state.scenes[currentSceneId]?.entities : {},
   );

@@ -2,16 +2,21 @@ import { create } from "zustand";
 
 interface SelectionState {
     selectedEntityId: string | null;
-    selectedComponentId: string | null;
+    selectedSceneId: string | null;
+    openComponentIds: string[];
 
+    
     selectEntity: (entityId: string | null) => void;
-    selectComponent: (componentId: string | null) => void;
+    selectScene: (sceneId: string | null) => void;
+    setOpenComponents: (componentIds: string[]) => void;
 }
 
 export const useSelectionStore = create<SelectionState>()((set) => ({
     selectedEntityId: null,
-    selectedComponentId: null,
+    selectedSceneId: null,
+    openComponentIds: [],
 
     selectEntity: (id) => set({ selectedEntityId: id}),
-    selectComponent: (id) => set({ selectedComponentId: id }),
+    selectScene: (id) => set({ selectedSceneId: id }),
+    setOpenComponents: (componentIds) => set({ openComponentIds: componentIds }),
 }));
