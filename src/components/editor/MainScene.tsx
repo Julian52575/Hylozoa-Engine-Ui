@@ -4,42 +4,36 @@ import { Stage, Layer, Transformer, Image } from "react-konva";
 import Logo from "../../assets/logo.webp";
 import { useEngineStore, type Entity } from "@/store/engineStore";
 import { useSelectionStore } from "@/store/useSelectionStore";
+import Konva from "konva";
 
-interface EntityProps{
+
+interface EntityProps extends Konva.NodeConfig {
   id: string;
   src: string;
   position: {
     x: number;
     y: number;
   };
-  transform?: {
-    scale?: {
-      x: number;
-      y: number;
-    };
-    rotation?: number;
+  scale: {
+    x: number;
+    y: number;
   };
-  onClick: (id: string) => void;
+  rotation: number;
   onRegister: (id: string, node: any) => void;
-  onDragMove?: (e: any) => void;
-  onDragEnd?: (e: any) => void;
+  onClick: (id: string) => void;
 }
 
 const Entity = ({
   id,
   src,
   position,
-  transform,
-  onClick,
+  scale,
   onRegister,
-  onDragMove,
-  onDragEnd,
+  onClick,
+  ...rest
 }: EntityProps) => {
   const [img, setImg] = useState<HTMLImageElement | undefined>(undefined);
   const [calculatedSize, setCalculatedSize] = useState({ width: 0, height: 0 });
-
-  const isDragging = useRef(false);
-  const imageRef = useRef<any>(null);
 
   useEffect(() => {
     const image = new window.Image();
@@ -50,34 +44,20 @@ const Entity = ({
     };
   }, [src]);
 
-  useEffect(() => { 
-    if (imageRef.current && !isDragging.current) {
-      imageRef.current.x(position.x);
-      imageRef.current.y(position.y);
-    }
-  }, [position]);
-
   return (
     <Image
-      ref={(node) => {
-        imageRef.current = node;
-        onRegister(id, node)
-      }}
+      ref={(node) => { if (node) onRegister(id, node)}}
       id={id}
       x={position.x}
       y={position.y}
-      rotation={transform?.rotation || 0}
-      scaleX={transform?.scale?.x || 1}
-      scaleY={transform?.scale?.y || 1}
+      scaleX={scale.x}
+      scaleY={scale.y}
+      image={img}
       width={calculatedSize.width}
       height={calculatedSize.height}
-      image={img}
       draggable
       onClick={() => onClick(id)}
-      onDragStart={() => {isDragging.current = true}}
-      onDragMove={onDragMove}
-      onDragEnd={(e) => {isDragging.current = false; onDragEnd && onDragEnd(e)}}
-
+      {...rest}
     />
   );
 };
@@ -128,12 +108,44 @@ function Displayer({
     );
     if (!transformComponent) return;
 
+    const posX = node.x();
+    const posY = node.y();
+
     useEngineStore.getState().updateComponentProps(
       sceneId,
       entityId,
       transformComponent.id,
       {
-        position: { x: node.x(), y: node.y() },
+        position: { x: posX, y: posY },
+      },
+    );
+  };
+
+  const handleTransformEnd = (e: any) => {
+    const node = e.target;
+    const entityId = node.id();
+    const sceneId = useSelectionStore.getState().selectedSceneId;
+    if (!sceneId) return;
+
+    const entity = useEngineStore.getState().scenes[sceneId]?.entities[entityId];
+    if (!entity) return;
+
+    const transformComponent = Object.values(entity.components).find(
+      (c) => c.type === "localTransform",
+    );
+    if (!transformComponent) return;
+
+    const scaleX = node.scaleX();
+    const scaleY = node.scaleY();
+    const rotation = node.rotation();
+
+    useEngineStore.getState().updateComponentProps(
+      sceneId,
+      entityId,
+      transformComponent.id,
+      {
+        rotation: rotation,
+        scale: { x: scaleX, y: scaleY },
       },
     );
   };
@@ -157,9 +169,12 @@ function Displayer({
               key={entity.id}
               id={entity.id}
               src={Logo}
-              position={transform?.props.position || { x: 50, y: 50 }}
+              position={transform?.props.position || { x: 0, y: 0 }}
+              scale={transform?.props.scale || { x: 1, y: 1 }}
+              rotation={transform?.props.rotation || 0}
               onClick={handleSelection}
               onRegister={addToRefs}
+              onTransformEnd={handleTransformEnd}
               onDragEnd={handleDragEnd}
             />
         )})}
