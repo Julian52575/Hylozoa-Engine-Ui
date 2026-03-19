@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { temporal } from "zundo";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 export interface Component {
   id?: string;
@@ -93,19 +93,18 @@ export const useEngineStore = create<EngineState>()(
       immer((set, _) => ({
         version: "1.0.0",
         scenes: {},
-        currentSceneId: null,
 
         addScene: (name: string) => {
           const id = uuidv4();
           set((state: EngineState) => {
             state.scenes[id] = { id, name, entities: {} };
-          })
+          });
           return id;
         },
         addEntityToScene: (sceneId: string, entity: Entity) =>
           set((state: EngineState) => {
             const scene = state.scenes[sceneId];
-            if (!scene)return;
+            if (!scene) return;
             const entityId = uuidv4();
             const processedComponents: Record<string, Component> = {};
             if (entity.components) {
@@ -114,7 +113,11 @@ export const useEngineStore = create<EngineState>()(
                 processedComponents[compId] = { ...comp, id: compId };
               });
             }
-            const newEntity = { ...entity, id: entityId, components: processedComponents };
+            const newEntity = {
+              ...entity,
+              id: entityId,
+              components: processedComponents,
+            };
             scene.entities[entityId] = newEntity;
           }),
         removeScene: (id: string) =>
@@ -165,21 +168,13 @@ export const useEngineStore = create<EngineState>()(
           newProps: Record<string, any>,
         ) =>
           set((state: EngineState) => {
-            console.log(`Updating props`);
             const scene = state.scenes[sceneId];
             if (scene) {
-              console.log(`Found scene ${sceneId}`);
               const entity = scene.entities[entityId];
               if (entity) {
-                console.log(`Found entity ${entityId}`);
                 const component = entity.components[componentId];
                 if (component) {
-                  console.log(`Found component ${componentId}`);
                   component.props = { ...component.props, ...newProps };
-                  console.log(
-                    `Updated props for component ${componentId} of entity ${entityId} in scene ${sceneId}`,
-                    component.props,
-                  );
                 }
               }
             }
