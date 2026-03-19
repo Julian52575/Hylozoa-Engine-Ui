@@ -20,7 +20,7 @@ function Temp() {
   const [listScenesId, setListScenesId] = useState<string[]>([]);
   const addRandomScene = () => {
     const id = (Math.random() * 10000).toFixed(0);
-    engineStore.addScene(id, `Scene ${id}`);
+    engineStore.addScene(`Scene ${id}`);
     setListScenesId([...listScenesId, id]);
     alert(`Added Scene with ID: ${id}`);
   };
@@ -118,8 +118,8 @@ function App() {
 
   // Temporary code to add a scene and an entity for testing purposes
   useEffect(() => {
-    addScene("1", "Scene 1");
-    setSelectedSceneId("1");
+    const id = addScene("Scene 1");
+    setSelectedSceneId(id);
   }, [addScene, setSelectedSceneId]);
 
   return (

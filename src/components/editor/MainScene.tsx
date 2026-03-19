@@ -114,7 +114,7 @@ function Displayer({
     useEngineStore.getState().updateComponentProps(
       sceneId,
       entityId,
-      transformComponent.id,
+      transformComponent.id || "",
       {
         position: { x: posX, y: posY },
       },
@@ -142,7 +142,7 @@ function Displayer({
     useEngineStore.getState().updateComponentProps(
       sceneId,
       entityId,
-      transformComponent.id,
+      transformComponent.id || "",
       {
         rotation: rotation,
         scale: { x: scaleX, y: scaleY },
@@ -166,8 +166,8 @@ function Displayer({
           const transform = Object.values(entity.components).find((c) => c.type === "localTransform");
           return (
             <Entity
-              key={entity.id}
-              id={entity.id}
+              key={entity.id || ""}
+              id={entity.id || ""}
               src={Logo}
               position={transform?.props.position || { x: 0, y: 0 }}
               scale={transform?.props.scale || { x: 1, y: 1 }}

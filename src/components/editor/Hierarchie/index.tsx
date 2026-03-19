@@ -82,7 +82,6 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
                   useSelectionStore.getState().selectedSceneId!,
                   node.data.id,
                   {
-                    id: `component-${Date.now()}`,
                     name: componentType,
                     type: componentType,
                     props: newComponentProps,
@@ -124,23 +123,18 @@ export function Hierarchie() {
   const addEntityToScene = useEngineStore((state) => state.addEntityToScene);
 
   const handleAddEntity = () => {
-    const id = `entity-${Date.now()}`;
     const createDefaultComponent = useSchemaStore.getState().createDefaultComponent;
     const newTransform = createDefaultComponent('localTransform');
-    const componenId = `component-${Date.now()}`;
     addEntityToScene(currentSceneId!, {
-      id: id,
       name: `Entity ${Object.keys(useEngineStore.getState().scenes[currentSceneId!].entities).length + 1}`,
       type: "entity",
       components: {
-        [componenId]: {
-          id: componenId,
+        default: {
           name: "localTransform",
           type: newTransform?.type || "localTransform",
           props: newTransform?.values || {},
         },
       },
-
     });
   };
 

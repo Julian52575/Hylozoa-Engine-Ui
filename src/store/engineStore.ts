@@ -2,23 +2,24 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { temporal } from "zundo";
+import { v4 as uuidv4 } from 'uuid';
 
 export interface Component {
-  id: string;
+  id?: string;
   name: string;
   type: string;
   props: Record<string, any>;
 }
 
 export interface Entity {
-  id: string;
+  id?: string;
   name: string;
   type: string;
   components: Record<string, Component>;
 }
 
 interface SceneState {
-  id: string;
+  id?: string;
   name: string;
   entities: Record<string, Entity>;
 }
@@ -27,7 +28,7 @@ interface EngineState {
   version: string;
   scenes: Record<string, SceneState>;
 
-  addScene: (id: string, name: string) => void;
+  addScene: (name: string) => string;
   removeScene: (id: string) => void;
   addEntityToScene: (sceneId: string, entity: Entity) => void;
   removeEntityFromScene: (sceneId: string, entityId: string) => void;
@@ -94,16 +95,27 @@ export const useEngineStore = create<EngineState>()(
         scenes: {},
         currentSceneId: null,
 
-        addScene: (id: string, name: string) =>
+        addScene: (name: string) => {
+          const id = uuidv4();
           set((state: EngineState) => {
             state.scenes[id] = { id, name, entities: {} };
-          }),
+          })
+          return id;
+        },
         addEntityToScene: (sceneId: string, entity: Entity) =>
           set((state: EngineState) => {
             const scene = state.scenes[sceneId];
-            if (scene) {
-              scene.entities[entity.id] = entity;
+            if (!scene)return;
+            const entityId = uuidv4();
+            const processedComponents: Record<string, Component> = {};
+            if (entity.components) {
+              Object.values(entity.components).forEach((comp) => {
+                const compId = uuidv4();
+                processedComponents[compId] = { ...comp, id: compId };
+              });
             }
+            const newEntity = { ...entity, id: entityId, components: processedComponents };
+            scene.entities[entityId] = newEntity;
           }),
         removeScene: (id: string) =>
           set((state: EngineState) => {
@@ -126,7 +138,9 @@ export const useEngineStore = create<EngineState>()(
             if (scene) {
               const entity = scene.entities[entityId];
               if (entity) {
-                entity.components[component.id] = component;
+                const id = uuidv4();
+                const newComponent = { ...component, id };
+                entity.components[newComponent.id] = newComponent;
               }
             }
           }),
