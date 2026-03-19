@@ -14,7 +14,38 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 
+import { useEngineStore } from "@/store/engineStore";
+import { useEffect } from "react";
+
+
 export default function EditorPage() {
+  useEffect(() => {
+    const temporal = (useEngineStore as any).temporal;
+    if (!temporal) {
+      console.warn("Temporal store is not available");
+      return;
+    }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isMod = e.ctrlKey || e.metaKey;
+
+      if (isMod && e.key === "z") {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.shiftKey) {
+          temporal.getState().redo();
+        } else {
+          temporal.getState().undo();
+        }
+      } else if (isMod && e.key === "y") {
+        e.preventDefault();
+        e.stopPropagation();
+        temporal.getState().redo();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown,true);
+    return () => window.removeEventListener("keydown", handleKeyDown,true);
+  }, []);
+
   return (
     <div className="h-svh w-svw flex flex-col">
       <HeaderWindow isHome={false} />

@@ -16,6 +16,8 @@ import { useSchemaStore } from "@/store/useSchemaStore";
 import { Button } from "@/components/ui/button";
 import { useMemo } from "react";
 
+
+
 type NodeData = {
   id: string;
   name: string;
@@ -97,20 +99,21 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
   );
 }
 
+const EMPTY_ENTITIES = {};
 export function Hierarchie() {
   const currentSceneId = useSelectionStore((state) => state.selectedSceneId);
-  const entities = useEngineStore((state) =>
-    currentSceneId ? state.scenes[currentSceneId]?.entities : {},
-  );
+  const entities = useEngineStore((state) => (
+    currentSceneId ? state.scenes[currentSceneId]?.entities : EMPTY_ENTITIES
+  ));
 
   const treeData: NodeData[] = useMemo(() => {
-    if (!currentSceneId) return [];
+    if (!currentSceneId || !entities) return [];
 
-    return Object.values(entities).map((entity) => ({
+    return Object.values(entities).map((entity : any) => ({
       id: entity.id,
       name: entity.name,
       type: "entity",
-      children: Object.values(entity.components).map((comp) => ({
+      children: Object.values(entity.components).map((comp : any) => ({
         id: comp.id,
         name: comp.name,
         type: comp.type,
@@ -119,26 +122,25 @@ export function Hierarchie() {
   }, [entities, currentSceneId]);
 
   const addEntityToScene = useEngineStore((state) => state.addEntityToScene);
-  const addComponentToEntity = useEngineStore((state) => state.addComponentToEntity);
 
   const handleAddEntity = () => {
     const id = `entity-${Date.now()}`;
+    const createDefaultComponent = useSchemaStore.getState().createDefaultComponent;
+    const newTransform = createDefaultComponent('localTransform');
+    const componenId = `component-${Date.now()}`;
     addEntityToScene(currentSceneId!, {
       id: id,
       name: `Entity ${Object.keys(useEngineStore.getState().scenes[currentSceneId!].entities).length + 1}`,
       type: "entity",
-      components: {},
-    });
-    const createDefaultComponent = useSchemaStore.getState().createDefaultComponent;
-    const newTransform = createDefaultComponent('localTransform');
-    if (!newTransform) {
-      console.error("Failed to create default component for localTransform");
-    }
-    addComponentToEntity(currentSceneId!, id, {
-      id: `component-${Date.now()}`,
-      name: "localTransform",
-      type: newTransform?.type || "localTransform",
-      props: newTransform?.values || {},
+      components: {
+        [componenId]: {
+          id: componenId,
+          name: "localTransform",
+          type: newTransform?.type || "localTransform",
+          props: newTransform?.values || {},
+        },
+      },
+
     });
   };
 

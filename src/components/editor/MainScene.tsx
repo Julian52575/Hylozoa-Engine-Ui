@@ -183,7 +183,7 @@ function Displayer({
     </Stage>
   );
 }
-
+const EMPTY_ENTITIES = {};
 export function MainScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -204,7 +204,7 @@ export function MainScene() {
 
   const currentSceneId = useSelectionStore((state) => state.selectedSceneId);
   const entities = useEngineStore((state) =>
-    currentSceneId ? state.scenes[currentSceneId]?.entities : {},
+    currentSceneId ? state.scenes[currentSceneId]?.entities : EMPTY_ENTITIES,
   );
 
   return (
@@ -212,7 +212,7 @@ export function MainScene() {
       <Displayer
         width={dimensions.width}
         height={dimensions.height}
-        entities={currentSceneId ? Object.values(entities) : []}
+        entities={entities ? Object.values(entities) : []}
       />
     </div>
   );

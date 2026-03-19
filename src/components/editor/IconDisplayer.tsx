@@ -1,5 +1,5 @@
 import { FaRegCircle, FaCube } from "react-icons/fa";
-import { BsCameraVideoFill } from "react-icons/bs";
+import { PiVideoCameraFill } from "react-icons/pi";
 import { MdLightMode } from "react-icons/md";
 import { MdOutlineRectangle } from "react-icons/md";
 import { TbCube } from "react-icons/tb";
@@ -14,7 +14,7 @@ export default function IconDisplayer({
   const displayIcon = () => {
     switch (type) {
       case "camera":
-        return <BsCameraVideoFill size={size} />;
+        return <PiVideoCameraFill size={size} />;
       case "light":
         return <MdLightMode size={size} />;
       case "Rectangle":

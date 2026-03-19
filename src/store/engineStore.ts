@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import { temporal } from "zundo";
 
 export interface Component {
   id: string;
@@ -86,91 +87,97 @@ export const loadEngineState = (data: any): void => {
   });
 };
 export const useEngineStore = create<EngineState>()(
-  persist(
-    immer((set, _) => ({
-      version: "1.0.0",
-      scenes: {},
-      currentSceneId: null,
+  temporal(
+    persist(
+      immer((set, _) => ({
+        version: "1.0.0",
+        scenes: {},
+        currentSceneId: null,
 
-      addScene: (id: string, name: string) =>
-        set((state: EngineState) => {
-          state.scenes[id] = { id, name, entities: {} };
-        }),
-      addEntityToScene: (sceneId: string, entity: Entity) =>
-        set((state: EngineState) => {
-          const scene = state.scenes[sceneId];
-          if (scene) {
-            scene.entities[entity.id] = entity;
-          }
-        }),
-      removeScene: (id: string) =>
-        set((state: EngineState) => {
-          delete state.scenes[id];
-        }),
-      removeEntityFromScene: (sceneId: string, entityId: string) =>
-        set((state: EngineState) => {
-          const scene = state.scenes[sceneId];
-          if (scene) {
-            delete scene.entities[entityId];
-          }
-        }),
-      addComponentToEntity: (
-        sceneId: string,
-        entityId: string,
-        component: Component,
-      ) =>
-        set((state: EngineState) => {
-          const scene = state.scenes[sceneId];
-          if (scene) {
-            const entity = scene.entities[entityId];
-            if (entity) {
-              entity.components[component.id] = component;
+        addScene: (id: string, name: string) =>
+          set((state: EngineState) => {
+            state.scenes[id] = { id, name, entities: {} };
+          }),
+        addEntityToScene: (sceneId: string, entity: Entity) =>
+          set((state: EngineState) => {
+            const scene = state.scenes[sceneId];
+            if (scene) {
+              scene.entities[entity.id] = entity;
             }
-          }
-        }),
-      removeComponentFromEntity: (
-        sceneId: string,
-        entityId: string,
-        componentId: string,
-      ) =>
-        set((state: EngineState) => {
-          const scene = state.scenes[sceneId];
-          if (scene) {
-            const entity = scene.entities[entityId];
-            if (entity) {
-              delete entity.components[componentId];
+          }),
+        removeScene: (id: string) =>
+          set((state: EngineState) => {
+            delete state.scenes[id];
+          }),
+        removeEntityFromScene: (sceneId: string, entityId: string) =>
+          set((state: EngineState) => {
+            const scene = state.scenes[sceneId];
+            if (scene) {
+              delete scene.entities[entityId];
             }
-          }
-        }),
-      updateComponentProps: (
-        sceneId: string,
-        entityId: string,
-        componentId: string,
-        newProps: Record<string, any>,
-      ) =>
-        set((state: EngineState) => {
-          console.log(`Updating props`);
-          const scene = state.scenes[sceneId];
-          if (scene) {
-            console.log(`Found scene ${sceneId}`);
-            const entity = scene.entities[entityId];
-            if (entity) {
-              console.log(`Found entity ${entityId}`);
-              const component = entity.components[componentId];
-              if (component) {
-                console.log(`Found component ${componentId}`);
-                component.props = { ...component.props, ...newProps };
-                console.log(
-                  `Updated props for component ${componentId} of entity ${entityId} in scene ${sceneId}`,
-                  component.props,
-                );
+          }),
+        addComponentToEntity: (
+          sceneId: string,
+          entityId: string,
+          component: Component,
+        ) =>
+          set((state: EngineState) => {
+            const scene = state.scenes[sceneId];
+            if (scene) {
+              const entity = scene.entities[entityId];
+              if (entity) {
+                entity.components[component.id] = component;
               }
             }
-          }
-        }),
-    })),
+          }),
+        removeComponentFromEntity: (
+          sceneId: string,
+          entityId: string,
+          componentId: string,
+        ) =>
+          set((state: EngineState) => {
+            const scene = state.scenes[sceneId];
+            if (scene) {
+              const entity = scene.entities[entityId];
+              if (entity) {
+                delete entity.components[componentId];
+              }
+            }
+          }),
+        updateComponentProps: (
+          sceneId: string,
+          entityId: string,
+          componentId: string,
+          newProps: Record<string, any>,
+        ) =>
+          set((state: EngineState) => {
+            console.log(`Updating props`);
+            const scene = state.scenes[sceneId];
+            if (scene) {
+              console.log(`Found scene ${sceneId}`);
+              const entity = scene.entities[entityId];
+              if (entity) {
+                console.log(`Found entity ${entityId}`);
+                const component = entity.components[componentId];
+                if (component) {
+                  console.log(`Found component ${componentId}`);
+                  component.props = { ...component.props, ...newProps };
+                  console.log(
+                    `Updated props for component ${componentId} of entity ${entityId} in scene ${sceneId}`,
+                    component.props,
+                  );
+                }
+              }
+            }
+          }),
+      })),
+      {
+        name: "engine-storage",
+      },
+    ),
     {
-      name: "engine-storage",
+      limit: 50,
+      partialize: (state) => ({ version: state.version, scenes: state.scenes }),
     },
   ),
 );

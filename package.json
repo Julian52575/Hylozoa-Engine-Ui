@@ -39,6 +39,7 @@
     "react-router-dom": "^7.13.1",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
+    "zundo": "^2.3.0",
     "zustand": "^5.0.10"
   },
   "devDependencies": {
