@@ -1,0 +1,20 @@
+{
+    "type": "renderableShape",
+    "label": "Shape",
+    "$schema": { 
+        "shapeType": { "type": "enum", "label": "Shape Type", "options": ["rectangle", "circle"] },
+        "width": { "type": "number", "label": "Width" },
+        "height": { "type": "number", "label": "Height" },
+        "radius": { "type": "number", "label": "Radius" },
+        "outlineColor": { "type": "vector4", "label": "Outline Color" },
+        "outlineThickness": { "type": "number", "label": "Outline Thickness" }
+    },
+    "values": {
+        "shapeType": "rectangle",
+        "width": 30,
+        "height": 30,
+        "radius": 30,
+        "outlineColor": { "x": 0, "y": 0, "z": 0, "w": 255 },
+        "outlineThickness": 1
+    }
+}

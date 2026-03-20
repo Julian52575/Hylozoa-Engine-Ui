@@ -10,7 +10,7 @@
         "zoom": { "type": "number", "label": "Zoom" },
         "order" : { "type": "number", "label": "Order" },
         "isUI" : { "type": "boolean", "label": "Is UI" },
-        "cullingMask": { "type": "number", "label": "Culling Mask - Not correctly serialized for now" }
+        "cullingMask": { "type": "enum", "label": "Culling Mask", "options": ["All", "Default", "Nothing"] }
     },
     "values":{
         "offset": { "x": 0, "y": 1.6},
@@ -21,6 +21,6 @@
         "zoom": 1,
         "order" : 0,
         "isUI" : false,
-        "cullingMask": 1
+        "cullingMask": "Default"
     }
 }

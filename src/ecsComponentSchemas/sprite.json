@@ -1,0 +1,14 @@
+{
+    "type": "sprite",
+    "label": "Sprite",
+    "schema": {
+        "textureName": { "type": "string", "label": "Texture Name" },
+        "scale": { "type": "vector2", "label": "Scale" },
+        "origin": { "type": "vector2", "label": "Origin" }
+    },
+    "values": {
+        "textureName": "",
+        "scale": { "x": 1, "y": 1 },
+        "origin": { "x": 0, "y": 0 }
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "type": "noiseListener",
+    "label": "Noise Listener",
+    "schema": {
+        "hearingRange": { "type": "number", "label": "Hearing Range" }
+    },
+    "values": {
+        "hearingRange": 100
+    }
+}

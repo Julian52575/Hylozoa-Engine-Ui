@@ -1,0 +1,16 @@
+{
+    "type": "renderable",
+    "label": "Renderable",
+    "$schema": {
+        "color": { "type": "vector4", "label": "Color" },
+        "visible": { "type": "boolean", "label": "Visible" },
+        "LayerBit": { "type": "string", "label": "Layer" },
+        "transparency": { "type": "number", "label": "Transparency" }
+    },
+    "values": {
+        "color": { "x": 0, "y": 0, "z": 0, "w": 255 },
+        "visible": true,
+        "LayerBit": "Default",
+        "transparency": 255
+    }
+}
