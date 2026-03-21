@@ -9,6 +9,7 @@ import { SceneList } from "@/components/editor/SceneList";
 import { ViewportButtons } from "@/components/editor/Viewport";
 import { SceneManager } from "@/components/editor/SceneManager";
 import { Toolbar } from "@/components/editor/Toolbar";
+import { useSchemaStore } from "@/store/useSchemaStore";
 
 import {
   ResizableHandle,
@@ -16,17 +17,18 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 
-import { useEngineStore } from "@/store/engineStore";
+import { serializeEngineState, useEngineStore } from "@/store/engineStore";
 import { useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 
 export default function EditorPage() {
   useEffect(() => {
     const temporal = (useEngineStore as any).temporal;
     if (!temporal) {
-      console.warn("Temporal store is not available");
       return;
     }
-    const handleKeyDown = (e: KeyboardEvent) => {
+
+    const handleKeyDown = async (e: KeyboardEvent) => {
       const isMod = e.ctrlKey || e.metaKey;
 
       if (isMod && e.key === "z") {
@@ -42,10 +44,34 @@ export default function EditorPage() {
         e.stopPropagation();
         temporal.getState().redo();
       }
+
+      if (isMod && e.key === "s") {
+        e.preventDefault();
+        e.stopPropagation();
+        const currentStoreState = useEngineStore.getState();
+        const serialized = JSON.stringify(
+          serializeEngineState(currentStoreState),
+        );
+        try {
+          await invoke("save_compressed_project", {
+            path: "project.hlz",
+            data: serialized,
+          });
+          alert(`Project saved successfully`);
+        } catch (error) {
+          alert(`Failed to save project: ${error}`);
+        }
+      }
     };
     window.addEventListener("keydown", handleKeyDown, true);
     return () => window.removeEventListener("keydown", handleKeyDown, true);
   }, []);
+
+  const loadSchemas = useSchemaStore((s) => s.loadSchemas);
+
+  useEffect(() => {
+    loadSchemas();
+  }, [loadSchemas]);
 
   return (
     <div className="h-svh w-svw flex flex-col">
