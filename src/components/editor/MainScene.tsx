@@ -6,7 +6,6 @@ import { useEngineStore, type Entity } from "@/store/engineStore";
 import { useSelectionStore } from "@/store/useSelectionStore";
 import Konva from "konva";
 
-
 interface EntityProps extends Konva.NodeConfig {
   id: string;
   src: string;
@@ -135,17 +134,14 @@ function Displayer({
     );
     if (!transformComponent) return;
 
-    const scaleX = node.scaleX();
-    const scaleY = node.scaleY();
-    const rotation = node.rotation();
-
     useEngineStore.getState().updateComponentProps(
       sceneId,
       entityId,
       transformComponent.id || "",
       {
-        rotation: rotation,
-        scale: { x: scaleX, y: scaleY },
+        rotation: node.rotation(),
+        scale: { x: node.scaleX(), y: node.scaleY() },
+        position: { x: node.x(), y: node.y() },
       },
     );
   };
@@ -178,7 +174,7 @@ function Displayer({
               onDragEnd={handleDragEnd}
             />
         )})}
-        {selectedId && <Transformer ref={trRef} />}
+        {selectedId && <Transformer ref={trRef} flipEnabled={true} />}
       </Layer>
     </Stage>
   );

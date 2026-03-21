@@ -3,6 +3,10 @@ import { FaFile } from "react-icons/fa";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import { invoke } from "@tauri-apps/api/core";
+import {
+  AutoSizer,
+  type AutoSizerChildProps,
+} from "react-virtualized-auto-sizer";
 
 import {
   ContextMenu,
@@ -62,8 +66,7 @@ function entryToData(entry: FileEntry): FileData {
   };
 }
 
-export function FolderDisplayer({path}: {path: string}) {
-
+export function FolderDisplayer({ path }: { path: string }) {
   const [searchTerm, setSearchTerm] = useState("");
 
   const [data, setData] = useState<FileData[]>([]);
@@ -89,16 +92,22 @@ export function FolderDisplayer({path}: {path: string}) {
         />
       </div>
       <div className="flex h-full px-2 py-1 overflow-auto">
-        <Tree
-          indent={10}
-          searchTerm={searchTerm}
-          searchMatch={(node, term) =>
-            node.data.name.toLowerCase().includes(term.toLowerCase())
-          }
-          data={data}
-        >
-          {Node}
-        </Tree>
+        <AutoSizer
+          renderProp={({ height, width }: AutoSizerChildProps) => (
+            <Tree
+              indent={10}
+              height={height}
+              width={width}
+              searchTerm={searchTerm}
+              searchMatch={(node, term) =>
+                node.data.name.toLowerCase().includes(term.toLowerCase())
+              }
+              data={data}
+            >
+              {Node}
+            </Tree>
+          )}
+        />
       </div>
     </div>
   );

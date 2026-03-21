@@ -3,6 +3,7 @@ import { EnumOption } from "./EnumOption";
 import { BooleanOption } from "./BooleanOption";
 import { TextOption } from "./TextOption";
 import { NumberOption } from "./NumberOption";
+import { ImageOption } from "./ImageOption";
 import IconDisplayer from "../IconDisplayer";
 
 import {
@@ -44,8 +45,10 @@ function DisplayProposal({
       return <TextOption label={label} value={value} />;
     case "number":
       return <NumberOption label={label} value={value} />;
+    case "image":
+      return <ImageOption label={label} value={value} />;
     default:
-      return null;
+      return <div>Unsupported type: {type}</div>;
   }
 }
 
@@ -70,7 +73,6 @@ export function Inspector() {
     );
   }
 
-
   return (
     <div className="w-full h-full flex flex-col">
       <div className="p-3 border-b bg-secondary/50 flex items-center gap-2">
@@ -92,7 +94,7 @@ export function Inspector() {
             return (
               <AccordionItem
                 key={component.id}
-                value={component.id}
+                value={component.id || ""}
                 className="border rounded-md bg-card overflow-hidden !border-b"
               >
                 <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-accent/50 hover:cursor-pointer transition-colors">
@@ -101,7 +103,7 @@ export function Inspector() {
                     <span>{component.name}</span>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="p-3 border-t bg-primary/5 flex flex-col gap-3">
+                <AccordionContent className="p-3 border-t bg-primary/5 flex flex-col gap-3 ">
                   {Object.entries(schema.schema).map(([key, propConfig]) => (
                     <DisplayProposal
                       key={key}

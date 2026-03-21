@@ -1,4 +1,5 @@
 import { Tree, NodeRendererProps } from "react-arborist";
+import { AutoSizer, type AutoSizerChildProps } from "react-virtualized-auto-sizer";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 
 import {
@@ -16,8 +17,6 @@ import { useSchemaStore } from "@/store/useSchemaStore";
 import { Button } from "@/components/ui/button";
 import { useMemo } from "react";
 
-
-
 type NodeData = {
   id: string;
   name: string;
@@ -31,7 +30,7 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
   );
   const handleNodeClick = () => {
     if (!node.isLeaf) {
-        useSelectionStore.getState().selectEntity(node.data.id);
+      useSelectionStore.getState().selectEntity(node.data.id);
     }
   };
 
@@ -74,8 +73,10 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
         {node.data.type === "entity" ? (
           <ComponentModal
             onValidate={(componentType) => {
-              const createDefaultComponent = useSchemaStore.getState().createDefaultComponent;
-              const newComponentProps = createDefaultComponent(componentType)?.values || {};
+              const createDefaultComponent =
+                useSchemaStore.getState().createDefaultComponent;
+              const newComponentProps =
+                createDefaultComponent(componentType)?.values || {};
               useEngineStore
                 .getState()
                 .addComponentToEntity(
@@ -86,7 +87,7 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
                     type: componentType,
                     props: newComponentProps,
                   },
-                );              
+                );
               node.open();
             }}
           />
@@ -101,18 +102,18 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
 const EMPTY_ENTITIES = {};
 export function Hierarchie() {
   const currentSceneId = useSelectionStore((state) => state.selectedSceneId);
-  const entities = useEngineStore((state) => (
-    currentSceneId ? state.scenes[currentSceneId]?.entities : EMPTY_ENTITIES
-  ));
+  const entities = useEngineStore((state) =>
+    currentSceneId ? state.scenes[currentSceneId]?.entities : EMPTY_ENTITIES,
+  );
 
   const treeData: NodeData[] = useMemo(() => {
     if (!currentSceneId || !entities) return [];
 
-    return Object.values(entities).map((entity : any) => ({
+    return Object.values(entities).map((entity: any) => ({
       id: entity.id,
       name: entity.name,
       type: "entity",
-      children: Object.values(entity.components).map((comp : any) => ({
+      children: Object.values(entity.components).map((comp: any) => ({
         id: comp.id,
         name: comp.name,
         type: comp.type,
@@ -123,8 +124,9 @@ export function Hierarchie() {
   const addEntityToScene = useEngineStore((state) => state.addEntityToScene);
 
   const handleAddEntity = () => {
-    const createDefaultComponent = useSchemaStore.getState().createDefaultComponent;
-    const newTransform = createDefaultComponent('localTransform');
+    const createDefaultComponent =
+      useSchemaStore.getState().createDefaultComponent;
+    const newTransform = createDefaultComponent("localTransform");
     addEntityToScene(currentSceneId!, {
       name: `Entity ${Object.keys(useEngineStore.getState().scenes[currentSceneId!].entities).length + 1}`,
       type: "entity",
@@ -139,12 +141,18 @@ export function Hierarchie() {
   };
 
   return (
-    <div className="bg-secondary h-full">
-      <div className="p-2 bg-primary/10">Scene</div>
+    <div className="flex-1 h-full flex flex-col bg-secondary items-start overflow-hidden">
+      <div className="w-full bg-primary/10 px-4 py-2 shrink-0">Hierarchy</div>
       <ContextMenu>
         <ContextMenuTrigger asChild onContextMenu={(e) => e.stopPropagation()}>
-          <div className="flex h-full px-2 py-1 overflow-auto">
-            <Tree data={treeData}>{Node}</Tree>
+          <div className="flex-1 w-full min-h-0 px-2">
+            <AutoSizer renderProp={
+              ({ height, width }: AutoSizerChildProps) => (
+                <Tree data={treeData} height={height} width={width}>
+                  {Node}
+                </Tree>
+              )}
+              />
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent>

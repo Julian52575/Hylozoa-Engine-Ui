@@ -2,12 +2,12 @@
     "type": "sprite",
     "label": "Sprite",
     "schema": {
-        "textureName": { "type": "string", "label": "Texture Name" },
+        "texture": { "type": "image", "label": "Texture" },
         "scale": { "type": "vector2", "label": "Scale" },
         "origin": { "type": "vector2", "label": "Origin" }
     },
     "values": {
-        "textureName": "",
+        "texture": null,
         "scale": { "x": 1, "y": 1 },
         "origin": { "x": 0, "y": 0 }
     }

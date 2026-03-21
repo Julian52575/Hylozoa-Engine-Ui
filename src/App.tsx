@@ -118,7 +118,7 @@ function App() {
 
   // Temporary code to add a scene and an entity for testing purposes
   useEffect(() => {
-    const id = addScene("Scene 1");
+    const id = addScene("Scene" + Math.floor(Math.random() * 1000));
     setSelectedSceneId(id);
   }, [addScene, setSelectedSceneId]);
 

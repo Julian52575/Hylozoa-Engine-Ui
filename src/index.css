@@ -124,3 +124,7 @@
 body {
   -webkit-font-smoothing: antialiased;
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
