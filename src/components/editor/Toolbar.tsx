@@ -34,30 +34,43 @@ function HistoryButtons() {
 export function Toolbar() {
   const [status, setStatus] = useState<"idle" | "running">("idle");
   const childRef = useRef<Child | null>(null);
+  const windowRef = useRef<WebviewWindow | null>(null);
 
   async function launchHylozoa() {
     if (status === "running") return;
 
-    const command = Command.sidecar("binaries/hylozoa", ["mon-argument"]);
-    const child = await command.spawn();
-    childRef.current = child;
+    try {
+        const command = Command.sidecar("binaries/hylozoa", ["mon-argument"]);
+        const child = await command.spawn();
+        childRef.current = child;
+        setStatus("running");
 
-    setStatus("running");
+        const webview = await createNodeWindow();
+        windowRef.current = webview;
 
-    createNodeWindow();
-
-    command.on("close", () => {
-      setStatus("idle");
-      childRef.current = null;
-    });
+        command.on("close", async () => {
+            await closeGraphWindow();
+            setStatus("idle");
+            childRef.current = null;
+        });
+    } catch (error) {
+        console.error("Failed to launch Hylozoa:", error);
+    }
   }
+
+  const closeGraphWindow = async () => {
+    if (windowRef.current) {
+      await windowRef.current.close();
+      windowRef.current = null;
+    }
+  };
 
   async function handleStop() {
     if (childRef.current) {
       await childRef.current.kill();
-      setStatus("idle");
-      childRef.current = null;
     }
+    await closeGraphWindow();
+    setStatus("idle");
   }
 
   const createNodeWindow = async () => {
@@ -75,6 +88,7 @@ export function Toolbar() {
     webview.once("tauri://error", (e) => {
       console.error("Error creating graph window:", e);
     });
+    return webview;
   };
 
   return (
