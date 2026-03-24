@@ -4,8 +4,6 @@
     "schema":{
         "offset": { "type": "vector2", "label": "Offset" },
         "anchorMode": { "type": "enum", "label": "Anchor Mode", "options": ["head", "eyes", "body", "feet"] },
-        "ignoreRotation": { "type": "boolean", "label": "Ignore Rotation" },
-        "text": { "type": "text", "label": "Text Mode" },
         "viewportSize" : { "type": "vector2", "label": "Viewport Size" },
         "zoom": { "type": "number", "label": "Zoom" },
         "order" : { "type": "number", "label": "Order" },
@@ -15,8 +13,6 @@
     "values":{
         "offset": { "x": 0, "y": 1.6},
         "anchorMode": "head",
-        "ignoreRotation": false,
-        "text": "none",
         "viewportSize" : { "x": 1920, "y": 1080},
         "zoom": 1,
         "order" : 0,

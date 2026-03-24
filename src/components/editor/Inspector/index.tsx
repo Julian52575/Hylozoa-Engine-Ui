@@ -4,6 +4,7 @@ import { BooleanOption } from "./BooleanOption";
 import { TextOption } from "./TextOption";
 import { NumberOption } from "./NumberOption";
 import { ImageOption } from "./ImageOption";
+import { ColorOption } from "./ColorOption";
 import IconDisplayer from "../IconDisplayer";
 
 import {
@@ -47,6 +48,8 @@ function DisplayProposal({
       return <NumberOption label={label} value={value} />;
     case "image":
       return <ImageOption label={label} value={value} />;
+    case "color":
+      return <ColorOption label={label} value={value} />;
     default:
       return <div>Unsupported type: {type}</div>;
   }
@@ -104,14 +107,15 @@ export function Inspector() {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="p-3 border-t bg-primary/5 flex flex-col gap-3 ">
-                  {Object.entries(schema.schema).map(([key, propConfig]) => (
-                    <DisplayProposal
-                      key={key}
-                      propConfig={propConfig}
-                      value={component.props[key]}
-                      //id=component.id
-                    />
-                  ))}
+                  {schema.schema &&
+                    Object.entries(schema.schema).map(([key, propConfig]) => (
+                      <DisplayProposal
+                        key={key}
+                        propConfig={propConfig}
+                        value={component.props[key]}
+                        //id=component.id
+                      />
+                    ))}
                 </AccordionContent>
               </AccordionItem>
             );

@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { Stage, Layer, Transformer, Image } from "react-konva";
+import { Stage, Layer, Transformer } from "react-konva";
 
-import Logo from "../../assets/logo.webp";
+import Logo from "../../../assets/logo.webp";
 import { useEngineStore, type Entity } from "@/store/engineStore";
 import { useSelectionStore } from "@/store/useSelectionStore";
 import Konva from "konva";
+
+import { LocalTransformShow } from "./LocalTransform";
+import { SpriteShow } from "./Sprite";
+import { CameraShow } from "./Camera";
 
 interface EntityProps extends Konva.NodeConfig {
   id: string;
@@ -27,37 +31,39 @@ const Entity = ({
   src,
   position,
   scale,
+  rotation,
   onRegister,
   onClick,
   ...rest
 }: EntityProps) => {
-  const [img, setImg] = useState<HTMLImageElement | undefined>(undefined);
-  const [calculatedSize, setCalculatedSize] = useState({ width: 0, height: 0 });
-
-  useEffect(() => {
-    const image = new window.Image();
-    image.src = src;
-    image.onload = () => {
-      setImg(image);
-      setCalculatedSize({ width: image.width, height: image.height });
-    };
-  }, [src]);
+    const rectRef = useRef<Konva.Rect>(null);
+    useEffect(() => {
+        if (rectRef.current) {
+            rectRef.current.getClientRect = () => {
+                return { x: 0, y: 0, width: 0, height: 0 };
+            };
+        }
+    }, []);
 
   return (
-    <Image
-      ref={(node) => { if (node) onRegister(id, node)}}
+    <LocalTransformShow
+      ref={(node) => {
+        if (node) onRegister(id, node);
+      }}
       id={id}
       x={position.x}
       y={position.y}
       scaleX={scale.x}
       scaleY={scale.y}
-      image={img}
-      width={calculatedSize.width}
-      height={calculatedSize.height}
+      rotation={rotation}
       draggable
       onClick={() => onClick(id)}
+      lineColor="red"
       {...rest}
-    />
+    >
+      <SpriteShow src={src} />
+      <CameraShow size={{ width: 200, height: 200 }} />
+    </LocalTransformShow>
   );
 };
 
@@ -99,7 +105,8 @@ function Displayer({
     const sceneId = useSelectionStore.getState().selectedSceneId;
     if (!sceneId) return;
 
-    const entity = useEngineStore.getState().scenes[sceneId]?.entities[entityId];
+    const entity =
+      useEngineStore.getState().scenes[sceneId]?.entities[entityId];
     if (!entity) return;
 
     const transformComponent = Object.values(entity.components).find(
@@ -110,14 +117,11 @@ function Displayer({
     const posX = node.x();
     const posY = node.y();
 
-    useEngineStore.getState().updateComponentProps(
-      sceneId,
-      entityId,
-      transformComponent.id || "",
-      {
+    useEngineStore
+      .getState()
+      .updateComponentProps(sceneId, entityId, transformComponent.id || "", {
         position: { x: posX, y: posY },
-      },
-    );
+      });
   };
 
   const handleTransformEnd = (e: any) => {
@@ -126,7 +130,8 @@ function Displayer({
     const sceneId = useSelectionStore.getState().selectedSceneId;
     if (!sceneId) return;
 
-    const entity = useEngineStore.getState().scenes[sceneId]?.entities[entityId];
+    const entity =
+      useEngineStore.getState().scenes[sceneId]?.entities[entityId];
     if (!entity) return;
 
     const transformComponent = Object.values(entity.components).find(
@@ -134,16 +139,13 @@ function Displayer({
     );
     if (!transformComponent) return;
 
-    useEngineStore.getState().updateComponentProps(
-      sceneId,
-      entityId,
-      transformComponent.id || "",
-      {
+    useEngineStore
+      .getState()
+      .updateComponentProps(sceneId, entityId, transformComponent.id || "", {
         rotation: node.rotation(),
         scale: { x: node.scaleX(), y: node.scaleY() },
         position: { x: node.x(), y: node.y() },
-      },
-    );
+      });
   };
 
   return (
@@ -159,7 +161,9 @@ function Displayer({
     >
       <Layer>
         {entities?.map((entity) => {
-          const transform = Object.values(entity.components).find((c) => c.type === "localTransform");
+          const transform = Object.values(entity.components).find(
+            (c) => c.type === "localTransform",
+          );
           return (
             <Entity
               key={entity.id || ""}
@@ -173,7 +177,8 @@ function Displayer({
               onTransformEnd={handleTransformEnd}
               onDragEnd={handleDragEnd}
             />
-        )})}
+          );
+        })}
         {selectedId && <Transformer ref={trRef} flipEnabled={true} />}
       </Layer>
     </Stage>

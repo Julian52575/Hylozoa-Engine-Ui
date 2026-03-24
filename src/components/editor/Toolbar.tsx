@@ -88,6 +88,9 @@ export function Toolbar() {
     webview.once("tauri://error", (e) => {
       console.error("Error creating graph window:", e);
     });
+    webview.once("tauri://close-requested", async () => {
+            await closeGraphWindow();
+    });
     return webview;
   };
 
