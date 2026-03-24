@@ -3,6 +3,7 @@ import { create } from "zustand";
 interface PropertyDefinition {
   type: "vector2" | "enum" | "boolean" | "text" | "number";
   label: string;
+  dependency?: string;
   options?: string[];
 }
 interface Component {

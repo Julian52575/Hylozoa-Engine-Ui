@@ -21,11 +21,24 @@ import { useSchemaStore } from "@/store/useSchemaStore";
 function DisplayProposal({
   propConfig,
   value,
+  allValues,
+  onChange,
 }: {
   propConfig: any;
   value: any;
+  allValues?: Record<string, any>;
+  onChange?: (newValue: any) => void;
 }) {
-  const { type, label, options } = propConfig;
+  const { type, label, options,dependency } = propConfig;
+
+  if (dependency && allValues) {
+    console.log("Checking dependency for", label, ":", dependency);
+    const [depKey, depValue] = dependency.split("-");
+    console.log("Dependency key:", depKey, "Expected value:", depValue, "Actual value:", allValues[depKey]);
+    if (allValues[depKey] !== depValue) {
+      return null;
+    }
+  }
 
   switch (type) {
     case "vector2":
@@ -38,6 +51,7 @@ function DisplayProposal({
           label={label}
           options={options || []}
           defaultValue={value}
+          onChange={onChange}
         />
       );
     case "boolean":
@@ -51,7 +65,7 @@ function DisplayProposal({
     case "color":
       return <ColorOption label={label} value={value} />;
     default:
-      return <div>Unsupported type: {type}</div>;
+      return <div className="font-semibold">Unsupported type: {type}</div>;
   }
 }
 
@@ -61,6 +75,8 @@ export function Inspector() {
   const schemas = useSchemaStore((state) => state.schemas);
   const openComponents = useSelectionStore((s) => s.openComponentIds);
   const setOpenComponents = useSelectionStore((s) => s.setOpenComponents);
+
+  const updateComponentProps = useEngineStore((s) => s.updateComponentProps);
 
   const entity = useEngineStore((s) =>
     selectedEntityId && currentSceneId
@@ -113,7 +129,15 @@ export function Inspector() {
                         key={key}
                         propConfig={propConfig}
                         value={component.props[key]}
-                        //id=component.id
+                        allValues={component.props}
+                        onChange={(newValue: any) => {
+                          updateComponentProps(
+                            currentSceneId!,
+                            selectedEntityId!,
+                            component.id!,
+                            {[key]: newValue}
+                          );
+                        }}
                       />
                     ))}
                 </AccordionContent>

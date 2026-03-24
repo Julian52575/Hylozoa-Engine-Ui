@@ -7,7 +7,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export function EnumOption({ label, options, defaultValue }: { label: string, options: string[], defaultValue: string }) {
+export function EnumOption({ 
+    label, 
+    options, 
+    defaultValue,
+    onChange
+}: { 
+    label: string, 
+    options: string[], 
+    defaultValue: string,
+    onChange?: (newValue: string) => void
+}) {
     return (
         <div className="flex flex-col gap-2 p-3 bg-zinc-50/50 rounded-lg border border-zinc-200 transition-all hover:border-zinc-300">
             <Label 
@@ -16,7 +26,7 @@ export function EnumOption({ label, options, defaultValue }: { label: string, op
             >
                 {label}
             </Label>
-            <Select defaultValue={defaultValue}>
+            <Select defaultValue={defaultValue} onValueChange={onChange}>
                 <SelectTrigger 
                     id={label} 
                     className="w-full h-8 text-sm bg-white border-zinc-200 focus:ring-1 focus:ring-zinc-400 focus:ring-offset-0 transition-all font-medium"

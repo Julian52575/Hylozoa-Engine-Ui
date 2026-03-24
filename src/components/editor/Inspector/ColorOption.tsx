@@ -110,7 +110,10 @@ export function ColorOption({
       >
         {label}
       </Label>
-      <ColorPicker value={value} />
+      <ColorPicker 
+        id={label}
+        value={value} 
+      />
     </div>
   );
 }

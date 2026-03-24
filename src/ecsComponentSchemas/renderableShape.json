@@ -1,20 +1,36 @@
 {
-    "type": "renderableShape",
-    "label": "Shape",
-    "schema": { 
-        "shapeType": { "type": "enum", "label": "Shape Type", "options": ["rectangle", "circle"] },
-        "width": { "type": "number", "label": "Width" },
-        "height": { "type": "number", "label": "Height" },
-        "radius": { "type": "number", "label": "Radius" },
-        "outlineColor": { "type": "color", "label": "Outline Color" },
-        "outlineThickness": { "type": "number", "label": "Outline Thickness" }
+  "type": "renderableShape",
+  "label": "Shape",
+  "schema": {
+    "shapeType": {
+      "type": "enum",
+      "label": "Shape Type",
+      "options": ["rectangle", "circle"]
     },
-    "values": {
-        "shapeType": "rectangle",
-        "width": 30,
-        "height": 30,
-        "radius": 30,
-        "outlineColor": "#000000",
-        "outlineThickness": 1
-    }
+    "width": {
+      "type": "number",
+      "label": "Width",
+      "dependency": "shapeType-rectangle"
+    },
+    "height": {
+      "type": "number",
+      "label": "Height",
+      "dependency": "shapeType-rectangle"
+    },
+    "radius": {
+      "type": "number",
+      "label": "Radius",
+      "dependency": "shapeType-circle"
+    },
+    "outlineColor": { "type": "color", "label": "Outline Color" },
+    "outlineThickness": { "type": "number", "label": "Outline Thickness" }
+  },
+  "values": {
+    "shapeType": "rectangle",
+    "width": 30,
+    "height": 30,
+    "radius": 30,
+    "outlineColor": "#000000",
+    "outlineThickness": 1
+  }
 }
