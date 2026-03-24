@@ -1,6 +1,7 @@
 {
   "type": "rigidBody",
   "label": "Rigid Body",
+  "icon": "lucide:git-branch",
   "schema": {
     "bodyType": {
       "type": "enum",

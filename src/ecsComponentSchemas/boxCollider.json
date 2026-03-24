@@ -1,6 +1,7 @@
 {
     "type" : "boxCollider",
     "label" : "Box Collider",
+    "icon": "lucide:box",
     "schema":{
         "size" : { "type" : "vector2", "label" : "Size" }
     },

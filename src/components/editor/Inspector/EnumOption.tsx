@@ -10,12 +10,12 @@ import {
 export function EnumOption({ 
     label, 
     options, 
-    defaultValue,
+    value,
     onChange
 }: { 
     label: string, 
     options: string[], 
-    defaultValue: string,
+    value: string,
     onChange?: (newValue: string) => void
 }) {
     return (
@@ -26,7 +26,7 @@ export function EnumOption({
             >
                 {label}
             </Label>
-            <Select defaultValue={defaultValue} onValueChange={onChange}>
+            <Select value={value} onValueChange={onChange}>
                 <SelectTrigger 
                     id={label} 
                     className="w-full h-8 text-sm bg-white border-zinc-200 focus:ring-1 focus:ring-zinc-400 focus:ring-offset-0 transition-all font-medium"

@@ -1,5 +1,4 @@
-import { IoClose } from "react-icons/io5";
-import { FaPlus } from "react-icons/fa";
+import { Icon } from "@iconify/react";
 import { useEngineStore } from "@/store/engineStore";
 import { useSelectionStore } from "@/store/useSelectionStore";
 
@@ -17,7 +16,7 @@ export function SceneList() {
   return (
     <div className="w-full flex items-start justify-start h-full">
       <div className="bg-gray-200 px-2 py-1 border border-primary/10 flex items-center h-8">
-        <FaPlus className="cursor-pointer" size={16} />
+        <Icon icon="fa-solid:plus" className="cursor-pointer w-4 h-4" />
       </div>
       <div className="w-[83%] flex flex-row overflow-scroll scrollbar-hide">
         {Object.values(scenes)
@@ -38,9 +37,9 @@ export function SceneList() {
               `}
             >
               <span className="text-nowrap">{scene.name}</span>
-              <IoClose
-                className="cursor-pointer"
-                size={20}
+              <Icon
+                icon="ion:close"
+                className="cursor-pointer w-5 h-5"
                 color="red"
                 onClick={(e) => {
                   e.stopPropagation();

@@ -1,11 +1,11 @@
 import { Button } from "../ui/button";
-import { FaPlay, FaSpinner, FaStop } from "react-icons/fa";
 import { Command, Child } from "@tauri-apps/plugin-shell";
 import { useState, useRef } from "react";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 
-import { GrRedo, GrUndo } from "react-icons/gr";
 import { useEngineStore } from "@/store/engineStore";
+import { Icon } from "@iconify/react";
+
 
 function HistoryButtons() {
   const temporal = (useEngineStore as any).temporal;
@@ -17,7 +17,7 @@ function HistoryButtons() {
         className="cursor-pointer"
         onClick={() => temporal.getState().undo()}
       >
-        <GrUndo />
+        <Icon icon="lucide:undo-2" className="w-4 h-4" />
       </Button>
       <Button
         variant="outline"
@@ -25,7 +25,7 @@ function HistoryButtons() {
         className="cursor-pointer"
         onClick={() => temporal.getState().redo()}
       >
-        <GrRedo />
+        <Icon icon="lucide:redo-2" className="w-4 h-4" />
       </Button>
     </div>
   );
@@ -105,9 +105,9 @@ export function Toolbar() {
           disabled={status === "running"}
         >
           {status === "running" ? (
-            <FaSpinner className="animate-spin mr-0.5" />
+            <Icon icon="lucide:loader-2" className="w-4 h-4 animate-spin" />
           ) : (
-            <FaPlay className="ml-0.5" />
+            <Icon icon="lucide:play" className="w-4 h-4" />
           )}
           <span>Play</span>
         </Button>
@@ -117,7 +117,7 @@ export function Toolbar() {
           onClick={handleStop}
           disabled={status === "idle"}
         >
-          <FaStop />
+          <Icon icon="lucide:square" className="w-4 h-4" fill="currentColor" />
           <span>Stop</span>
         </Button>
       </div>

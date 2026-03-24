@@ -1,6 +1,5 @@
 import { Tree, NodeRendererProps } from "react-arborist";
-import { FaFile } from "react-icons/fa";
-import { FaChevronDown, FaChevronRight } from "react-icons/fa";
+import { Icon } from "@iconify/react";  
 import { Input } from "@/components/ui/input";
 import { invoke } from "@tauri-apps/api/core";
 import {
@@ -39,11 +38,11 @@ function Node({ node, style, dragHandle }: NodeRendererProps<FileData>) {
           className="flex items-center gap-1 hover:bg-primary/10 px-2 w-max rounded cursor-pointer select-none"
         >
           {node.isLeaf ? (
-            <FaFile />
+            <Icon icon="lucide:file" className="w-4 h-4" />
           ) : node.isOpen ? (
-            <FaChevronDown size={10} />
+            <Icon icon="lucide:chevron-right" className="w-4 h-4" />
           ) : (
-            <FaChevronRight size={10} />
+            <Icon icon="lucide:chevron-down" className="w-4 h-4" />
           )}
           <div className="font-normal text-sm">{node.data.name}</div>
         </div>

@@ -1,6 +1,7 @@
 {
     "type": "camera",
     "label" : "Camera",
+    "icon": "lucide:camera",
     "schema":{
         "offset": { "type": "vector2", "label": "Offset" },
         "anchorMode": { "type": "enum", "label": "Anchor Mode", "options": ["head", "eyes", "body", "feet"] },

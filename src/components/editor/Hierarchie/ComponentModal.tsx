@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { useSchemaStore } from "@/store/useSchemaStore"
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { Icon } from "@iconify/react";
 
 export default function ComponentModal({
     onValidate,
@@ -58,13 +59,14 @@ export default function ComponentModal({
                     <div 
                         key={schema.type} 
                         className={`
-                            p-2 border-b cursor-pointer rounded hover:bg-primary/10
+                            p-2 border-b cursor-pointer rounded hover:bg-primary/10 flex items-center
                             ${selected === schema.type ? "bg-primary/20" : ""}
                         `}
                         onClick={() => setSelected(schema.type)}
                         onDoubleClick={handleAddComponent}
                     >
-                        {schema.label}
+                        <Icon icon={schema.icon} className="w-4 h-4 mr-2" />
+                        <span>{schema.label}</span>
                     </div>
                 ))}
             </div>

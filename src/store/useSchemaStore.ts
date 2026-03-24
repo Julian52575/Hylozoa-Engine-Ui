@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 interface PropertyDefinition {
-  type: "vector2" | "enum" | "boolean" | "text" | "number";
+  type: "vector2" | "enum" | "boolean" | "text" | "number" | "image" | "color";
   label: string;
   dependency?: string;
   options?: string[];
@@ -9,6 +9,7 @@ interface PropertyDefinition {
 interface Component {
   type: string;
   label: string;
+  icon: string;
   schema: Record<string, PropertyDefinition>;
   values: Record<string, any>;
 }

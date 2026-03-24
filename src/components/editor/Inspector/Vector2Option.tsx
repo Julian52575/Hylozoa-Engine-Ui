@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaUnlink, FaLink } from "react-icons/fa";
+import { Icon } from "@iconify/react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,9 +17,9 @@ function LinkedButton() {
       title={linkedActive ? "Unlink axes" : "Link axes"}
     >
       {linkedActive ? (
-        <FaLink className="text-zinc-500" size={12} />
+        <Icon icon="lucide:link" className="w-4 h-4" />
       ) : (
-        <FaUnlink className="text-zinc-400" size={12} />
+        <Icon icon="lucide:link-2-off" className="w-4 h-4" />
       )}
     </Button>
   );

@@ -1,6 +1,7 @@
 {
   "type": "localTransform",
   "label": "Local Transform",
+  "icon": "lucide:move",
   "schema": {
     "position": { "type": "vector2", "label": "Position" },
     "scale": { "type": "vector2", "label": "Scale" },

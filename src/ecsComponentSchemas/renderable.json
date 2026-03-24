@@ -1,6 +1,7 @@
 {
     "type": "renderable",
     "label": "Renderable",
+    "icon": "lucide:eye",
     "schema": {
         "color": { "type": "color", "label": "Color" },
         "visible": { "type": "boolean", "label": "Visible" },

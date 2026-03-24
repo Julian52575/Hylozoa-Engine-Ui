@@ -1,7 +1,9 @@
 import { Tree, NodeRendererProps } from "react-arborist";
-import { AutoSizer, type AutoSizerChildProps } from "react-virtualized-auto-sizer";
-import { FaChevronDown, FaChevronRight } from "react-icons/fa";
-
+import {
+  AutoSizer,
+  type AutoSizerChildProps,
+} from "react-virtualized-auto-sizer";
+import { Icon } from "@iconify/react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -11,7 +13,6 @@ import {
 import { useSelectionStore } from "@/store/useSelectionStore";
 
 import ComponentModal from "./ComponentModal";
-import IconDisplayer from "../IconDisplayer";
 import { useEngineStore } from "@/store/engineStore";
 import { useSchemaStore } from "@/store/useSchemaStore";
 import { Button } from "@/components/ui/button";
@@ -25,13 +26,25 @@ type NodeData = {
 };
 
 function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
+  const schemas = useSchemaStore((state) => state.schemas);
+
   const isSelected = useSelectionStore(
     (state) => state.selectedEntityId === node.data.id,
   );
-  const handleNodeClick = () => {
-    if (!node.isLeaf) {
-      useSelectionStore.getState().selectEntity(node.data.id);
+  const handleNodeClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    const idToSelect = node.isLeaf ? node.parent?.data.id : node.data.id;
+    if (idToSelect) {
+      useSelectionStore.getState().selectEntity(idToSelect);
     }
+  };
+
+  const getIcon = () => {
+    if (node.data.type === "entity") {
+      return "lucide:box";
+    }
+    const schema = schemas[node.data.type];
+    return schema?.icon || "lucide:puzzle";
   };
 
   return (
@@ -41,22 +54,23 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
           style={style}
           ref={dragHandle}
           className="flex items-center gap-1 cursor-default select-none"
+          onClick={handleNodeClick}
         >
-          {!node.isLeaf && node.isOpen && (
-            <FaChevronDown
-              size={10}
-              onClick={() => node.toggle()}
-              className="cursor-pointer"
-            />
+          {!node.isLeaf && (
+            <div className="w-4 h-4">
+              <Icon
+                icon={
+                  node.isOpen ? "lucide:chevron-down" : "lucide:chevron-right"
+                }
+                className="w-4 h-4 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  node.toggle();
+                }}
+              />
+            </div>
           )}
-          {!node.isLeaf && !node.isOpen && (
-            <FaChevronRight
-              size={10}
-              onClick={() => node.toggle()}
-              className="cursor-pointer"
-            />
-          )}
-          <IconDisplayer type={node.data.type} size={14} />
+          <Icon icon={getIcon()} className="w-4 h-4" />
           <div
             className={`
                 font-normal text-sm px-1 py-0.5 rounded-md
@@ -146,13 +160,13 @@ export function Hierarchie() {
       <ContextMenu>
         <ContextMenuTrigger asChild onContextMenu={(e) => e.stopPropagation()}>
           <div className="flex-1 w-full min-h-0 px-2">
-            <AutoSizer renderProp={
-              ({ height, width }: AutoSizerChildProps) => (
+            <AutoSizer
+              renderProp={({ height, width }: AutoSizerChildProps) => (
                 <Tree data={treeData} height={height} width={width}>
                   {Node}
                 </Tree>
               )}
-              />
+            />
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent>

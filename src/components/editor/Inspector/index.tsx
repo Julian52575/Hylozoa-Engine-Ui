@@ -5,7 +5,6 @@ import { TextOption } from "./TextOption";
 import { NumberOption } from "./NumberOption";
 import { ImageOption } from "./ImageOption";
 import { ColorOption } from "./ColorOption";
-import IconDisplayer from "../IconDisplayer";
 
 import {
   Accordion,
@@ -17,6 +16,7 @@ import {
 import { useSelectionStore } from "@/store/useSelectionStore";
 import { useEngineStore } from "@/store/engineStore";
 import { useSchemaStore } from "@/store/useSchemaStore";
+import { Icon } from "@iconify/react";
 
 function DisplayProposal({
   propConfig,
@@ -32,9 +32,7 @@ function DisplayProposal({
   const { type, label, options,dependency } = propConfig;
 
   if (dependency && allValues) {
-    console.log("Checking dependency for", label, ":", dependency);
     const [depKey, depValue] = dependency.split("-");
-    console.log("Dependency key:", depKey, "Expected value:", depValue, "Actual value:", allValues[depKey]);
     if (allValues[depKey] !== depValue) {
       return null;
     }
@@ -50,7 +48,7 @@ function DisplayProposal({
         <EnumOption
           label={label}
           options={options || []}
-          defaultValue={value}
+          value={value}
           onChange={onChange}
         />
       );
@@ -118,7 +116,7 @@ export function Inspector() {
               >
                 <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-accent/50 hover:cursor-pointer transition-colors">
                   <div className="flex items-center gap-2">
-                    <IconDisplayer type={component.type} />
+                    <Icon icon={schema.icon} className="w-4 h-4" />
                     <span>{component.name}</span>
                   </div>
                 </AccordionTrigger>

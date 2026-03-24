@@ -1,10 +1,7 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useState,useEffect } from "react";
+import { Icon } from "@iconify/react";
 
-import { VscClose } from "react-icons/vsc";
-import { VscChromeRestore } from "react-icons/vsc";
-import { MdMinimize } from "react-icons/md";
-import { VscChromeMaximize } from "react-icons/vsc";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -49,7 +46,7 @@ function ButtonsWindowHandler() {
                 }}
                 aria-label="Minimize window"
             >
-                <MdMinimize size={12} />
+                <Icon icon="fa-regular:window-minimize" className="w-4 h-4" />
             </Button>
             <Button
                 size={"icon-sm"}
@@ -59,7 +56,7 @@ function ButtonsWindowHandler() {
                 }}
                 aria-label={isMaximized ? "Restore window" : "Maximize window"}
             >
-                {isMaximized ? <VscChromeRestore size={12} /> : <VscChromeMaximize size={12} />}
+                {isMaximized ? <Icon icon="fa-regular:window-restore" className="w-4 h-4" /> : <Icon icon="fa-regular:window-maximize" className="w-4 h-4" />}
             </Button>
             <Button
                 size={"icon-sm"}
@@ -69,7 +66,7 @@ function ButtonsWindowHandler() {
                 }}
                 aria-label="Close window"
             >
-                <VscClose size={12} />
+                <Icon icon="fa:close" className="w-4 h-4" />
             </Button>
         </div>
     )

@@ -2,13 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-menubar";
 import { HeaderWindow } from "@/components/HeaderWindow";
-import { FaPlus } from "react-icons/fa6";
-import { FaPen } from "react-icons/fa6";
-import { FaTrash } from "react-icons/fa6";
-import { FaFolderOpen } from "react-icons/fa";
-import { LuTextCursor } from "react-icons/lu";
-import { FaPlay } from "react-icons/fa";
-import { FaStar } from "react-icons/fa6";
+import { Icon } from "@iconify/react";
 
 import { 
   Select,
@@ -56,7 +50,7 @@ function ImportFolderButton() {
     }
     return ( 
         <Button onClick={openFolder}>
-            <FaFolderOpen/>
+            <Icon icon="lucide:folder-open" className="w-4 h-4" />
             Import
             {error && <p className="text-red-600">{error}</p>}
         </Button>
@@ -82,7 +76,7 @@ function ProjectCard({
  }: ProjectCardProps) {
   return (
     <div className="flex flex-row p-2 items-center gap-2 bg-zinc-100 h-20 border-b border-zinc-200">
-      <FaStar className="inline w-5" color={isFavorite ? "gold" : "gray"} />
+      <Icon icon="lucide:star" className="w-4 h-4" color={isFavorite ? "gold" : "gray"} />
       <img
         src={logo}
         alt="Project Thumbnail"
@@ -122,7 +116,7 @@ export default function HomePage() {
       <HeaderWindow isHome />
       <div className="w-full flex items-center justify-center gap-1.5 p-2 bg-secondary border-b border-zinc-200">
         <Button>
-          <FaPlus/>
+          <Icon icon="lucide:plus" className="w-4 h-4" />
           Create
         </Button>
         <ImportFolderButton />
@@ -176,22 +170,22 @@ export default function HomePage() {
         </div>
         <div className="flex-[0.15] border-l border-zinc-200 flex flex-col p-2 gap-2">
           <Button className="w-full relative flex items-center justify-center cursor-pointer" onClick={handleProjectClick}>
-            <FaPen className="absolute left-3 scale-75" />
+            <Icon icon="lucide:edit" className="absolute left-3 scale-75" />
             <span>Edit</span>
           </Button>
   
           <Button className="w-full relative flex items-center justify-center">
-            <FaPlay className="absolute left-3 scale-75" />
+            <Icon icon="lucide:play" className="absolute left-3 scale-75" />
             <span>Run</span>
           </Button>
   
           <Button className="w-full relative flex items-center justify-center">
-            <LuTextCursor className="absolute left-3" />
+            <Icon icon="lucide:type" className="absolute left-3" />
             <span>Rename</span>
           </Button>
   
           <Button className="w-full relative flex items-center justify-center" variant="destructive">
-            <FaTrash className="absolute left-3 scale-75" />
+            <Icon icon="lucide:trash-2" className="absolute left-3 scale-75" />
             <span>Remove</span>
           </Button>
         </div>

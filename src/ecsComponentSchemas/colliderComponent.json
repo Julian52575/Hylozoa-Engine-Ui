@@ -1,6 +1,7 @@
 {
     "type": "collider",
     "label": "Base Collider",
+    "icon": "lucide:crosshair",
     "schema":{
         "density" : { "type" : "number", "label" : "Density" },
         "friction" : { "type" : "number", "label" : "Friction" },

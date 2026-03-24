@@ -1,6 +1,7 @@
 {
     "type" : "name",
     "label" : "Name",
+    "icon": "lucide:tag",
     "schema": {
         "value" : {"type": "string", "label": "Value"}
     },
