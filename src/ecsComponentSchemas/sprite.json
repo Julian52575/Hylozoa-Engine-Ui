@@ -3,7 +3,7 @@
     "label": "Sprite",
     "icon": "lucide:image",
     "schema": {
-        "texture": { "type": "image", "label": "Texture" },
+        "texture": { "type": "file", "label": "Texture", "accept": "image" },
         "scale": { "type": "vector2", "label": "Scale" },
         "origin": { "type": "vector2", "label": "Origin" }
     },

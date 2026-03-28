@@ -3,7 +3,7 @@ import { EnumOption } from "./EnumOption";
 import { BooleanOption } from "./BooleanOption";
 import { TextOption } from "./TextOption";
 import { NumberOption } from "./NumberOption";
-import { ImageOption } from "./ImageOption";
+import { FileOption } from "./FileOption";
 import { ColorOption } from "./ColorOption";
 
 import {
@@ -29,7 +29,7 @@ function DisplayProposal({
   allValues?: Record<string, any>;
   onChange?: (newValue: any) => void;
 }) {
-  const { type, label, options, dependency, min, max, step } = propConfig;
+  const { type, label, options, dependency, min, max, step, accept } = propConfig;
 
   if (dependency && allValues) {
     const [depKey, depValue] = dependency.split("-");
@@ -67,8 +67,8 @@ function DisplayProposal({
           step={step}
         />
       );
-    case "image":
-      return <ImageOption label={label} value={value} />;
+    case "file":
+      return <FileOption label={label} value={value} accept={accept} />;
     case "color":
       return <ColorOption label={label} value={value} />;
     default:

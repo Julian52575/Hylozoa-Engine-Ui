@@ -6,7 +6,6 @@ import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { useEngineStore } from "@/store/engineStore";
 import { Icon } from "@iconify/react";
 
-
 function HistoryButtons() {
   const temporal = (useEngineStore as any).temporal;
   return (
@@ -40,21 +39,21 @@ export function Toolbar() {
     if (status === "running") return;
 
     try {
-        const command = Command.sidecar("binaries/hylozoa", ["mon-argument"]);
-        const child = await command.spawn();
-        childRef.current = child;
-        setStatus("running");
+      const command = Command.sidecar("binaries/hylozoa", ["mon-argument"]);
+      const child = await command.spawn();
+      childRef.current = child;
+      setStatus("running");
 
-        const webview = await createNodeWindow();
-        windowRef.current = webview;
+      const webview = await createNodeWindow();
+      windowRef.current = webview;
 
-        command.on("close", async () => {
-            await closeGraphWindow();
-            setStatus("idle");
-            childRef.current = null;
-        });
+      command.on("close", async () => {
+        await closeGraphWindow();
+        setStatus("idle");
+        childRef.current = null;
+      });
     } catch (error) {
-        console.error("Failed to launch Hylozoa:", error);
+      console.error("Failed to launch Hylozoa:", error);
     }
   }
 
@@ -85,11 +84,11 @@ export function Toolbar() {
       console.log("Graph window created");
     });
 
-    webview.once("tauri://error", (e) => {
+    webview.once("tauri://error", (e: any) => {
       console.error("Error creating graph window:", e);
     });
     webview.once("tauri://close-requested", async () => {
-            await closeGraphWindow();
+      await closeGraphWindow();
     });
     return webview;
   };

@@ -1,13 +1,14 @@
 import { create } from "zustand";
 
 interface PropertyDefinition {
-  type: "vector2" | "enum" | "boolean" | "text" | "number" | "image" | "color";
+  type: "vector2" | "enum" | "boolean" | "text" | "number" | "file" | "color";
   label: string;
   dependency?: string;
   options?: string[];
   min?: number;
   max?: number;
   step?: number;
+  accept?: "image" | "video" | "audio";
 }
 interface Component {
   type: string;

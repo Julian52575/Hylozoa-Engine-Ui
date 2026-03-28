@@ -65,7 +65,7 @@ function ImageInput({
     )
 }
 
-export function ImageOption({ label, value }: { label: string, value: string }) {
+export function ImageAccept({ label, value }: { label: string, value: string }) {
     return (
         <div className="flex flex-col gap-2 p-3 bg-zinc-50/50 rounded-lg border border-zinc-200 transition-all hover:border-zinc-300">
             <div className="px-1">
