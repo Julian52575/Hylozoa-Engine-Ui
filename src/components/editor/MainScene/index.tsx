@@ -148,15 +148,48 @@ function Displayer({
       });
   };
 
+  const handleWheel = (e: any) => {
+    e.evt.preventDefault();
+    const stage = e.target.getStage();
+    const oldScale = stage.scaleX();
+
+    const pointer = stage.getPointerPosition();
+    const mousePointTo = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale,
+    };
+    
+    const speed = 1.1;
+    const newScale = e.evt.deltaY > 0 ? oldScale / speed : oldScale * speed;
+    
+    stage.scale({ x: newScale, y: newScale });
+
+    const newPos = {
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale,
+    };
+    stage.position(newPos);
+  };
+
   return (
     <Stage
       width={width}
       height={height}
-      style={{ backgroundColor: "#ffffff" }}
+      draggable
+      onWheel={handleWheel}
+      style={{ backgroundColor: "#242424"}}
+      onMouseUp={(e) => {
+        const stage = e.target.getStage();
+        if (stage)
+          stage.container().style.cursor = 'default';
+      }}
       onMouseDown={(e) => {
-        if (e.target === e.target.getStage()) {
+        const stage = e.target.getStage();
+        if (e.target === stage) {
           useSelectionStore.getState().selectEntity(null);
         }
+        if (stage)
+          stage.container().style.cursor = 'grabbing';
       }}
     >
       <Layer>

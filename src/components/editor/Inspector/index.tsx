@@ -29,7 +29,7 @@ function DisplayProposal({
   allValues?: Record<string, any>;
   onChange?: (newValue: any) => void;
 }) {
-  const { type, label, options,dependency } = propConfig;
+  const { type, label, options, dependency, min, max, step } = propConfig;
 
   if (dependency && allValues) {
     const [depKey, depValue] = dependency.split("-");
@@ -57,7 +57,16 @@ function DisplayProposal({
     case "text":
       return <TextOption label={label} value={value} />;
     case "number":
-      return <NumberOption label={label} value={value} />;
+      return (
+        <NumberOption
+          label={label}
+          value={value}
+          onChange={onChange}
+          min={min}
+          max={max}
+          step={step}
+        />
+      );
     case "image":
       return <ImageOption label={label} value={value} />;
     case "color":
@@ -133,7 +142,7 @@ export function Inspector() {
                             currentSceneId!,
                             selectedEntityId!,
                             component.id!,
-                            {[key]: newValue}
+                            { [key]: newValue },
                           );
                         }}
                       />

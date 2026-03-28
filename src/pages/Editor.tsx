@@ -2,7 +2,7 @@ import { HeaderWindow } from "@/components/HeaderWindow";
 
 import { Hierarchie } from "@/components/editor/Hierarchie";
 import { FolderDisplayer } from "@/components/editor/FolderDisplayer";
-import { ConsoleDisplayer } from "@/components/editor/ConsoleDisplayer";
+import { BottomPanel } from "@/components/editor/BottomPanel";
 import { MainScene } from "@/components/editor/MainScene";
 import { Inspector } from "@/components/editor/Inspector";
 import { SceneList } from "@/components/editor/SceneList";
@@ -73,6 +73,7 @@ export default function EditorPage() {
     loadSchemas();
   }, [loadSchemas]);
 
+
   return (
     <div className="h-svh w-svw flex flex-col">
       <HeaderWindow isHome={false} />
@@ -119,9 +120,9 @@ export default function EditorPage() {
               <MainScene />
             </ResizablePanel>
             <ResizableHandle className="h-0.5 w-full bg-primary/20 cursor-row-resize" />
-            <ResizablePanel minSize={150} defaultSize={200}>
-              <ConsoleDisplayer />
-            </ResizablePanel>
+            {/* <ResizablePanel minSize={70} defaultSize={70}> */}
+              <BottomPanel />
+            {/* </ResizablePanel> */}
           </ResizablePanelGroup>
         </ResizablePanel>
         <ResizableHandle className="h-full w-0.5 bg-primary/20 cursor-col-resize" />

@@ -5,6 +5,9 @@ interface PropertyDefinition {
   label: string;
   dependency?: string;
   options?: string[];
+  min?: number;
+  max?: number;
+  step?: number;
 }
 interface Component {
   type: string;

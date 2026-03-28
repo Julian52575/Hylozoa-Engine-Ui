@@ -5,7 +5,7 @@
   "schema": {
     "position": { "type": "vector2", "label": "Position" },
     "scale": { "type": "vector2", "label": "Scale" },
-    "rotation": { "type": "number", "label": "Rotation" }
+    "rotation": { "type": "number", "label": "Rotation", "min": 0, "max": 360, "step": 1 }
   },
   "values": {
     "position": { "x": 100, "y": 200 },

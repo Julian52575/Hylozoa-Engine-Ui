@@ -85,28 +85,57 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
       </ContextMenuTrigger>
       <ContextMenuContent>
         {node.data.type === "entity" ? (
-          <ComponentModal
-            onValidate={(componentType) => {
-              const createDefaultComponent =
-                useSchemaStore.getState().createDefaultComponent;
-              const newComponentProps =
-                createDefaultComponent(componentType)?.values || {};
+          <div className="flex flex-col gap-1 items-start w-full">
+            <ComponentModal
+              onValidate={(componentType) => {
+                const createDefaultComponent =
+                  useSchemaStore.getState().createDefaultComponent;
+                const newComponentProps =
+                  createDefaultComponent(componentType)?.values || {};
+                useEngineStore
+                  .getState()
+                  .addComponentToEntity(
+                    useSelectionStore.getState().selectedSceneId!,
+                    node.data.id,
+                    {
+                      name: componentType,
+                      type: componentType,
+                      props: newComponentProps,
+                    },
+                  );
+                node.open();
+              }}
+            />
+            <Button
+              variant={"ghost"}
+              className=""
+              onClick={() => {
+                useEngineStore
+                  .getState()
+                  .removeEntityFromScene(
+                    useSelectionStore.getState().selectedSceneId!,
+                    node.data.id,
+                  );
+              }}
+            >
+              Remove Entity
+            </Button>
+          </div>
+        ) : (
+          <Button variant={"ghost"} className="cursor-pointer w-full" onClick={() => {
+            const parentEntityId = node.parent?.data.id;
+            if (parentEntityId) {
               useEngineStore
                 .getState()
-                .addComponentToEntity(
+                .removeComponentFromEntity(
                   useSelectionStore.getState().selectedSceneId!,
+                  parentEntityId,
                   node.data.id,
-                  {
-                    name: componentType,
-                    type: componentType,
-                    props: newComponentProps,
-                  },
                 );
-              node.open();
-            }}
-          />
-        ) : (
-          <div>{node.data.type} Options</div>
+            }
+          }}>
+            Remove {node.data.type}
+          </Button>
         )}
       </ContextMenuContent>
     </ContextMenu>
@@ -155,11 +184,11 @@ export function Hierarchie() {
   };
 
   return (
-    <div className="flex-1 h-full flex flex-col bg-secondary items-start overflow-hidden">
+    <div className="flex-1 h-full flex flex-col bg-secondary items-start">
       <div className="w-full bg-primary/10 px-4 py-2 shrink-0">Hierarchy</div>
       <ContextMenu>
         <ContextMenuTrigger asChild onContextMenu={(e) => e.stopPropagation()}>
-          <div className="flex-1 w-full min-h-0 px-2">
+          <div className="flex-1 w-full min-h-0 px-2 py-1">
             <AutoSizer
               renderProp={({ height, width }: AutoSizerChildProps) => (
                 <Tree data={treeData} height={height} width={width}>
