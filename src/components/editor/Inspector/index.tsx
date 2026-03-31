@@ -1,11 +1,3 @@
-import { Vector2Option } from "./Vector2Option";
-import { EnumOption } from "./EnumOption";
-import { BooleanOption } from "./BooleanOption";
-import { TextOption } from "./TextOption";
-import { NumberOption } from "./NumberOption";
-import { FileOption } from "./FileOption";
-import { ColorOption } from "./ColorOption";
-
 import {
   Accordion,
   AccordionItem,
@@ -18,72 +10,81 @@ import { useEngineStore } from "@/store/engineStore";
 import { useSchemaStore } from "@/store/useSchemaStore";
 import { Icon } from "@iconify/react";
 
-function DisplayProposal({
-  propConfig,
-  value,
-  allValues,
-  onChange,
-}: {
-  propConfig: any;
-  value: any;
-  allValues?: Record<string, any>;
-  onChange?: (newValue: any) => void;
-}) {
-  const { type, label, options, dependency, min, max, step, accept } = propConfig;
+import OptionsManager from "./OptionsManager";
+import { useSessionStore } from "@/store/useSessionStore";
 
-  if (dependency && allValues) {
-    const [depKey, depValue] = dependency.split("-");
-    if (allValues[depKey] !== depValue) {
-      return null;
-    }
-  }
+const EMPTY_OBJ = {};
+function ComponentManager({ component }: { component: any }) {
+  const selectedEntityId = useSelectionStore((s) => s.selectedEntityId);
+  const currentSceneId = useSelectionStore((s) => s.selectedSceneId);
+  
+  const setLiveProp = useSessionStore((s) => s.setLiveProp);
+  const updateComponentProps = useEngineStore((s) => s.updateComponentProps);
+  
+  const clearOverrides = useSessionStore((s) => s.clearOverrides);
 
-  switch (type) {
-    case "vector2":
-      return (
-        <Vector2Option label={label} x={value.x} y={value.y} linked={true} />
-      );
-    case "enum":
-      return (
-        <EnumOption
-          label={label}
-          options={options || []}
-          value={value}
-          onChange={onChange}
-        />
-      );
-    case "boolean":
-      return <BooleanOption label={label} checked={value} />;
-    case "text":
-      return <TextOption label={label} value={value} />;
-    case "number":
-      return (
-        <NumberOption
-          label={label}
-          value={value}
-          onChange={onChange}
-          min={min}
-          max={max}
-          step={step}
-        />
-      );
-    case "file":
-      return <FileOption label={label} value={value} accept={accept} />;
-    case "color":
-      return <ColorOption label={label} value={value} />;
-    default:
-      return <div className="font-semibold">Unsupported type: {type}</div>;
-  }
+  const liveProps = useSessionStore((s) => {
+    if (!selectedEntityId || !component.id) return EMPTY_OBJ;
+    return s.overrides[selectedEntityId]?.[component.id!] || EMPTY_OBJ;
+  });
+
+  const schemas = useSchemaStore((s) => s.schemas);
+  const schema = schemas[component.type];
+  if (!schema) return null;
+
+  const handleLiveChange = (key: string, newValue: any) => {
+    if (!selectedEntityId) return;
+    const current = liveProps?.[key] ?? component.props[key];
+    if (JSON.stringify(current) === JSON.stringify(newValue)) return;
+    setLiveProp(selectedEntityId!, component.id!, { [key]: newValue });
+  };
+
+  const handleCommit = (key: string, newValue: any) => {
+    updateComponentProps(currentSceneId!, selectedEntityId!, component.id!, {
+      [key]: newValue,
+    });
+    clearOverrides();
+  };
+
+  return (
+    <AccordionItem
+      value={component.id || ""}
+      className="border rounded-md bg-card overflow-hidden !border-b"
+    >
+      <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-accent/50 hover:cursor-pointer transition-colors">
+        <div className="flex items-center gap-2">
+          <Icon icon={schema.icon} className="w-4 h-4" />
+          <span>{component.name}</span>
+        </div>
+      </AccordionTrigger>
+      <AccordionContent className="p-3 border-t bg-primary/5 flex flex-col gap-3 ">
+        {schema.schema &&
+          Object.entries(schema.schema).map(([key, propConfig]) => {
+            const displayValue =
+              liveProps[key] !== undefined
+                ? liveProps[key]
+                : component.props[key];
+            return (
+              <OptionsManager
+                key={key}
+                propConfig={propConfig}
+                value={displayValue}
+                allValues={{ ...component.props, ...(liveProps || EMPTY_OBJ) }}
+                onValueChange={(newValue) => handleLiveChange(key, newValue)}
+                onCommit={(newValue) => handleCommit(key, newValue)}
+              />
+            );
+          })}
+      </AccordionContent>
+    </AccordionItem>
+  );
 }
 
 export function Inspector() {
   const selectedEntityId = useSelectionStore((state) => state.selectedEntityId);
   const currentSceneId = useSelectionStore((state) => state.selectedSceneId);
-  const schemas = useSchemaStore((state) => state.schemas);
   const openComponents = useSelectionStore((s) => s.openComponentIds);
   const setOpenComponents = useSelectionStore((s) => s.setOpenComponents);
-
-  const updateComponentProps = useEngineStore((s) => s.updateComponentProps);
 
   const entity = useEngineStore((s) =>
     selectedEntityId && currentSceneId
@@ -114,43 +115,9 @@ export function Inspector() {
           value={openComponents}
           onValueChange={(ids) => setOpenComponents(ids)}
         >
-          {Object.values(entity.components).map((component) => {
-            const schema = schemas[component.type];
-            if (!schema) return null;
-            return (
-              <AccordionItem
-                key={component.id}
-                value={component.id || ""}
-                className="border rounded-md bg-card overflow-hidden !border-b"
-              >
-                <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-accent/50 hover:cursor-pointer transition-colors">
-                  <div className="flex items-center gap-2">
-                    <Icon icon={schema.icon} className="w-4 h-4" />
-                    <span>{component.name}</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="p-3 border-t bg-primary/5 flex flex-col gap-3 ">
-                  {schema.schema &&
-                    Object.entries(schema.schema).map(([key, propConfig]) => (
-                      <DisplayProposal
-                        key={key}
-                        propConfig={propConfig}
-                        value={component.props[key]}
-                        allValues={component.props}
-                        onChange={(newValue: any) => {
-                          updateComponentProps(
-                            currentSceneId!,
-                            selectedEntityId!,
-                            component.id!,
-                            { [key]: newValue },
-                          );
-                        }}
-                      />
-                    ))}
-                </AccordionContent>
-              </AccordionItem>
-            );
-          })}
+          {Object.entries(entity.components).map(([componentId, component]) => (
+            <ComponentManager key={componentId} component={component} />
+          ))}
         </Accordion>
       </div>
     </div>

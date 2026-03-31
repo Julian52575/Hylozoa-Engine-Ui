@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,28 @@ function AxisInput({
   colorClass: string;
   onChange: (newVal: { x: number; y: number }) => void;
 }) {
+
+  const safeValue = typeof value === 'number' ? value : 0;
+  const [localValue, setLocalValue] = useState<string>(safeValue.toString());
+
+useEffect(() => {
+    // On met à jour seulement si value n'est pas null
+    if (value !== null && value !== undefined) {
+      setLocalValue(value.toString());
+    }
+  }, [value]);
+
+  
+  const processChange = (newValue: string) => {
+    setLocalValue(newValue);
+    const parsed = parseFloat(newValue);
+    if (!isNaN(parsed)) {
+      // ... ta logique de min/max
+      onChange?.({ x: axisLabel === "X" ? parsed : value, y: axisLabel === "Y" ? parsed : value });
+    }
+  };
+
+
   return (
     <div className="relative flex items-center group ">
       <Label
@@ -45,9 +67,9 @@ function AxisInput({
       </Label>
       <Input
         type="number"
-        defaultValue={value}
+        value={localValue}
+        onChange={(e) => processChange(e.target.value)}
         className={`pl-6 h-8 text-sm font-mono border-zinc-200 focus-visible:border-${colorClass.split("-")[1]}-400 focus-visible:ring-${colorClass.split("-")[1]}-400/30 transition-all bg-white`}
-        onChange={(e) => onChange({ x: axisLabel === "X" ? parseFloat(e.target.value) : value, y: axisLabel === "Y" ? parseFloat(e.target.value) : value })}
       />
     </div>
   );
