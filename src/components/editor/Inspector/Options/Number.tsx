@@ -36,24 +36,15 @@ export function NumberOption({
     lastValueRef.current = localValue;
   }, [localValue]);
 
-  const clamp = (val: number) => {
-    let clamped = val;
-    if (min !== undefined) clamped = Math.max(min, clamped);
-    if (max !== undefined) clamped = Math.min(max, clamped);
-    return clamped;
-  };
+    const processChange = (newValue: number | undefined) => {
+      if (newValue === undefined) return;
+      setLocalValue(newValue);
+      onChange?.(newValue);
+    };
 
-  const processChange = (newValue: undefined | number) => {
+  const handleBlur = (newValue: number | undefined  ) => {
     if (newValue === undefined) return;
-    setLocalValue(newValue);
-    const finalValue = clamp(newValue);
-    onChange?.(finalValue);
-  };
-
-  const handleBlur = (newValue: undefined | number) => {
-    if (newValue === undefined) return;
-    const finalValue = clamp(newValue);
-    onCommit?.(finalValue);
+    onCommit?.(newValue);
   };
 
   useEffect(() => {
@@ -79,7 +70,7 @@ export function NumberOption({
           min={min}
           max={max}
           step={step}
-          showSpinButtons={false}
+          showSpinButtons={true}
           decimalScale={2}
           className="w-full bg-white border-zinc-200 focus:ring-1 focus:ring-zinc-400 focus:ring-offset-0 transition-all font-medium text-sm"
         />

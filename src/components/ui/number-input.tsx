@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { forwardRef, useCallback, useEffect, useState, useRef } from "react";
 import { NumericFormat, NumericFormatProps } from "react-number-format";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ export interface NumberInputProps extends Omit<
   defaultValue?: number;
   min?: number;
   max?: number;
-  value?: number; // Controlled value
+  value?: number;
   suffix?: string;
   prefix?: string;
   onValueChange?: (value: number | undefined) => void;
@@ -45,25 +45,21 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     },
     ref,
   ) => {
-    const internalRef = useRef<HTMLInputElement>(null); // Create an internal ref
-    const combinedRef = ref || internalRef; // Use provided ref or internal ref
+    const internalRef = useRef<HTMLInputElement>(null);
+    const combinedRef = ref || internalRef;
     const [value, setValue] = useState<number | undefined>(
       controlledValue ?? defaultValue,
     );
 
     const handleIncrement = useCallback(() => {
       setValue((prev) =>
-        prev === undefined
-          ? (step ?? 1)
-          : Math.min(prev + (step ?? 1), max),
+        prev === undefined ? (step ?? 1) : Math.min(prev + (step ?? 1), max),
       );
     }, [step, max]);
 
     const handleDecrement = useCallback(() => {
       setValue((prev) =>
-        prev === undefined
-          ? -(step ?? 1)
-          : Math.max(prev - (step ?? 1), min),
+        prev === undefined ? -(step ?? 1) : Math.max(prev - (step ?? 1), min),
       );
     }, [step, min]);
 
@@ -93,35 +89,50 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       }
     }, [controlledValue]);
 
+    const clamp = (val: number) => {
+      let clamped = val;
+      if (min !== undefined) clamped = Math.max(min, clamped);
+      if (max !== undefined) clamped = Math.min(max, clamped);
+      return clamped;
+    };
+
     const handleChange = (values: {
       value: string;
       floatValue: number | undefined;
     }) => {
-      const newValue =
-        values.floatValue === undefined ? undefined : values.floatValue;
-      setValue(newValue);
-      if (onValueChange) {
-        onValueChange(newValue);
+      const rawValue = values.floatValue;
+      if (rawValue === undefined) {
+        setValue(undefined);
+        onValueChange?.(undefined);
+        return;
+      }
+      const clampedValue = clamp(rawValue);
+      if (clampedValue === value && rawValue !== clampedValue) {
+        setValue(undefined);
+        setTimeout(() => {
+          setValue(clampedValue);
+        }, 0);
+        return;
+      }
+      if (rawValue !== clampedValue) {
+        setValue(clampedValue);
+        onValueChange?.(clampedValue);
+      } else {
+        setValue(rawValue);
+        onValueChange?.(rawValue);
       }
     };
 
     const handleBlur = () => {
       if (value !== undefined) {
-        if (value < min) {
-          setValue(min);
-          (ref as React.RefObject<HTMLInputElement>).current!.value =
-            String(min);
-        } else if (value > max) {
-          setValue(max);
-          (ref as React.RefObject<HTMLInputElement>).current!.value =
-            String(max);
-        }
+        let newValue = clamp(value);
+        setValue(newValue);
+        onBlur?.(newValue);
       }
-      onBlur?.(value);
     };
 
     return (
-      <div className="flex items-center">
+      <div className="group relative flex items-center w-full">
         <NumericFormat
           value={value}
           onValueChange={handleChange}
@@ -137,29 +148,33 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           prefix={prefix}
           customInput={Input}
           placeholder={placeholder}
-          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none rounded-r-none relative"
-          getInputRef={combinedRef} // Use combined ref
+          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-full pr-8"
+          getInputRef={combinedRef}
           {...props}
         />
         {showSpinButtons && (
-          <div className="flex flex-col">
+          <div className="absolute right-1 inset-y-1.5 flex flex-col w-7 overflow-hidden border border-zinc-200 bg-white scale-70">
             <Button
+              type="button"
+              variant="ghost"
+              size={"icon-xs"}
               aria-label="Increase value"
-              className="px-2 h-5 rounded-l-none rounded-br-none border-input border-l-0 border-b-[0.5px] focus-visible:relative"
-              variant="outline"
+              className="h-1/2 w-full px-0 rounded-none hover:bg-zinc-100 border-b-[0.5px] border-input transition-colors"
               onClick={handleIncrement}
-              disabled={value === max}
+              disabled={value !== undefined && value >= max}
             >
-              <ChevronUp size={15} />
+              <Icon icon="mynaui:chevron-up-solid" width="24" height="24" />
             </Button>
             <Button
+              type="button"
+              variant="ghost"
+              size={"icon-xs"}
               aria-label="Decrease value"
-              className="px-2 h-5 rounded-l-none rounded-tr-none border-input border-l-0 border-t-[0.5px] focus-visible:relative"
-              variant="outline"
+              className="h-1/2 w-full px-0 rounded-none rounded-br-md hover:bg-zinc-100 transition-colors"
               onClick={handleDecrement}
-              disabled={value === min}
+              disabled={value !== undefined && value <= min}
             >
-              <ChevronDown size={15} />
+              <Icon icon="mynaui:chevron-down-solid" width="24" height="24" />
             </Button>
           </div>
         )}
