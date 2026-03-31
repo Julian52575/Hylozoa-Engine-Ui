@@ -60,10 +60,11 @@ export default function OptionsManager({
         <NumberOption
           label={label}
           value={value}
-          onChange={onValueChange}
           min={min}
           max={max}
           step={step}
+          onChange={onValueChange}
+          onCommit={onCommit}
         />
       );
     case "file":

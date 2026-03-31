@@ -1,7 +1,7 @@
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Slider } from "@/components/ui/slider";
+import { NumberInput } from "@/components/ui/number-input";
 
 interface NumberOptionProps {
   label: string;
@@ -10,39 +10,57 @@ interface NumberOptionProps {
   max?: number;
   step?: number;
   onChange?: (newValue: number) => void;
+  onCommit?: (newValue: number) => void;
 }
 
 export function NumberOption({
   label,
   value,
-  onChange,
   min,
   max,
   step,
+  onChange,
+  onCommit,
 }: NumberOptionProps) {
+  const safeValue = typeof value === "number" ? value : 0;
+  const [localValue, setLocalValue] = useState<number>(safeValue);
+  const lastValueRef = useRef(localValue);
 
-  const safeValue = typeof value === 'number' ? value : 0;
-  const [localValue, setLocalValue] = useState<string>(safeValue.toString());
   useEffect(() => {
-    if (typeof value === 'number') {
-      setLocalValue(value.toString());
+    if (typeof value === "number") {
+      setLocalValue(value);
     }
   }, [value]);
 
-  const processChange = (newValue: string | number) => {
-    const strValue = newValue.toString();
-    setLocalValue(strValue);
-    
-    if (newValue === "" || newValue === "-") return;
+  useEffect(() => {
+    lastValueRef.current = localValue;
+  }, [localValue]);
 
-    const parsed = parseFloat(newValue as string);
-    if (!isNaN(parsed) && parsed !== value) {
-      let finalValue = parsed;
-      if (min !== undefined && parsed < min) finalValue = Math.max(min, finalValue);
-      if (max !== undefined && parsed > max) finalValue = Math.min(max, finalValue);
-      onChange?.(finalValue);
-    }
+  const clamp = (val: number) => {
+    let clamped = val;
+    if (min !== undefined) clamped = Math.max(min, clamped);
+    if (max !== undefined) clamped = Math.min(max, clamped);
+    return clamped;
   };
+
+  const processChange = (newValue: undefined | number) => {
+    if (newValue === undefined) return;
+    setLocalValue(newValue);
+    const finalValue = clamp(newValue);
+    onChange?.(finalValue);
+  };
+
+  const handleBlur = (newValue: undefined | number) => {
+    if (newValue === undefined) return;
+    const finalValue = clamp(newValue);
+    onCommit?.(finalValue);
+  };
+
+  useEffect(() => {
+    return () => {
+      handleBlur(lastValueRef.current);
+    };
+  }, []);
 
   return (
     <div className="flex flex-col gap-2 p-3 bg-zinc-50/50 rounded-lg border border-zinc-200 transition-all hover:border-zinc-300">
@@ -52,26 +70,24 @@ export function NumberOption({
       >
         {label}
       </Label>
-      <Input
-        type="number"
-        value={localValue}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          processChange(e.target.value)
-        }
-        onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
-          processChange(e.target.value)
-        }
-        min={min}
-        max={max}
-        step={step}
-        id={label}
-        className="h-8 text-sm font-mono border-zinc-200 focus-visible:border-zinc-400 focus-visible:ring-zinc-400/30 transition-all bg-white"
-      />
+        <NumberInput
+          id={label}
+          value={localValue}
+          thousandSeparator=","
+          onValueChange={processChange}
+          onBlur={handleBlur}
+          min={min}
+          max={max}
+          step={step}
+          showSpinButtons={false}
+          decimalScale={2}
+          className="w-full bg-white border-zinc-200 focus:ring-1 focus:ring-zinc-400 focus:ring-offset-0 transition-all font-medium text-sm"
+        />
       {min !== undefined && max !== undefined && (
         <Slider
-          value={[localValue ? parseFloat(localValue) : 0]}
+          value={[localValue]}
           onValueChange={(values) => processChange(values[0])}
-          onBlur={() => processChange(localValue)}
+          onBlur={() => handleBlur(localValue)}
           min={min}
           max={max}
           step={step}

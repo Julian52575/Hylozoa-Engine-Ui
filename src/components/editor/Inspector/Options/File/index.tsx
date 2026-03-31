@@ -5,7 +5,6 @@ export function FileOption({
     value,
     accept
 }: { label: string; value: string; accept?: "image" | "video" | "audio" }) {
-    console.log("Rendering FileOption with value:", value, "and accept:", accept);
     if (accept === "image") {
         return (
             <ImageAccept label={label} value={value} />
