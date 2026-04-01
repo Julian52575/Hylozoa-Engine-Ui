@@ -44,6 +44,7 @@ function ComponentManager({ component }: { component: any }) {
       [key]: newValue,
     });
     clearOverrides();
+    console.log("Committed change for", key, "with value", newValue);
   };
 
   return (

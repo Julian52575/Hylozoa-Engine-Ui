@@ -13,7 +13,7 @@ import { useSessionStore } from "@/store/useSessionStore";
 
 interface EntityProps extends Konva.NodeConfig {
   id: string;
-  src: string;
+  src?: string;
   position: {
     x: number;
     y: number;
@@ -62,7 +62,7 @@ const Entity = ({
       lineColor="red"
       {...rest}
     >
-      <SpriteShow src={src} />
+      {src && <SpriteShow src={src} />}
       <CameraShow size={{ width: 200, height: 200 }} />
     </LocalTransformShow>
   );
@@ -168,13 +168,12 @@ function Displayer({
     const rawRotation = node.rotation();
     const normalizedRotation = Math.floor(((rawRotation % 360) + 360) % 360);
     const props = {
-      position: { x: Math.floor(node.x()), y: Math.floor(node.y()) },
       rotation: normalizedRotation,
       scale: { x: node.scaleX(), y: node.scaleY() },
     };
 
     if (isEnd) {
-      updateComponentProps(sceneId, id, transformId, props);
+      updateComponentProps(sceneId, id, transformId, {position: { x: Math.floor(node.x()), y: Math.floor(node.y()) },...props});
       clearOverrides();
       return;
     }
@@ -245,15 +244,20 @@ function ConnectedEntity({ entity, ...props }: ConnectedEntityProps) {
     return result;
   }, [entity.components, liveOverrides]);
 
-  const transform = allProps["localTransform"] || {};
+  const transform = allProps["localTransform"] || undefined;
+  const sprite = allProps["sprite"] || undefined;
+
+  if (transform === undefined) {
+    return null;
+  }
 
   return (
     <Entity
       id={entity.id || ""}
-      src={Logo}
-      position={transform.position || { x: 0, y: 0 }}
-      scale={transform.scale || { x: 1, y: 1 }}
-      rotation={transform.rotation || 0}
+      src={sprite?.texture}
+      position={transform.position}
+      scale={transform.scale}
+      rotation={transform.rotation}
       {...props}
     />
   );

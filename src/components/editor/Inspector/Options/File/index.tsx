@@ -1,13 +1,22 @@
 import { ImageAccept } from "./ImageAccept";
 
+
+interface FileOptionProps {
+    label: string;
+    value: string;
+    accept?: "image" | "video" | "audio";
+    onCommit: (newValue: any) => void;
+}
+
 export function FileOption({ 
     label, 
     value,
-    accept
-}: { label: string; value: string; accept?: "image" | "video" | "audio" }) {
+    accept,
+    onCommit,
+}: FileOptionProps) {
     if (accept === "image") {
         return (
-            <ImageAccept label={label} value={value} />
+            <ImageAccept label={label} value={value} onChange={onCommit} />
         );
     }
     return (

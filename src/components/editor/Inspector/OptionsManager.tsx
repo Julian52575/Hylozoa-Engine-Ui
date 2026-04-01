@@ -69,7 +69,14 @@ export default function OptionsManager({
         />
       );
     case "file":
-      return <FileOption label={label} value={value} accept={accept} />;
+      return (
+        <FileOption 
+          label={label} 
+          value={value} 
+          accept={accept}
+          onCommit={onCommit}
+        />
+      );
     case "color":
       return <ColorOption label={label} value={value} />;
     default:

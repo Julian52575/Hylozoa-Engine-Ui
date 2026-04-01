@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useState } from "react";
 import Konva from "konva";
 import { Image } from "react-konva";
+import { convertFileSrc } from '@tauri-apps/api/core'; // Pour Tauri v2
 
 interface SpriteProps extends Konva.ImageConfig {
   src: string;
@@ -14,18 +15,22 @@ export const SpriteShow = forwardRef<Konva.Image, SpriteProps>(
       width: 0,
       height: 0,
     });
+
     useEffect(() => {
+      const assetUrl = src.startsWith('http') ? src : convertFileSrc(src);
       const image = new window.Image();
-      image.src = src;
+      image.src = assetUrl;
       image.onload = () => {
         setImg(image);
         setCalculatedSize({ width: image.width, height: image.height });
       };
     }, [src]);
 
+
     if (!img) {
       return null;
     }
+
 
     return (
       <Image
