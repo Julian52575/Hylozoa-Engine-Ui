@@ -141,7 +141,7 @@ function Displayer({
     )?.id;
     if (!transformId) return;
 
-    const props = { position: { x: node.x(), y: node.y() } };
+    const props = { position: { x: Math.floor(node.x()), y: Math.floor(node.y()) } };
 
     if (isEnd) {
       updateComponentProps(sceneId, id, transformId, props);
@@ -168,7 +168,7 @@ function Displayer({
     const rawRotation = node.rotation();
     const normalizedRotation = Math.floor(((rawRotation % 360) + 360) % 360);
     const props = {
-      position: { x: node.x(), y: node.y() },
+      position: { x: Math.floor(node.x()), y: Math.floor(node.y()) },
       rotation: normalizedRotation,
       scale: { x: node.scaleX(), y: node.scaleY() },
     };

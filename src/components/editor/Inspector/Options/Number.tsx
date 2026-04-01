@@ -36,13 +36,13 @@ export function NumberOption({
     lastValueRef.current = localValue;
   }, [localValue]);
 
-    const processChange = (newValue: number | undefined) => {
-      if (newValue === undefined) return;
-      setLocalValue(newValue);
-      onChange?.(newValue);
-    };
+  const processChange = (newValue: number | undefined) => {
+    if (newValue === undefined) return;
+    setLocalValue(newValue);
+    onChange?.(newValue);
+  };
 
-  const handleBlur = (newValue: number | undefined  ) => {
+  const handleBlur = (newValue: number | undefined) => {
     if (newValue === undefined) return;
     onCommit?.(newValue);
   };
@@ -61,19 +61,19 @@ export function NumberOption({
       >
         {label}
       </Label>
-        <NumberInput
-          id={label}
-          value={localValue}
-          thousandSeparator=","
-          onValueChange={processChange}
-          onBlur={handleBlur}
-          min={min}
-          max={max}
-          step={step}
-          showSpinButtons={true}
-          decimalScale={2}
-          className="w-full bg-white border-zinc-200 focus:ring-1 focus:ring-zinc-400 focus:ring-offset-0 transition-all font-medium text-sm"
-        />
+      <NumberInput
+        id={label}
+        value={localValue}
+        thousandSeparator=","
+        onValueChange={processChange}
+        onBlur={handleBlur}
+        min={min}
+        max={max}
+        step={step}
+        showSpinButtons={true}
+        decimalScale={2}
+        className="w-full bg-white border-zinc-200 focus:ring-1 focus:ring-zinc-400 focus:ring-offset-0 transition-all font-medium text-sm"
+      />
       {min !== undefined && max !== undefined && (
         <Slider
           value={[localValue]}

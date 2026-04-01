@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "@iconify/react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -30,33 +30,52 @@ function AxisInput({
   value,
   colorClass,
   onChange,
+  onCommit,
 }: {
   axisLabel: string;
   value: number;
   colorClass: string;
-  onChange: (newVal: { x: number; y: number }) => void;
+  onChange: (val: number) => void; // Simplifié : juste le nombre
+  onCommit: (val: number) => void; // Simplifié : juste le nombre
 }) {
-
-  const safeValue = typeof value === 'number' ? value : 0;
+  const safeValue = typeof value === "number" ? value : 0;
   const [localValue, setLocalValue] = useState<string>(safeValue.toString());
+  const stateRef = useRef({ localValue, value, axisLabel });
 
-useEffect(() => {
-    // On met à jour seulement si value n'est pas null
+  useEffect(() => {
     if (value !== null && value !== undefined) {
       setLocalValue(value.toString());
     }
   }, [value]);
 
-  
+  useEffect(() => {
+    stateRef.current = { localValue, value, axisLabel };
+  }, [localValue, value, axisLabel]);
+
   const processChange = (newValue: string) => {
     setLocalValue(newValue);
     const parsed = parseFloat(newValue);
     if (!isNaN(parsed)) {
-      // ... ta logique de min/max
-      onChange?.({ x: axisLabel === "X" ? parsed : value, y: axisLabel === "Y" ? parsed : value });
+      onChange?.(parsed);
     }
   };
 
+  const handleBlur = (newValue: string) => {
+    const parsed = parseFloat(newValue);
+    if (!isNaN(parsed)) {
+      onCommit?.(parsed);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      const { localValue } = stateRef.current;
+      const parsed = parseFloat(localValue);
+      if (!isNaN(parsed)) {
+        onCommit?.(parsed);
+      }
+    };
+  }, []);
 
   return (
     <div className="relative flex items-center group ">
@@ -69,6 +88,7 @@ useEffect(() => {
         type="number"
         value={localValue}
         onChange={(e) => processChange(e.target.value)}
+        onBlur={() => handleBlur(localValue)}
         className={`pl-6 h-8 text-sm font-mono border-zinc-200 focus-visible:border-${colorClass.split("-")[1]}-400 focus-visible:ring-${colorClass.split("-")[1]}-400/30 transition-all bg-white`}
       />
     </div>
@@ -81,13 +101,20 @@ export function Vector2Option({
   y,
   linked,
   onChange,
+  onCommit,
 }: {
   label: string;
   x: number;
   y: number;
   linked: boolean;
   onChange?: (newVal: { x: number; y: number }) => void;
+  onCommit?: (newVal: { x: number; y: number }) => void;
 }) {
+  const currentValues = useRef({ x, y });
+  useEffect(() => {
+    currentValues.current = { x, y };
+  }, [x, y]);
+
   return (
     <div className="flex flex-col gap-2 p-3 bg-zinc-50/50 rounded-lg border border-zinc-200 hover:border-zinc-300 transition-all cursor-default">
       <div className="flex items-center justify-between px-1">
@@ -100,13 +127,15 @@ export function Vector2Option({
           axisLabel="X"
           value={x}
           colorClass="text-red-500"
-          onChange={(newVal) => onChange && onChange({ x: newVal.x, y })}
+          onChange={(newX) => onChange?.({ x: newX, y : currentValues.current.y })}
+          onCommit={(finalX) => onCommit?.({ x: finalX, y: currentValues.current.y })}
         />
         <AxisInput
           axisLabel="Y"
           value={y}
           colorClass="text-green-500"
-          onChange={(newVal) => onChange && onChange({ x, y: newVal.y })}
+          onChange={(newY) => onChange?.({ x: currentValues.current.x, y: newY })}
+          onCommit={(finalY) => onCommit?.({ x: currentValues.current.x, y: finalY })}
         />
       </div>
     </div>

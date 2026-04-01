@@ -40,6 +40,7 @@ export default function OptionsManager({
           y={value.y} 
           linked={true}
           onChange={onValueChange}
+          onCommit={onCommit}
         />
       );
     case "enum":
