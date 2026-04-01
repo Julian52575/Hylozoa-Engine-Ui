@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Stage, Layer, Transformer } from "react-konva";
 
-import Logo from "../../../assets/logo.webp";
 import { useEngineStore, type Entity } from "@/store/engineStore";
 import { useSelectionStore } from "@/store/useSelectionStore";
 import Konva from "konva";
@@ -13,26 +12,45 @@ import { useSessionStore } from "@/store/useSessionStore";
 
 interface EntityProps extends Konva.NodeConfig {
   id: string;
-  src?: string;
-  position: {
-    x: number;
-    y: number;
+  transform: {
+    position: {
+      x: number;
+      y: number;
+    };
+    scale: {
+      x: number;
+      y: number;
+    };
+    rotation: number;
   };
-  scale: {
-    x: number;
-    y: number;
+  sprite?: {
+    texture: string;
+    scale: {
+      x: number;
+      y: number;
+    };
+    origin: {
+      x: number;
+      y: number;
+    };
+    camera?: {
+      viewportSize: {
+        x: number;
+        y: number;
+      };
+
+    };
   };
-  rotation: number;
+  
   onRegister: (id: string, node: any) => void;
   onClick: (id: string) => void;
 }
 
 const Entity = ({
   id,
-  src,
-  position,
-  scale,
-  rotation,
+  transform,
+  sprite,
+  camera,
   onRegister,
   onClick,
   ...rest
@@ -52,18 +70,18 @@ const Entity = ({
         if (node) onRegister(id, node);
       }}
       id={id}
-      x={position.x}
-      y={position.y}
-      scaleX={scale.x}
-      scaleY={scale.y}
-      rotation={rotation}
+      x={transform.position.x}
+      y={transform.position.y}
+      scaleX={transform.scale.x}
+      scaleY={transform.scale.y}
+      rotation={transform.rotation}
       draggable
       onClick={() => onClick(id)}
       lineColor="red"
       {...rest}
     >
-      {src && <SpriteShow src={src} />}
-      <CameraShow size={{ width: 200, height: 200 }} />
+      {sprite && <SpriteShow src={sprite.texture} scale={sprite.scale} origin={sprite.origin} originType="top-left" />}
+      {camera && <CameraShow size={camera.viewportSize} />}
     </LocalTransformShow>
   );
 };
@@ -102,6 +120,15 @@ function Displayer({
   }, [selectedId]);
 
   const handleSelection = (id: string) => {
+    if (selectedId === id) return;
+    if (!sceneId) return;
+    const entity = useEngineStore.getState().scenes[sceneId]?.entities[id];
+    if (!entity) return;
+    const transformComp = Object.values(entity.components).find(
+      (c) => c.type === "localTransform",
+    );
+    if (!transformComp) return;
+
     useSelectionStore.getState().selectEntity(id);
   };
 
@@ -246,6 +273,7 @@ function ConnectedEntity({ entity, ...props }: ConnectedEntityProps) {
 
   const transform = allProps["localTransform"] || undefined;
   const sprite = allProps["sprite"] || undefined;
+  const camera = allProps["camera"] || undefined;
 
   if (transform === undefined) {
     return null;
@@ -254,10 +282,9 @@ function ConnectedEntity({ entity, ...props }: ConnectedEntityProps) {
   return (
     <Entity
       id={entity.id || ""}
-      src={sprite?.texture}
-      position={transform.position}
-      scale={transform.scale}
-      rotation={transform.rotation}
+      sprite={sprite}
+      transform={transform}
+      camera={camera}
       {...props}
     />
   );

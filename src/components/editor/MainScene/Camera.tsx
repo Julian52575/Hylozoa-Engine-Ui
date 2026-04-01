@@ -5,8 +5,8 @@ import { Rect } from "react-konva";
 interface SpriteProps extends Konva.RectConfig {
   offsetType?: "center" | "top-left";
   size: {
-    width: number;
-    height: number;
+    x: number;
+    y: number;
   };
   color?: string;
   listening?: boolean;
@@ -14,7 +14,7 @@ interface SpriteProps extends Konva.RectConfig {
 
 export function CameraShow({
   size,
-  color = "lightblue",
+  color = "blue",
   listening = false,
   offsetType = "center",
   ...rest
@@ -28,13 +28,15 @@ export function CameraShow({
     }
   }, []);
 
+  console.log("Rendering CameraShow with size:", size, "color:", color, "listening:", listening, "offsetType:", offsetType);
+
   return (
     <Rect
       ref={rectRef}
-      width={size.width}
-      height={size.height}
-      offsetX={offsetType === "center" ? size.width / 2 : 0}
-      offsetY={offsetType === "center" ? size.height / 2 : 0}
+      width={size.x}
+      height={size.y}
+      offsetX={offsetType === "center" ? size.x / 2 : 0}
+      offsetY={offsetType === "center" ? size.y / 2 : 0}
       stroke={color}
       strokeWidth={1}
       listening={listening}

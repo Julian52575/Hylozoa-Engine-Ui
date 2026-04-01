@@ -53,7 +53,14 @@ export default function ComponentModal({
           <DialogTitle>Add new Component</DialogTitle>
         </DialogHeader>
         <div>
-            <Input placeholder="Search Component..." className="mb-4" value={search} onChange={(e) => setSearch(e.target.value)} autoFocus/>
+            <Input 
+                placeholder="Search Component..." 
+                className="mb-4" 
+                value={search} 
+                onChange={(e) => setSearch(e.target.value)} 
+                autoFocus
+                onKeyDown={(e) => e.stopPropagation()}
+            />
             <div className="flex flex-col overflow-scroll gap-2 max-h-[300px]">
                 {filteredSchemas.map((schema) => (
                     <div 
