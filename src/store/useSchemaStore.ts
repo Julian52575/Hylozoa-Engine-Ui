@@ -4,7 +4,7 @@ interface PropertyDefinition {
   type: "vector2" | "enum" | "boolean" | "text" | "number" | "file" | "color";
   label: string;
   dependency?: string;
-  options?: string[];
+  options?: { label: string; value: any }[];
   min?: number;
   max?: number;
   step?: number;

@@ -14,10 +14,21 @@ export function EnumOption({
     onChange
 }: { 
     label: string, 
-    options: string[], 
+    options: { label: string; value: any }[],
     value: string,
     onChange?: (newValue: string) => void
 }) {
+    const formattedValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
+    const handleChange = (newValue: string) => {
+        if (!onChange) return;
+        try {
+            const parsed = JSON.parse(newValue);
+            onChange(parsed);
+        } catch (e) {
+            onChange(newValue);
+        }
+    };
+
     return (
         <div className="flex flex-col gap-2 p-3 bg-zinc-50/50 rounded-lg border border-zinc-200 transition-all hover:border-zinc-300">
             <Label 
@@ -26,7 +37,7 @@ export function EnumOption({
             >
                 {label}
             </Label>
-            <Select value={value} onValueChange={onChange}>
+            <Select value={formattedValue} onValueChange={handleChange}>
                 <SelectTrigger 
                     id={label} 
                     className="w-full h-8 text-sm bg-white border-zinc-200 focus:ring-1 focus:ring-zinc-400 focus:ring-offset-0 transition-all font-medium"
@@ -43,11 +54,11 @@ export function EnumOption({
                 >
                     {options.map((option) => (
                         <SelectItem 
-                            key={option} 
-                            value={option}
+                            key={typeof option.value === 'object' ? JSON.stringify(option.value) : option.value}
+                            value={typeof option.value === 'object' ? JSON.stringify(option.value) : option.value}
                             className="text-sm focus:bg-zinc-100 focus:text-zinc-900 cursor-pointer"
                         >
-                            {option}
+                            {option.label}
                         </SelectItem>
                     ))}
                 </SelectContent>

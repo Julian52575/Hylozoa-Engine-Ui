@@ -29,7 +29,7 @@ interface EntityProps extends Konva.NodeConfig {
       x: number;
       y: number;
     };
-    origin: {
+    offset: {
       x: number;
       y: number;
     };
@@ -80,7 +80,7 @@ const Entity = ({
       lineColor="red"
       {...rest}
     >
-      {sprite && <SpriteShow src={sprite.texture} scale={sprite.scale} origin={sprite.origin} originType="top-left" />}
+      {sprite && <SpriteShow src={sprite.texture} scale={sprite.scale} offset={sprite.offset} />}
       {camera && <CameraShow size={camera.viewportSize} />}
     </LocalTransformShow>
   );

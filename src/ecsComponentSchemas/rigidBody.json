@@ -6,7 +6,11 @@
     "bodyType": {
       "type": "enum",
       "label": "Body Type",
-      "options": ["static", "dynamic", "kinematic"]
+      "options": [
+        { "label": "Static", "value": "static" },
+        { "label": "Dynamic", "value": "dynamic" },
+        { "label": "Kinematic", "value": "kinematic" }
+      ]
     },
     "gravityScale": {
       "type": "number",

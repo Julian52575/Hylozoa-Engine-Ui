@@ -6,7 +6,10 @@
     "shapeType": {
       "type": "enum",
       "label": "Shape Type",
-      "options": ["rectangle", "circle"]
+      "options": [
+        { "label": "Rectangle", "value": "rectangle" },
+        { "label": "Circle", "value": "circle" }
+      ]      
     },
     "width": {
       "type": "number",
