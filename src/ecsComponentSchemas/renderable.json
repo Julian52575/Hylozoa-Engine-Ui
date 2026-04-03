@@ -6,12 +6,14 @@
         "color": { "type": "color", "label": "Color" },
         "visible": { "type": "boolean", "label": "Visible" },
         "LayerBit": { "type": "string", "label": "Layer" },
-        "transparency": { "type": "number", "label": "Transparency" }
+        "transparency": { "type": "number", "label": "Transparency" },
+        "origin": { "type": "vector2", "label": "Origin" }
     },
     "values": {
         "color": "#ffffff",
         "visible": true,
         "LayerBit": "Default",
-        "transparency": 255
+        "transparency": 255,
+        "origin": { "x": 0, "y": 0 }
     }
 }
