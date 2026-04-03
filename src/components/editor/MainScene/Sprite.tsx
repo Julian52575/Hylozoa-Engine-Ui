@@ -22,13 +22,13 @@ export const SpriteShow = forwardRef<Konva.Image, SpriteProps>(
     ref,
   ) => {
     const [img, setImg] = useState<HTMLImageElement | undefined>(undefined);
+    const assetUrl = src.startsWith("http") ? src : convertFileSrc(src);
     const [calculatedSize, setCalculatedSize] = useState({
       width: 0,
       height: 0,
     });
 
     useEffect(() => {
-      const assetUrl = src.startsWith("http") ? src : convertFileSrc(src);
       const image = new window.Image();
       image.src = assetUrl;
       image.onload = () => {

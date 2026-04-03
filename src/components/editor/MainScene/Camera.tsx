@@ -28,8 +28,6 @@ export function CameraShow({
     }
   }, []);
 
-  console.log("Rendering CameraShow with size:", size, "color:", color, "listening:", listening, "offsetType:", offsetType);
-
   return (
     <Rect
       ref={rectRef}

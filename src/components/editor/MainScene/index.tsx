@@ -113,6 +113,14 @@ function Displayer({
     }
   };
   useEffect(() => {
+    if (!sceneId) return;
+    const entity = useEngineStore.getState().scenes[sceneId]?.entities[selectedId!];
+    if (!entity) return;
+    const transformComp = Object.values(entity.components).find(
+      (c) => c.type === "localTransform",
+    );
+    if (!transformComp) return;
+
     if (selectedId && trRef.current && nodesRef.current.has(selectedId)) {
       trRef.current.nodes([nodesRef.current.get(selectedId)]);
       trRef.current.getLayer().batchDraw();
@@ -120,15 +128,6 @@ function Displayer({
   }, [selectedId]);
 
   const handleSelection = (id: string) => {
-    if (selectedId === id) return;
-    if (!sceneId) return;
-    const entity = useEngineStore.getState().scenes[sceneId]?.entities[id];
-    if (!entity) return;
-    const transformComp = Object.values(entity.components).find(
-      (c) => c.type === "localTransform",
-    );
-    if (!transformComp) return;
-
     useSelectionStore.getState().selectEntity(id);
   };
 

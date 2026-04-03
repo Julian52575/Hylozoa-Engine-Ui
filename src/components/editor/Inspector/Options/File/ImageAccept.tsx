@@ -80,10 +80,7 @@ export function ImageAccept({ label, value,onChange }: { label: string, value: s
             <ImageInput 
                 image={value} 
                 text={label}
-                onImageChange={(newImage) => {
-                    console.log("Selected image:", newImage);
-                    onChange(newImage);
-                }} 
+                onImageChange={onChange}
             />
         </div>
     );
