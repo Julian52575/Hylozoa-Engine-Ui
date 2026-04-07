@@ -9,6 +9,8 @@
     "dialog:allow-open",
     "dialog:default",
     "fs:default",
+    "fs:allow-temp-write",
+    "fs:allow-write-text-file",
     "core:window:allow-set-title",
     "core:window:allow-title",
     "core:window:allow-close",
@@ -21,14 +23,18 @@
     "core:webview:allow-create-webview-window",
     "shell:allow-kill",
     {
-      "identifier":"shell:allow-spawn",
-      "allow": [{
-        "name": "binaries/hylozoa",
-        "sidecar": true,
-        "args":[
-          {"validator": "\\S+"}
-        ]
-      }]
+      "identifier": "shell:allow-spawn",
+      "allow": [
+        {
+          "name": "binaries/hylozoa",
+          "sidecar": true,
+          "args": [
+           { "validator": "[\\s\\S]*" },
+            { "validator": "[\\s\\S]*" },
+            { "validator": "[\\s\\S]*" }
+          ]
+        }
+      ]
     }
   ]
 }

@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { temporal } from "zundo";
-import { v4 as uuidv4 } from "uuid";
+import { Component } from "lucide-react";
 
 export interface Component {
   id?: string;
@@ -65,6 +65,44 @@ export const serializeEngineState = (state: EngineState): object => {
   };
 };
 
+export const exportToEngine = (state: EngineState) => {
+  return {
+    version: state.version,
+    scenes: Object.values(state.scenes).map((scene) => ({
+      sceneID: scene.id,
+      sceneName: scene.name,
+      Entities: Object.values(scene.entities).map((entity) => {
+        const transformedComponents = Object.values(entity.components).reduce(
+          (acc, comp) => {
+            const capitalizedName =
+              comp.name.charAt(0).toUpperCase() + comp.name.slice(1);
+            if (capitalizedName === "Camera") {
+              acc[capitalizedName] = {
+                ...comp.props,
+                cullingMask: Array.isArray(comp.props.cullingMask)
+                  ? comp.props.cullingMask
+                  : ["Default"],
+              };
+            } else {
+              acc[capitalizedName] = { ...comp.props };
+            }
+            return acc;
+          },
+          {} as Record<string, any>,
+        );
+        if (!transformedComponents["Name"]) {
+          transformedComponents["Name"] = { "name": entity.name };
+        }
+        return {
+          UUID: entity.id,
+          Parent: null,
+          Components: transformedComponents,
+        };
+      }),
+    })),
+  };
+};
+
 export const loadEngineState = (data: any): void => {
   const scenes: Record<string, SceneState> = {};
   data.scenes.forEach((sceneData: any) => {
@@ -87,6 +125,15 @@ export const loadEngineState = (data: any): void => {
     scenes,
   });
 };
+
+const generateUint64Id = (): string => {
+  const array = new Uint32Array(2);
+  window.crypto.getRandomValues(array);
+  const high = BigInt(array[0]);
+  const low = BigInt(array[1]);
+  const uuid64 = (high << 32n) | low;
+  return uuid64.toString();
+};
 export const useEngineStore = create<EngineState>()(
   temporal(
     persist(
@@ -95,7 +142,7 @@ export const useEngineStore = create<EngineState>()(
         scenes: {},
 
         addScene: (name: string) => {
-          const id = uuidv4();
+          const id = generateUint64Id();
           set((state: EngineState) => {
             state.scenes[id] = { id, name, entities: {} };
           });
@@ -105,11 +152,11 @@ export const useEngineStore = create<EngineState>()(
           set((state: EngineState) => {
             const scene = state.scenes[sceneId];
             if (!scene) return;
-            const entityId = uuidv4();
+            const entityId = generateUint64Id();
             const processedComponents: Record<string, Component> = {};
             if (entity.components) {
               Object.values(entity.components).forEach((comp) => {
-                const compId = uuidv4();
+                const compId = generateUint64Id();
                 processedComponents[compId] = { ...comp, id: compId };
               });
             }
@@ -141,7 +188,7 @@ export const useEngineStore = create<EngineState>()(
             if (scene) {
               const entity = scene.entities[entityId];
               if (entity) {
-                const id = uuidv4();
+                const id = generateUint64Id();
                 const newComponent = { ...component, id };
                 entity.components[newComponent.id] = newComponent;
               }

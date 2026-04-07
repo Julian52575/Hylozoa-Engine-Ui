@@ -29,8 +29,16 @@ set(TARGET_TRIPLET ${ARCH}-unknown-${OS})
 
 # --- BINARY NAME ---
 set(BINARY_NAME hylozoa-${TARGET_TRIPLET})
-
 add_executable(${BINARY_NAME} host/main.cpp)
+
+target_link_directories(${BINARY_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/lib)
+target_link_libraries(${BINARY_NAME} PRIVATE hylozoa_engine)
+
+set_target_properties(${BINARY_NAME} PROPERTIES
+    SKIP_BUILD_RPATH FALSE
+    BUILD_WITH_INSTALL_RPATH FALSE
+    INSTALL_RPATH "$ORIGIN/lib"
+)
 
 
 # target_link_directories(engine_host PRIVATE ${CMAKE_SOURCE_DIR}/lib)

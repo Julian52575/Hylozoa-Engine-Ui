@@ -37,6 +37,9 @@
   },
   "bundle": {
     "active": true,
+    "resources": [
+      "ressources/EngineSettings.json"
+    ],
     "externalBin": [
       "binaries/hylozoa"
     ],
