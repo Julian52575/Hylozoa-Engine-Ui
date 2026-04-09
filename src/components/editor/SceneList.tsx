@@ -8,7 +8,6 @@ export function SceneList() {
 
   const invisibleScenes = useSelectionStore().invisibleSceneIds;
 
-  // const addScene = useEngineStore().addScene;
   const setSelectedSceneId = useSelectionStore().selectScene;
   const setSelectedEntityId = useSelectionStore().selectEntity;
   const setInvisibleScenes = useSelectionStore().setInvisibleScenes;

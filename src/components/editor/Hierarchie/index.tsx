@@ -87,12 +87,12 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
         {node.data.type === "entity" ? (
           <div className="flex flex-col gap-1 items-start w-full">
             <ComponentModal
-              onValidate={(componentType) => {
+              onValidate={async (componentType) => {
                 const createDefaultComponent =
                   useSchemaStore.getState().createDefaultComponent;
                 const newComponentProps =
                   createDefaultComponent(componentType)?.values || {};
-                useEngineStore
+                await useEngineStore
                   .getState()
                   .addComponentToEntity(
                     useSelectionStore.getState().selectedSceneId!,
@@ -166,11 +166,11 @@ export function Hierarchie() {
 
   const addEntityToScene = useEngineStore((state) => state.addEntityToScene);
 
-  const handleAddEntity = () => {
+  const handleAddEntity = async () => {
     const createDefaultComponent =
       useSchemaStore.getState().createDefaultComponent;
     const newTransform = createDefaultComponent("localTransform");
-    addEntityToScene(currentSceneId!, {
+    await addEntityToScene(currentSceneId!, {
       name: `Entity ${Object.keys(useEngineStore.getState().scenes[currentSceneId!].entities).length + 1}`,
       type: "entity",
       components: {

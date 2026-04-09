@@ -22,17 +22,14 @@
     "core:window:allow-create",
     "core:webview:allow-create-webview-window",
     "shell:allow-kill",
+    "shell:allow-execute",
     {
       "identifier": "shell:allow-spawn",
       "allow": [
         {
           "name": "binaries/hylozoa",
           "sidecar": true,
-          "args": [
-           { "validator": "[\\s\\S]*" },
-            { "validator": "[\\s\\S]*" },
-            { "validator": "[\\s\\S]*" }
-          ]
+          "args": true
         }
       ]
     }

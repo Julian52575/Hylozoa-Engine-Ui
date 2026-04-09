@@ -1,17 +1,13 @@
 import { Button } from "../ui/button";
-import { Command, Child } from "@tauri-apps/plugin-shell";
+import { Child } from "@tauri-apps/plugin-shell";
 import { useState, useRef } from "react";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 
-import { useEngineStore ,exportToEngine } from "@/store/engineStore";
+import { useEngineStore  } from "@/store/engineStore";
 import { Icon } from "@iconify/react";
 
-import { resolveResource } from "@tauri-apps/api/path";
+import { runHylozoa } from "@/lib/engineAPI";
 
-import { writeTextFile } from '@tauri-apps/plugin-fs';
-import { tempDir, join } from '@tauri-apps/api/path';
-
-import { useSelectionStore } from "@/store/useSelectionStore";
 
 function HistoryButtons() {
   const temporal = (useEngineStore as any).temporal;
@@ -46,40 +42,25 @@ export function Toolbar() {
     if (status === "running") return;
 
     try {
-      const settingsPath = await resolveResource(
-        "ressources/EngineSettings.json",
-      );
-
-      const engineState = useEngineStore.getState();
-      const exportData = exportToEngine(engineState);
-      const stringifiedData = JSON.stringify(exportData.scenes[0], null, 2);
-      const tempPath = await join(await tempDir(), 'scene.json');
-      await writeTextFile(tempPath, stringifiedData);
-
-      const selectionState = useSelectionStore.getState(); //Todo, remplacer par la scnèe définie comme le main
-      const selectedSceneId = selectionState.selectedSceneId;
-      console.log("Selected Scene ID:", selectedSceneId);
-
-      const command = Command.sidecar("binaries/hylozoa", [settingsPath,tempPath,selectedSceneId || "0"]);
-      command.stdout.on("data", (line) => {
-        console.log("Hylozoa:", line);
+      const child = await runHylozoa({
+        onStdout: (line) => {
+          console.log("Hylozoa:", line);
+        },
+        onStderr: (line) => {
+          console.error(`[Hylozoa STDERR]: ${line}`);
+        },
+        onClose: async () => {
+          await closeGraphWindow();
+          setStatus("idle");
+          childRef.current = null;
+        },
       });
-      command.stderr.on("data", (line) => {
-        console.error(`[Hylozoa STDERR]: ${line}`);
-      });
-
-      const child = await command.spawn();
       childRef.current = child;
       setStatus("running");
 
       const webview = await createNodeWindow();
       windowRef.current = webview;
 
-      command.on("close", async () => {
-        await closeGraphWindow();
-        setStatus("idle");
-        childRef.current = null;
-      });
     } catch (error) {
       console.error("Failed to launch Hylozoa:", error);
     }

@@ -41,7 +41,7 @@ export function SceneManager() {
         </ContextMenuTrigger>
         <ContextMenuContent>
           <div className="p-0.5 flex flex-col gap-1">
-            <Button variant="ghost" className="w-full" onClick={() => addScene(`Scene ${Object.keys(scenes).length + 1}`)}>
+            <Button variant="ghost" className="w-full" onClick={async () => await addScene(`Scene ${Object.keys(scenes).length + 1}`)}>
               Add Scene
             </Button>
           </div>

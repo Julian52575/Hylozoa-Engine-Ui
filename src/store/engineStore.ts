@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { temporal } from "zundo";
 import { Component } from "lucide-react";
+import { generateUint64Id } from "@/lib/engineAPI";
 
 export interface Component {
   id?: string;
@@ -28,15 +29,15 @@ interface EngineState {
   version: string;
   scenes: Record<string, SceneState>;
 
-  addScene: (name: string) => string;
+  addScene: (name: string) => Promise<string>;
   removeScene: (id: string) => void;
-  addEntityToScene: (sceneId: string, entity: Entity) => void;
+  addEntityToScene: (sceneId: string, entity: Entity) => Promise<void>;
   removeEntityFromScene: (sceneId: string, entityId: string) => void;
   addComponentToEntity: (
     sceneId: string,
     entityId: string,
     component: Component,
-  ) => void;
+  ) => Promise<void>;
   removeComponentFromEntity: (
     sceneId: string,
     entityId: string,
@@ -91,7 +92,7 @@ export const exportToEngine = (state: EngineState) => {
           {} as Record<string, any>,
         );
         if (!transformedComponents["Name"]) {
-          transformedComponents["Name"] = { "name": entity.name };
+          transformedComponents["Name"] = { name: entity.name };
         }
         return {
           UUID: entity.id,
@@ -126,14 +127,8 @@ export const loadEngineState = (data: any): void => {
   });
 };
 
-const generateUint64Id = (): string => {
-  const array = new Uint32Array(2);
-  window.crypto.getRandomValues(array);
-  const high = BigInt(array[0]);
-  const low = BigInt(array[1]);
-  const uuid64 = (high << 32n) | low;
-  return uuid64.toString();
-};
+
+
 export const useEngineStore = create<EngineState>()(
   temporal(
     persist(
@@ -141,32 +136,40 @@ export const useEngineStore = create<EngineState>()(
         version: "1.0.0",
         scenes: {},
 
-        addScene: (name: string) => {
-          const id = generateUint64Id();
+        addScene: async (name: string) => {
+          const id = await generateUint64Id();
           set((state: EngineState) => {
             state.scenes[id] = { id, name, entities: {} };
           });
           return id;
         },
-        addEntityToScene: (sceneId: string, entity: Entity) =>
+        addEntityToScene: async (sceneId: string, entity: Entity) => {
+          // 1. Préparation de l'ID de l'entité
+          const entityId = await generateUint64Id();
+
+          // 2. Préparation des composants (en parallèle pour la performance)
+          const processedComponents: Record<string, Component> = {};
+          if (entity.components) {
+            const entries = await Promise.all(
+              Object.values(entity.components).map(async (comp) => {
+                const compId = await generateUint64Id();
+                return [compId, { ...comp, id: compId }];
+              }),
+            );
+            Object.assign(processedComponents, Object.fromEntries(entries));
+          }
+
+          // 3. Mutation finale de l'état
           set((state: EngineState) => {
             const scene = state.scenes[sceneId];
             if (!scene) return;
-            const entityId = generateUint64Id();
-            const processedComponents: Record<string, Component> = {};
-            if (entity.components) {
-              Object.values(entity.components).forEach((comp) => {
-                const compId = generateUint64Id();
-                processedComponents[compId] = { ...comp, id: compId };
-              });
-            }
-            const newEntity = {
+            scene.entities[entityId] = {
               ...entity,
               id: entityId,
               components: processedComponents,
             };
-            scene.entities[entityId] = newEntity;
-          }),
+          });
+        },
         removeScene: (id: string) =>
           set((state: EngineState) => {
             delete state.scenes[id];
@@ -178,22 +181,21 @@ export const useEngineStore = create<EngineState>()(
               delete scene.entities[entityId];
             }
           }),
-        addComponentToEntity: (
+        addComponentToEntity: async (
           sceneId: string,
           entityId: string,
           component: Component,
-        ) =>
+        ) => {
+          const id = await generateUint64Id();
+
           set((state: EngineState) => {
             const scene = state.scenes[sceneId];
-            if (scene) {
-              const entity = scene.entities[entityId];
-              if (entity) {
-                const id = generateUint64Id();
-                const newComponent = { ...component, id };
-                entity.components[newComponent.id] = newComponent;
-              }
+            const entity = scene?.entities[entityId];
+            if (entity) {
+              entity.components[id] = { ...component, id };
             }
-          }),
+          });
+        },
         removeComponentFromEntity: (
           sceneId: string,
           entityId: string,
