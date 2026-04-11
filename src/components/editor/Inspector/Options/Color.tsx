@@ -1,6 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { forwardRef, useEffect, useState } from "react";
-import { HexColorPicker } from "react-colorful";
+import { HexColorPicker, RgbaColorPicker } from "react-colorful";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { type VariantProps } from "class-variance-authority";
@@ -15,10 +15,17 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 
+interface RGBA {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
+
 interface ColorPickerProps {
-  value: string;
-  onChange?: (value: string) => void;
-  onBlur?: () => void;
+  value: string | RGBA;
+  onChange?: (value: string | RGBA) => void;
+  onBlur?: (value: string | RGBA) => void;
 }
 
 interface ButtonProps
@@ -28,18 +35,25 @@ interface ButtonProps
   asChild?: boolean;
 }
 
+const colorToCss = (color: string | RGBA) => {
+  if (typeof color === "string") return color;
+  return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+};
+
 const ColorPicker = forwardRef<
   HTMLInputElement,
   Omit<ButtonProps, "value" | "onChange" | "onBlur"> &
     ColorPickerProps &
-    ButtonProps
+    VariantProps<typeof buttonVariants>
 >(
   (
     { disabled, value, onChange, onBlur, name, className, size, ...props },
     ref,
   ) => {
     const [open, setOpen] = useState(false);
-    const [localValue, setLocalValue] = useState<string>(value || "#FFFFFF");
+    const [localValue, setLocalValue] = useState<string | RGBA>(
+      value || "#FFFFFF",
+    );
 
     useEffect(() => {
       if (value) {
@@ -47,14 +61,24 @@ const ColorPicker = forwardRef<
       }
     }, [value]);
 
-    const handleColorChange = (newColor: string) => {
+    const isRgba = typeof localValue === "object" && localValue !== null;
+
+    const handleColorChange = (newColor: string | RGBA) => {
       setLocalValue(newColor);
       onChange?.(newColor);
     };
 
+    const handleOpenChange = (newOpen: boolean) => {
+      setOpen(newOpen);
+      if (!newOpen) {
+        onBlur?.(localValue);
+      }
+    }
+
+
     return (
-      <Popover onOpenChange={setOpen} open={open}>
-        <PopoverTrigger asChild disabled={disabled} onBlur={onBlur}>
+      <Popover onOpenChange={handleOpenChange} open={open}>
+        <PopoverTrigger asChild disabled={disabled}>
           <Button
             {...props}
             className={cn("block", className)}
@@ -64,7 +88,7 @@ const ColorPicker = forwardRef<
             }}
             size={size}
             style={{
-              backgroundColor: localValue,
+              backgroundColor: colorToCss(localValue),
             }}
             variant="outline"
           >
@@ -72,23 +96,38 @@ const ColorPicker = forwardRef<
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-fit flex flex-col items-center p-2">
-          <HexColorPicker color={localValue} onChange={handleColorChange} />
-          <InputGroup className="mt-2">
-            <InputGroupInput
-              placeholder="Hex color code"
-              maxLength={6}
-              onChange={(e) => {
-                const val = e.currentTarget.value;
-                handleColorChange(val.startsWith("#") ? val : `#${val}`);
-              }}
-              className="h-8 font-mono text-xs uppercase"
-              ref={ref}
-              value={localValue.replace("#", "")}
-            />
-            <InputGroupAddon className="text-muted-foreground font-mono text-xs">
-              #
-            </InputGroupAddon>
-          </InputGroup>
+          {isRgba ? (
+            <RgbaColorPicker color={localValue} onChange={handleColorChange} />
+          ) : (
+            <HexColorPicker color={localValue} onChange={handleColorChange} />
+          )}
+          {!isRgba && (
+            <InputGroup className="mt-2">
+              <InputGroupInput
+                placeholder="Hex color code"
+                maxLength={6}
+                onChange={(e) => {
+                  const val = e.currentTarget.value;
+                  handleColorChange(val.startsWith("#") ? val : `#${val}`);
+                }}
+                onBlur={() => onBlur?.(localValue)}
+                className="h-8 font-mono text-xs uppercase"
+                ref={ref}
+                value={localValue.replace("#", "")}
+              />
+              <InputGroupAddon className="text-muted-foreground font-mono text-xs">
+                #
+              </InputGroupAddon>
+            </InputGroup>
+          )}
+          {isRgba && (
+            <div className="grid grid-cols-4 gap-1 text-[10px] font-mono uppercase text-center w-full">
+              <div className="bg-muted p-1 rounded">R:{(localValue as RGBA).r}</div>
+               <div className="bg-muted p-1 rounded">G:{(localValue as RGBA).g}</div>
+               <div className="bg-muted p-1 rounded">B:{(localValue as RGBA).b}</div>
+               <div className="bg-muted p-1 rounded">A:{Math.round((localValue as RGBA).a * 100) / 100}</div>
+            </div>
+          )}
         </PopoverContent>
       </Popover>
     );
@@ -98,9 +137,13 @@ const ColorPicker = forwardRef<
 export function ColorOption({
   label,
   value,
+  onChange,
+  onCommit,
 }: {
   label: string;
-  value: string;
+  value: string | RGBA;
+  onChange?: (value: string | RGBA) => void;
+  onCommit?: (value: string | RGBA) => void;
 }) {
   return (
     <div className="flex items-center justify-between p-3 bg-zinc-50/50 rounded-lg border border-zinc-200 transition-all hover:border-zinc-300 ">
@@ -110,10 +153,7 @@ export function ColorOption({
       >
         {label}
       </Label>
-      <ColorPicker 
-        id={label}
-        value={value} 
-      />
+      <ColorPicker id={label} value={value} onChange={onChange} onBlur={onCommit} />
     </div>
   );
 }

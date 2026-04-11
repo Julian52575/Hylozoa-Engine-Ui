@@ -5,12 +5,17 @@
     "schema": {
         "color": { "type": "color", "label": "Color" },
         "visible": { "type": "boolean", "label": "Visible" },
-        "LayerBit": { "type": "string", "label": "Layer" },
+        "LayerBit": { "type": "enum", "label": "Layer", "options": [{"label": "Default","value": "Default"}, {"label": "UI","value": "UI"}, {"label": "Background","value": "Background"}] },
         "transparency": { "type": "number", "label": "Transparency" },
         "origin": { "type": "vector2", "label": "Origin" }
     },
     "values": {
-        "color": "#ffffff",
+        "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 1
+        },
         "visible": true,
         "LayerBit": "Default",
         "transparency": 255,

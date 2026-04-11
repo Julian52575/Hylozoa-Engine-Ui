@@ -13,6 +13,7 @@ import { Icon } from "@iconify/react";
 import OptionsManager from "./OptionsManager";
 import { useSessionStore } from "@/store/useSessionStore";
 
+
 const EMPTY_OBJ = {};
 function ComponentManager({ component }: { component: any }) {
   const selectedEntityId = useSelectionStore((s) => s.selectedEntityId);

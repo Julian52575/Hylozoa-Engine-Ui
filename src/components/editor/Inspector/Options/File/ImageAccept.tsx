@@ -3,51 +3,80 @@ import { ImageIcon, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { open } from "@tauri-apps/plugin-dialog";
 import { useState, useEffect } from "react";
-import { getAssetUrl } from "@/lib/utils";
+import { getAssetUrl, resolveAssetPath } from "@/lib/utils";
+import { resolveResource } from "@tauri-apps/api/path";
+
+const isPathInside = (parent: string, child: string) => {
+  const normalizedParent = parent.replace(/[/\\]/g, "/");
+  const normalizedChild = child.replace(/[/\\]/g, "/");
+  return normalizedChild.startsWith(normalizedParent);
+};
 
 function ImageInput({
   image: initialImage,
   text = "Select an image",
+  origin = "Assets",
   onImageChange,
 }: {
   image?: string;
   text?: string;
+  origin?: string;
   onImageChange?: (image: string) => void;
 }) {
   const [localImage, setLocalImage] = useState<string | undefined>(
     initialImage,
   );
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const resolveAssetUrl = async (
+    path: string | null | undefined,
+  ): Promise<string | null> => {
+    const absolutePath = await resolveAssetPath(path, origin);
+    return absolutePath ? getAssetUrl(absolutePath) : null;
+  };
+  useEffect(() => {
+    if (localImage) {
+      resolveAssetUrl(localImage).then(setPreviewUrl);
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [localImage]);
 
   useEffect(() => {
     setLocalImage(initialImage);
   }, [initialImage]);
 
   const loadImage = async () => {
+    const absoluteAssetsPath = await resolveResource(origin);
+
     const selected = await open({
       multiple: false,
       title: "Choisir une image",
+      defaultPath: absoluteAssetsPath,
       filters: [
         { name: "Images", extensions: ["jpg", "jpeg", "png", "gif", "svg"] },
       ],
     });
     if (selected && typeof selected === "string") {
-      setLocalImage(selected);
-      onImageChange?.(selected);
+      if (isPathInside(absoluteAssetsPath, selected)) {
+        let relativePath = selected
+          .replace(absoluteAssetsPath, "")
+          .replace(/^[/\\]/, "");
+        setLocalImage(selected);
+        onImageChange?.(relativePath);
+      } else {
+        alert(
+          selected +
+            " is not inside the assets folder. Please select an image from the assets folder.",
+        );
+      }
     }
   };
 
-
-
-  const getPath = () => {
-    if (localImage)
-        return localImage
-    if (previewUrl)
-        return previewUrl.split(/[/\\]/).pop()
-    return text;
-
-  }
-
-  const previewUrl = getAssetUrl(localImage || null);
+  const getFileName = () => {
+    if (!localImage) return text;
+    return localImage.split(/[/\\]/).pop() || text;
+  };
 
   return (
     <Button
@@ -69,8 +98,11 @@ function ImageInput({
         )}
       </div>
       <div className="flex flex-col items-start gap-0.5 overflow-hidden">
-        <span className="text-sm font-medium leading-none" title={getPath()}>
-          {getPath()}
+        <span
+          className="text-sm font-medium leading-none"
+          title={getFileName()}
+        >
+          {getFileName()}
         </span>
         <span className="text-xs text-muted-foreground truncate">
           {previewUrl ? "Changer l'image" : "Aucune image sélectionnée"}

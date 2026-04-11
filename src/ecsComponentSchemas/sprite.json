@@ -2,6 +2,7 @@
   "type": "sprite",
   "label": "Sprite",
   "icon": "lucide:image",
+  "requires": "renderable",
   "schema": {
     "texture": { "type": "file", "label": "Texture", "accept": "image" },
     "scale": { "type": "vector2", "label": "Scale" },

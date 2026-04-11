@@ -53,7 +53,7 @@ export default function OptionsManager({
         />
       );
     case "boolean":
-      return <BooleanOption label={label} checked={value} />;
+      return <BooleanOption label={label} checked={value} onChange={onCommit} />;
     case "text":
       return <TextOption label={label} value={value} />;
     case "number":
@@ -78,7 +78,7 @@ export default function OptionsManager({
         />
       );
     case "color":
-      return <ColorOption label={label} value={value} />;
+      return <ColorOption label={label} value={value} onChange={onValueChange} onCommit={onCommit} />;
     default:
       return <div className="font-semibold">Unsupported type: {type}</div>;
   }

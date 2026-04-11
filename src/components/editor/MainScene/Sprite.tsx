@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useState } from "react";
 import Konva from "konva";
 import { Image } from "react-konva";
-import { getAssetUrl } from "@/lib/utils";
+import { getAssetUrl, resolveAssetPath } from "@/lib/utils";
 interface SpriteProps extends Konva.ImageConfig {
   src: string | null;
   scale?: { x: number; y: number };
@@ -17,12 +17,28 @@ export const SpriteShow = forwardRef<Konva.Image, SpriteProps>(
     });
 
     useEffect(() => {
-      const image = new window.Image();
-      image.src = getAssetUrl(src);
-      image.onload = () => {
-        setImg(image);
-        setCalculatedSize({ width: image.width, height: image.height });
+      if (!src) {
+        setImg(undefined);
+        setCalculatedSize({ width: 0, height: 0 });
+        return;
+      }
+      const loadImage = async () => {
+        const finalPath = await resolveAssetPath(src,'Assets');
+        if (!finalPath) return;
+
+        const image = new window.Image();
+        image.src = getAssetUrl(finalPath);
+        image.onload = () => {
+          setImg(image);
+          setCalculatedSize({ width: image.width, height: image.height });
+        };
+        image.onerror = () => {
+          console.error("Failed to load image:", finalPath);
+          setImg(undefined);
+          setCalculatedSize({ width: 0, height: 0 });
+        };
       };
+      loadImage();
     }, [src]);
 
     if (!img) {
