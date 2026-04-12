@@ -1,0 +1,7 @@
+{
+    "type": "mainListener",
+    "label": "Main Listener",
+    "icon": "lucide:volume-2",
+    "schema": {},
+    "values": {}
+}

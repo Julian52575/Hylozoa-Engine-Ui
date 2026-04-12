@@ -1,24 +1,21 @@
 import { Button } from "../ui/button";
-import { FaMousePointer } from "react-icons/fa";
-import { RiDragMoveFill } from "react-icons/ri";
-import { TbRotateDot } from "react-icons/tb";
-import { IoMdResize } from "react-icons/io";
+import { Icon } from "@iconify/react";
 
-export function Viewport() {
+export function ViewportButtons() {
     return (
         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
             <div className="flex items-center justify-start flex-1 pl-4">
                 <Button variant="outline" size={"icon-sm"}>
-                    <FaMousePointer className="ml-0.5" />
+                    <Icon icon="lucide:mouse-pointer" className="w-4 h-4 ml-0.5" />
                 </Button>
                 <Button variant="outline" size={"icon-sm"}>
-                    <RiDragMoveFill />
+                    <Icon icon="lucide:move" className="w-4 h-4" />
                 </Button>
                 <Button variant="outline" size={"icon-sm"}>
-                    <TbRotateDot className="rotate-90"/>
+                   <Icon icon="lucide:rotate-cw" className="w-4 h-4" />
                 </Button>
                 <Button variant="outline" size={"icon-sm"}>
-                    <IoMdResize />
+                    <Icon icon="lucide:maximize-2" className="w-4 h-4 rotate-45" />
                 </Button>
             </div>
         </div>

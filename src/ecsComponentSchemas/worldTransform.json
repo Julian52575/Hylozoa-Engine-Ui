@@ -1,21 +1,15 @@
 {
     "type": "worldTransform",
     "label": "World Transform",
-    "properties": {
-        "position": {
-            "type": "vector2",
-            "label": "Position",
-            "default": { "x": 0, "y": 0 }
-        },
-        "scale": {
-            "type": "vector2",
-            "label": "Scale",
-            "default": { "x": 1, "y": 1 }
-        },
-        "rotation": {
-            "type": "number",
-            "label": "Rotation",
-            "default": 0
-        }
+    "icon": "lucide:globe",
+    "schema": {
+        "position": { "type": "vector2", "label": "Position" },
+        "scale": { "type": "vector2", "label": "Scale" },
+        "rotation": { "type": "number", "label": "Rotation" }
+    },
+    "values": {
+        "position": { "x": 0, "y": 0 },
+        "scale": { "x": 1, "y": 1 },
+        "rotation": 0
     }
 }

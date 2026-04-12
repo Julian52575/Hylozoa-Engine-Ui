@@ -1,11 +1,11 @@
 {
     "type" : "name",
     "label" : "Name",
-    "properties" : {
-        "value" : {
-            "type" : "string",
-            "label" : "Value",
-            "default" : "New Entity"
-        }
+    "icon": "lucide:tag",
+    "schema": {
+        "value" : {"type": "string", "label": "Value"}
+    },
+    "values": {
+        "value": "New Entity"
     }
 }

@@ -1,6 +1,13 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react";
 
+import {
+  ResizablePanel,
+} from "@/components/ui/resizable";
+import { PanelImperativeHandle } from "react-resizable-panels";
+import { useRef } from "react";
 
-export function ConsoleDisplayer() {
+function Console(){
     const messages = [
         { text: "Console Output:", type: "info" },
         { text: "Initializing application...", type: "info" },
@@ -13,8 +20,7 @@ export function ConsoleDisplayer() {
         { text: "Available commands: start, stop, restart, status", type: "info" },
         { text: "> status", type: "info" },
         { text: "Application is running smoothly.", type: "success" },
-    ]
-
+    ];
     const handleTypeClass = (type: string) => {
         switch(type) {            
             case "success":
@@ -27,8 +33,7 @@ export function ConsoleDisplayer() {
             default:
                 return "text-zinc-300";
         }
-    }
-
+    };
 
     return (
         <div className="w-full h-full bg-primary p-2 overflow-auto 
@@ -44,5 +49,37 @@ export function ConsoleDisplayer() {
                 </div>
             ))}
         </div>
+    )
+}
+
+export function BottomPanel() {
+    const [selectedTab, setSelectedTab] = useState<string | null>(null);
+    const bottomPanelRef = useRef<PanelImperativeHandle>(null);
+    const toggleTab = (value: string) => {
+        const isClosing = selectedTab === value;
+        if (isClosing) {
+            bottomPanelRef.current?.resize(40);
+            setSelectedTab(null);
+        } else {
+            setSelectedTab(value);
+            bottomPanelRef.current?.resize(300);
+        }
+    };
+
+    return (
+        <ResizablePanel minSize={40} defaultSize={40} panelRef={bottomPanelRef} className="transition-all duration-200">
+            <Tabs className="w-full h-full justify-end" value={selectedTab || ""}> 
+                <TabsContent value="Console" className="w-full h-full">
+                    <Console />
+                </TabsContent>
+                <TabsContent value="password" className="w-full h-full">
+                    Change your password here.
+                </TabsContent>
+                <TabsList className="flex ">
+                        <TabsTrigger value="Console" onClick={() => toggleTab("Console")}>Console</TabsTrigger>
+                        <TabsTrigger value="password" onClick={() => toggleTab("password")}>Password</TabsTrigger>
+                </TabsList>
+            </Tabs>
+        </ResizablePanel>
     )
 }

@@ -1,21 +1,15 @@
 {
     "type" : "capsuleCollider",
     "label" : "Capsule Collider",
-    "properties" : {
-        "center1" : {
-            "type" : "vector2",
-            "label" : "Center 1",
-            "default" : { "x" : 0, "y" : -0.5 }
-        },
-        "center2" : {
-            "type" : "vector2",
-            "label" : "Center 2",
-            "default" : { "x" : 0, "y" : 0.5 }
-        },
-        "radius" : {
-            "type" : "number",
-            "label" : "Radius",
-            "default" : 0.5
-        }
+    "icon": "lucide:disc",
+    "schema": {
+        "center1" : { "type" : "vector2", "label" : "Center 1" },
+        "center2" : { "type" : "vector2", "label" : "Center 2" },
+        "radius" : { "type" : "number", "label" : "Radius" }
+    },
+    "values": {
+        "center1" : { "x" : 0, "y" : -0.5 },
+        "center2" : { "x" : 0, "y" : 0.5 },
+        "radius" : 0.5
     }
 }

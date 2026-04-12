@@ -1,52 +1,59 @@
 {
-    "type" : "rigidBody",
-    "label" : "Rigid Body",
-    "properties" : {
-        "bodyType" : {
-            "type" : "enum",
-            "label" : "Body Type",
-            "options" : [ "static", "dynamic", "kinematic" ],
-            "default" : "static"
-        },
-        "gravityScale" : {
-            "type" : "number",
-            "label" : "Gravity Scale",
-            "default" : 1
-        },
-        "linearDamping" : {
-            "type" : "number",
-            "label" : "Linear Damping",
-            "default" : 0
-        },
-        "angularDamping" : {
-            "type" : "number",
-            "label" : "Angular Damping",
-            "default" : 0
-        },
-        "fixedRotation" : {
-            "type" : "boolean",
-            "label" : "Fixed Rotation",
-            "default" : false
-        },
-        "isBullet" : {
-            "type" : "boolean",
-            "label" : "Is Bullet",
-            "default" : false
-        },
-        "isAwake" : {
-            "type" : "boolean",
-            "label" : "Is Awake",
-            "default" : true
-        },
-        "isEnabled" : {
-            "type" : "boolean",
-            "label" : "Is Enabled",
-            "default" : true
-        },
-        "linearVelocity" : {
-            "type" : "vector2",
-            "label" : "Linear Velocity",
-            "default" : { "x" : 0, "y" : 0 }
-        }
+  "type": "rigidBody",
+  "label": "Rigid Body",
+  "icon": "lucide:git-branch",
+  "schema": {
+    "bodyType": {
+      "type": "enum",
+      "label": "Body Type",
+      "options": [
+        { "label": "Static", "value": "static" },
+        { "label": "Dynamic", "value": "dynamic" },
+        { "label": "Kinematic", "value": "kinematic" }
+      ]
+    },
+    "gravityScale": {
+      "type": "number",
+      "label": "Gravity Scale"
+    },
+    "linearDamping": {
+      "type": "number",
+      "label": "Linear Damping"
+    },
+    "angularDamping": {
+      "type": "number",
+      "label": "Angular Damping"
+    },
+    "fixedRotation": {
+      "type": "boolean",
+      "label": "Fixed Rotation"
+    },
+    "isBullet": {
+      "type": "boolean",
+      "label": "Is Bullet"
+    },
+    "isAwake": {
+      "type": "boolean",
+      "label": "Is Awake"
+    },
+    "isEnabled": {
+      "type": "boolean",
+      "label": "Is Enabled"
+    },
+    "linearVelocity": {
+      "type": "vector2",
+      "label": "Linear Velocity"
     }
+  },
+  "values": {
+    "bodyType": "static",
+    "gravityScale": 1,
+    "linearDamping": 0,
+    "angularDamping": 0,
+    "fixedRotation": false,
+    "isBullet": false,
+    "isAwake": true,
+    "isEnabled": true,
+    "linearVelocity": { "x": 0, "y": 0 }
+  }
 }

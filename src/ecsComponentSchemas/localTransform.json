@@ -1,21 +1,15 @@
 {
-    "type": "localTransform",
-    "label": "Local Transform",
-    "properties": {
-        "position": {
-            "type": "vector2",
-            "label": "Position",
-            "default": { "x": 0, "y": 0 }
-        },
-        "scale": {
-            "type": "vector2",
-            "label": "Scale",
-            "default": { "x": 1, "y": 1 }
-        },
-        "rotation": {
-            "type": "number",
-            "label": "Rotation",
-            "default": 0
-        }
-    }
+  "type": "localTransform",
+  "label": "Local Transform",
+  "icon": "lucide:move",
+  "schema": {
+    "position": { "type": "vector2", "label": "Position" },
+    "scale": { "type": "vector2", "label": "Scale" },
+    "rotation": { "type": "number", "label": "Rotation", "min": 0, "max": 360, "step": 1 }
+  },
+  "values": {
+    "position": { "x": 100, "y": 200 },
+    "scale": { "x": 1, "y": 1 },
+    "rotation": 0
+  }
 }

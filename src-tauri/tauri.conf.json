@@ -28,11 +28,21 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["$HOME/**"]
+      }
     }
   },
   "bundle": {
     "active": true,
+    "resources": [
+      "ressources/EngineSettings.json"
+    ],
+    "externalBin": [
+      "binaries/hylozoa"
+    ],
     "targets": "all",
     "icon": [
       "icons/32x32.png",

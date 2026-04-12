@@ -1,0 +1,11 @@
+{
+    "type": "noiseListener",
+    "label": "Noise Listener",
+    "icon": "lucide:ear",
+    "schema": {
+        "hearingRange": { "type": "number", "label": "Hearing Range" }
+    },
+    "values": {
+        "hearingRange": 100
+    }
+}

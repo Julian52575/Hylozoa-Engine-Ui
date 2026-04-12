@@ -1,16 +1,13 @@
 {
     "type" : "circleCollider",
     "label" : "Circle Collider",
-    "properties" : {
-        "radius" : {
-            "type" : "number",
-            "label" : "Radius",
-            "default" : 0.5
-        },
-        "offset" : {
-            "type" : "vector2",
-            "label" : "Offset",
-            "default" : { "x" : 0, "y" : 0 }
-        }
+    "icon": "lucide:circle",
+    "schema": {
+        "radius": { "type": "number", "label": "Radius" },
+        "offset": { "type": "vector2", "label": "Offset" }
+    },
+    "values": {
+        "radius": 0.5,
+        "offset": { "x": 0, "y": 0 }
     }
 }

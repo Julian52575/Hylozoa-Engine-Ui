@@ -1,0 +1,26 @@
+{
+  "type": "sprite",
+  "label": "Sprite",
+  "icon": "lucide:image",
+  "requires": "renderable",
+  "schema": {
+    "texture": { "type": "file", "label": "Texture", "accept": "image" },
+    "scale": { "type": "vector2", "label": "Scale" },
+    "offset": {
+      "type": "enum",
+      "label": "Offset",
+      "options": [
+        { "label": "Top Left", "value": {"x":0, "y":0} },
+        { "label": "Top Right", "value": {"x":1, "y":0} },
+        { "label": "Bottom Left", "value": {"x":0, "y":1} },
+        { "label": "Bottom Right", "value": {"x":1, "y":1} },
+        { "label": "Center", "value": {"x":0.5, "y":0.5} }
+      ]
+    }
+  },
+  "values": {
+    "texture": null,
+    "scale": { "x": 1, "y": 1 },
+    "offset": { "x": 0.5, "y": 0.5 }
+  }
+}
