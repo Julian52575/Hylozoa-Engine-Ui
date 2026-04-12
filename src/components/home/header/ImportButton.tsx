@@ -2,7 +2,7 @@ import { useProjectStore, Project } from "@/store/projectStore";
 import { open } from "@tauri-apps/plugin-dialog";
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button";
-import { FaFolderOpen } from "react-icons/fa";
+import { Icon } from "@iconify/react";
 
 
 export default function ImportButton() {
@@ -42,7 +42,7 @@ export default function ImportButton() {
     }
     return ( 
         <Button onClick={openProject} className="cursor-pointer">
-            <FaFolderOpen/>
+            <Icon icon="fa-solid:folder-open" className="w-4 h-4" />
             Import
         </Button>
     );

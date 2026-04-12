@@ -16,10 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { Icon } from "@iconify/react";
 
-import { FaPlus } from "react-icons/fa6";
-import { FaFolderOpen, FaCheckCircle } from "react-icons/fa";
-import { MdOutlineError } from "react-icons/md";
 
 import { useProjectStore, Project } from "@/store/projectStore";
 
@@ -27,7 +25,7 @@ function TriggerButton() {
   return (
     <DialogTrigger asChild>
       <Button className="cursor-pointer">
-        <FaPlus />
+        <Icon icon="fa6-solid:plus" className="w-4 h-4" />
         Create
       </Button>
     </DialogTrigger>
@@ -186,9 +184,10 @@ export default function CreateButton() {
                 Folder path
               </Label>
               {errorFolder === null ? (
-                <FaCheckCircle className="inline" color="#07a417" size={16} />
+                <Icon icon="fa-solid:check-circle" className="w-4 h-4 text-green-600" />
               ) : (
-                <MdOutlineError className="inline" color="#a10707" size={16} />
+
+                <Icon icon="fa-solid:exclamation-circle" className="w-4 h-4 text-red-500" />
               )}
               {errorFolder && (
                 <span className="text-sm text-red-500 no-wrap">{errorFolder}</span>
@@ -208,7 +207,7 @@ export default function CreateButton() {
                 size="icon"
                 onClick={openFolderDialog}
               >
-                <FaFolderOpen />
+                <Icon icon="fa-solid:folder-open" className="w-4 h-4" />
               </Button>
             </div>
           </div>

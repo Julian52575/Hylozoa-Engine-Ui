@@ -1,5 +1,5 @@
 import { Project } from "@/store/projectStore";
-import { FaStar } from "react-icons/fa6";
+import { Icon } from "@iconify/react";
 
 interface ProjectCardProps {
     project : Project;
@@ -20,7 +20,7 @@ export function ProjectCard({
       `} 
       onClick={() => onClick(project)}
     >
-      <FaStar className={`inline hover:text-yellow-500 ${project.isFavorite ? "text-yellow-500" : "text-gray-500"}`} />
+      <Icon icon="fa6-solid:star" className={`inline hover:text-yellow-500 ${project.isFavorite ? "text-yellow-500" : "text-gray-500"}`} />
       <img
         src={project.logo}
         alt="Project Thumbnail"

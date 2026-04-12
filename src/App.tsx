@@ -10,9 +10,9 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/home" element={<HomePage />} />
+      <Route index element={<HomePage />} />
       <Route path="/graph" element={<GraphPage />} />
-      <Route index element={<EditorPage />} />
+      <Route path="/editor" element={<EditorPage />} />
     </Routes>
   );
 }
