@@ -1,3 +1,5 @@
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Julian52575_Hylozoa-Engine-Ui&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Julian52575_Hylozoa-Engine-Ui) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Julian52575_Hylozoa-Engine-Ui&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=Julian52575_Hylozoa-Engine-Ui) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Julian52575_Hylozoa-Engine-Ui&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Julian52575_Hylozoa-Engine-Ui) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Julian52575_Hylozoa-Engine-Ui&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Julian52575_Hylozoa-Engine-Ui) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Julian52575_Hylozoa-Engine-Ui&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Julian52575_Hylozoa-Engine-Ui)
+
 # Hylozoa UI
 Tauri-based desktop editor built with **React**, **TypeScript** and **Vite**.
 
