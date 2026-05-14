@@ -20,6 +20,7 @@ import {
 import { serializeEngineState, useEngineStore } from "@/store/engineStore";
 import { useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { useProjectStore } from "@/store/projectStore";
 
 export default function EditorPage() {
   useEffect(() => {
@@ -73,6 +74,8 @@ export default function EditorPage() {
     loadSchemas();
   }, [loadSchemas]);
 
+  const {currentProjectPath} = useProjectStore();
+
 
   return (
     <div className="h-svh w-svw flex flex-col">
@@ -97,7 +100,7 @@ export default function EditorPage() {
             </ResizablePanel>
             <ResizableHandle className="h-0.5 w-full bg-primary/20 cursor-row-resize" />
             <ResizablePanel minSize={40} defaultSize={300}>
-              <FolderDisplayer path=".." />
+              <FolderDisplayer path={currentProjectPath} />
             </ResizablePanel>
           </ResizablePanelGroup>
         </ResizablePanel>

@@ -34,7 +34,12 @@
     "width": 30,
     "height": 30,
     "radius": 30,
-    "outlineColor": "#000000",
+    "outlineColor": {
+      "r": 0,
+      "g": 0,
+      "b": 0,
+      "a": 1
+    },
     "outlineThickness": 1
   }
 }

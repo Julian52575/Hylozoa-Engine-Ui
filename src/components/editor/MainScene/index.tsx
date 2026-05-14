@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Stage, Layer, Transformer } from "react-konva";
+import { Stage, Layer, Transformer, Rect } from "react-konva";
 
 import { useEngineStore, type Entity } from "@/store/engineStore";
 import { useSelectionStore } from "@/store/useSelectionStore";
@@ -41,6 +41,8 @@ interface EntityProps extends Konva.NodeConfig {
 
     };
   };
+  renderable?: any;
+  renderableShape?: any;
   
   onRegister: (id: string, node: any) => void;
   onClick: (id: string) => void;
@@ -51,6 +53,8 @@ const Entity = ({
   transform,
   sprite,
   camera,
+  renderable,
+  renderableShape,
   onRegister,
   onClick,
   ...rest
@@ -63,6 +67,8 @@ const Entity = ({
       };
     }
   }, []);
+
+  console.log(renderable,renderableShape);
 
   return (
     <LocalTransformShow
@@ -82,6 +88,19 @@ const Entity = ({
     >
       {sprite && <SpriteShow src={sprite.texture} scale={sprite.scale} offset={sprite.offset} />}
       {camera && <CameraShow size={camera.viewportSize} />}
+      {renderable && renderableShape && renderableShape.shapeType === "rectangle" && (
+        <Rect
+          ref={rectRef}
+          width={renderableShape.width}
+          height={renderableShape.height}
+          fill={`rgba(${renderable.color.r}, ${renderable.color.g}, ${renderable.color.b}, ${renderable.color.a})`}
+          x={renderable.origin.x}
+          y={renderable.origin.y}
+          stroke={`rgba(${renderableShape.outlineColor.r}, ${renderableShape.outlineColor.g}, ${renderableShape.outlineColor.b}, ${renderableShape.outlineColor.a})`}
+          strokeWidth={renderableShape.outlineThickness}
+          strokeScaleEnabled={false}
+        />
+      )}
     </LocalTransformShow>
   );
 };
@@ -270,9 +289,11 @@ function ConnectedEntity({ entity, ...props }: ConnectedEntityProps) {
     return result;
   }, [entity.components, liveOverrides]);
 
+  const renderable = allProps["renderable"] || undefined;
   const transform = allProps["localTransform"] || undefined;
   const sprite = allProps["sprite"] || undefined;
   const camera = allProps["camera"] || undefined;
+  const renderableShape = allProps["renderableShape"] || undefined;
 
   if (transform === undefined) {
     return null;
@@ -284,6 +305,8 @@ function ConnectedEntity({ entity, ...props }: ConnectedEntityProps) {
       sprite={sprite}
       transform={transform}
       camera={camera}
+      renderable={renderable}
+      renderableShape={renderableShape}
       {...props}
     />
   );

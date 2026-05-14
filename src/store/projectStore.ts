@@ -12,6 +12,8 @@ export interface Project {
 
 interface ProjectsState {
     projects: Project[];
+    currentProjectPath: string;
+    setCurrentProjectPath: (path: string) => void;
     addProject: (project: Project) => void;
     removeProject: (folderPath: string) => void;
     updateProject: (folderPath: string, updatedData: Partial<Project>) => void;
@@ -21,6 +23,8 @@ export const useProjectStore = create<ProjectsState>()(
     persist(
         (set) => ({
             projects: [],
+            currentProjectPath: "",
+            setCurrentProjectPath: (path) => set({ currentProjectPath: path }),
             addProject: (project) => set((state) => ({ projects: [...state.projects, project] })),
             removeProject: (folderPath) => set((state) => ({ projects: state.projects.filter((p) => p.folderPath !== folderPath) })),
             updateProject: (folderPath, updatedData) => set((state) => ({

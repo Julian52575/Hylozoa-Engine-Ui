@@ -73,8 +73,7 @@ const ColorPicker = forwardRef<
       if (!newOpen) {
         onBlur?.(localValue);
       }
-    }
-
+    };
 
     return (
       <Popover onOpenChange={handleOpenChange} open={open}>
@@ -121,11 +120,34 @@ const ColorPicker = forwardRef<
             </InputGroup>
           )}
           {isRgba && (
-            <div className="grid grid-cols-4 gap-1 text-[10px] font-mono uppercase text-center w-full">
-              <div className="bg-muted p-1 rounded">R:{(localValue as RGBA).r}</div>
-               <div className="bg-muted p-1 rounded">G:{(localValue as RGBA).g}</div>
-               <div className="bg-muted p-1 rounded">B:{(localValue as RGBA).b}</div>
-               <div className="bg-muted p-1 rounded">A:{Math.round((localValue as RGBA).a * 100) / 100}</div>
+            <div className="grid grid-cols-4 gap-1 text-[10px] font-mono uppercase text-center w-full mt-3">
+              {(["r", "g", "b", "a"] as const).map((key) => (
+                <div key={key} className="flex flex-col gap-1">
+                  <label className="text-[9px] text-muted-foreground">
+                    {key}
+                  </label>
+                  <input
+                    type="number"
+                    min={key === "a" ? 0 : 0}
+                    max={key === "a" ? 1 : 255}
+                    step={key === "a" ? 0.01 : 1}
+                    value={localValue[key]}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value) || 0;
+                      const clampedVal =
+                        key === "a"
+                          ? Math.min(1, Math.max(0, val))
+                          : Math.min(255, Math.max(0, Math.round(val)));
+
+                      handleColorChange({
+                        ...localValue,
+                        [key]: clampedVal,
+                      });
+                    }}
+                    className="w-full bg-muted border-none rounded p-1 text-center focus:ring-1 focus:ring-ring outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+              ))}
             </div>
           )}
         </PopoverContent>
@@ -153,7 +175,12 @@ export function ColorOption({
       >
         {label}
       </Label>
-      <ColorPicker id={label} value={value} onChange={onChange} onBlur={onCommit} />
+      <ColorPicker
+        id={label}
+        value={value}
+        onChange={onChange}
+        onBlur={onCommit}
+      />
     </div>
   );
 }

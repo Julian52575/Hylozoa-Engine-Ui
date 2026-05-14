@@ -7,6 +7,8 @@ import { CardContainer } from "./CardManager";
 import ButtonsContainer from "./ButtonsManager";
 import Header from "./header";
 
+import { useEngineStore } from "@/store/engineStore";
+
 export function Home({
     onEditProject,
     onRemoveProject,
@@ -16,8 +18,7 @@ export function Home({
 }) {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [sortOption, setSortOption] = useState<string>("name");
-    const projectStore = useProjectStore();
-    const projects = projectStore.projects;
+    const {projects,removeProject,setCurrentProjectPath,currentProjectPath} = useProjectStore();
     const [projectSelected, setProjectSelected] = useState<Project | null>(null);
 
     const filteredProjects = projects.filter(project => 
@@ -43,12 +44,16 @@ export function Home({
             toast.error("Please select a project to edit.");
             return;
         }
+        if (currentProjectPath !== projectSelected.folderPath) {
+            setCurrentProjectPath(projectSelected.folderPath);
+            useEngineStore.persist.clearStorage();
+        }
         onEditProject && onEditProject();
     }
 
     const handleRemoveProject = () => {
         if (projectSelected) {
-            projectStore.removeProject(projectSelected.folderPath);
+            removeProject(projectSelected.folderPath);
             setProjectSelected(null);
             onRemoveProject && onRemoveProject();
         }
@@ -56,6 +61,7 @@ export function Home({
             toast.error("Please select a project to remove.");
         }
     };
+
 
     return (
         <div className="flex-1 overflow-hidden">
