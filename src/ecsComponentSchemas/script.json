@@ -1,0 +1,11 @@
+{
+    "type" : "script",
+    "label" : "Script",
+    "icon": "lucide:tag",
+    "schema": {
+        "scriptFile" : {"type": "string", "label": "File"}
+    },
+    "values": {
+        "value": "file.lua"
+    }
+}
