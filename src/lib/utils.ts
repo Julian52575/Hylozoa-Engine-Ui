@@ -2,8 +2,8 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import DEFAULT_IMG from "@/assets/logo.webp";
-import { resolveResource } from "@tauri-apps/api/path";
 import { useProjectStore } from "@/store/projectStore";
+import { saveEngineStateToFile } from "@/store/engineStore";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -39,3 +39,17 @@ export const resolveAssetPath = async (
     return null;
   }
 };
+
+export const SaveProjectFile = async ()=> {
+    const {projects, currentProjectPath} = useProjectStore.getState();
+    if (!currentProjectPath) {
+        alert("No project selected to save.");
+        return;
+    }
+    const currentProject = projects.find(p => p.folderPath === currentProjectPath);
+    if (!currentProject) {
+        alert("Current project not found in the store.");
+        return;
+    }
+    await saveEngineStateToFile(currentProject.folderPath, currentProject.name)
+}

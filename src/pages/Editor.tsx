@@ -17,10 +17,10 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 
-import { serializeEngineState, useEngineStore } from "@/store/engineStore";
+import { useEngineStore } from "@/store/engineStore";
 import { useEffect } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import { useProjectStore } from "@/store/projectStore";
+import { SaveProjectFile } from "@/lib/utils";
 
 export default function EditorPage() {
   useEffect(() => {
@@ -49,19 +49,7 @@ export default function EditorPage() {
       if (isMod && e.key === "s") {
         e.preventDefault();
         e.stopPropagation();
-        const currentStoreState = useEngineStore.getState();
-        const serialized = JSON.stringify(
-          serializeEngineState(currentStoreState),
-        );
-        try {
-          await invoke("save_compressed_project", {
-            path: "project.hlz",
-            data: serialized,
-          });
-          alert(`Project saved successfully`);
-        } catch (error) {
-          alert(`Failed to save project: ${error}`);
-        }
+        await SaveProjectFile();
       }
     };
     window.addEventListener("keydown", handleKeyDown, true);

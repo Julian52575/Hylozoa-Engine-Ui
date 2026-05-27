@@ -55,7 +55,7 @@ function ComponentManager({ component }: { component: any }) {
       <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-accent/50 hover:cursor-pointer transition-colors">
         <div className="flex items-center gap-2">
           <Icon icon={schema.icon} className="w-4 h-4" />
-          <span>{component.name}</span>
+          <span>{schema.label || component.name}</span>
         </div>
       </AccordionTrigger>
       <AccordionContent className="p-3 border-t bg-primary/5 flex flex-col gap-3 ">

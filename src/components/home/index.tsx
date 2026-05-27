@@ -7,7 +7,10 @@ import { CardContainer } from "./CardManager";
 import ButtonsContainer from "./ButtonsManager";
 import Header from "./header";
 
-import { useEngineStore } from "@/store/engineStore";
+import { loadEngineState, useEngineStore } from "@/store/engineStore";
+
+import { readTextFile, exists } from '@tauri-apps/plugin-fs';
+import { join } from "@tauri-apps/api/path";
 
 export function Home({
     onEditProject,
@@ -39,16 +42,39 @@ export function Home({
         return 0;
     });
 
-    const handleProjectClick = () => {
+    const handleProjectClick = async () => {
         if (!projectSelected) {
             toast.error("Please select a project to edit.");
             return;
         }
-        if (currentProjectPath !== projectSelected.folderPath) {
-            setCurrentProjectPath(projectSelected.folderPath);
-            useEngineStore.persist.clearStorage();
+        try {
+            const fileName = `${projectSelected.name}.hlz`;
+            const filePath = await join(projectSelected.folderPath, fileName);
+
+            const fileExists = await exists(filePath);
+            if (!fileExists) {
+                toast.error(`Project file not found at ${filePath}`);
+                return;
+            }
+            const isNewPath = currentProjectPath !== projectSelected.folderPath;
+            const isStoreEmpty = Object.keys(useEngineStore.getState().scenes).length === 0;
+            if (isNewPath || isStoreEmpty) {
+                const fileContent = await readTextFile(filePath);
+                const projectData = JSON.parse(fileContent);
+                useEngineStore.persist.clearStorage();
+                loadEngineState(projectData);
+                setCurrentProjectPath(projectSelected.folderPath);
+                toast.success("Project loaded successfully!");
+            }
+            if (onEditProject) {
+                onEditProject();
+            }
         }
-        onEditProject && onEditProject();
+        catch (error) {
+            console.error("Error loading project:", error);
+            toast.error("Failed to load project. Please try again.");
+            return;
+        }
     }
 
     const handleRemoveProject = () => {

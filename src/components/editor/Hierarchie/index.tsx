@@ -79,7 +79,7 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
             `}
             onClick={handleNodeClick}
           >
-            {node.data.name}
+            {schemas[node.data.type]?.label || node.data.name}
           </div>
         </div>
       </ContextMenuTrigger>
@@ -169,14 +169,14 @@ export function Hierarchie() {
   const handleAddEntity = async () => {
     const createDefaultComponent =
       useSchemaStore.getState().createDefaultComponent;
-    const newTransform = createDefaultComponent("localTransform");
+    const newTransform = createDefaultComponent("localtransform");
     await addEntityToScene(currentSceneId!, {
       name: `Entity ${Object.keys(useEngineStore.getState().scenes[currentSceneId!].entities).length + 1}`,
       type: "entity",
       components: {
         default: {
-          name: "localTransform",
-          type: newTransform?.type || "localTransform",
+          name: "localtransform",
+          type: newTransform?.type || "localtransform",
           props: newTransform?.values || {},
         },
       },

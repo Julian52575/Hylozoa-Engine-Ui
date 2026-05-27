@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/menubar"
 
 import { isTauri } from "@tauri-apps/api/core";
+import { SaveProjectFile } from "@/lib/utils";
 
 function ButtonsWindowHandler() {
     const appWindow = getCurrentWindow();
@@ -60,6 +61,7 @@ function ButtonsWindowHandler() {
                 size={"icon-sm"}
                 className="h-6 w-6 hover:bg-secondary/10"
                 onClick={async () => {
+                    await SaveProjectFile();
                     await appWindow.close();
                 }}
                 aria-label="Close window"

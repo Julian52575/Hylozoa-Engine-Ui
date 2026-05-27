@@ -1,5 +1,5 @@
 {
-  "type": "localTransform",
+  "type": "localtransform",
   "label": "Local Transform",
   "icon": "lucide:move",
   "schema": {

@@ -5,6 +5,9 @@ import { temporal } from "zundo";
 import { Component } from "lucide-react";
 import { generateUint64Id } from "@/lib/engineAPI";
 
+import { writeTextFile } from "@tauri-apps/plugin-fs";
+import { join } from "@tauri-apps/api/path";
+
 export interface Component {
   id?: string;
   name: string;
@@ -51,6 +54,15 @@ interface EngineState {
   ) => void;
 }
 
+export const saveEngineStateToFile = async (folderPath: string, projectName: string): Promise<void> => {
+  const state = useEngineStore.getState();
+  const formattedData = exportToEngine(state);
+  const jsonString = JSON.stringify(formattedData, null, 2);
+  const fileName = `${projectName}.hlz`;
+  const filePath = await join(folderPath, fileName);
+  await writeTextFile(filePath, jsonString);
+}
+
 export const serializeEngineState = (state: EngineState): object => {
   return {
     version: state.version,
@@ -85,7 +97,7 @@ export const exportToEngine = (state: EngineState) => {
                   : ["Default"],
               };
             } else {
-              acc[capitalizedName] = { ...comp.props };
+              acc[comp.name] = { ...comp.props };
             }
             return acc;
           },
@@ -106,25 +118,51 @@ export const exportToEngine = (state: EngineState) => {
 
 export const loadEngineState = (data: any): void => {
   const scenes: Record<string, SceneState> = {};
+  if (!data || !data.scenes) {
+    useEngineStore.setState({ version: "1.0.0", scenes: {} });
+    return;
+  }
+
   data.scenes.forEach((sceneData: any) => {
     const entities: Record<string, Entity> = {};
-    sceneData.Entities.forEach((entityData: any) => {
-      entities[entityData.id] = {
-        id: entityData.id,
-        name: entityData.name,
-        type: entityData.type,
-        components: entityData.components,
+    const entitiesList = sceneData.Entities || sceneData.entities || [];
+    entitiesList.forEach((entityData: any) => {
+      const entityId = entityData.UUID || entityData.id;
+      const components: Record<string, Component> = {};
+      const rawComponents = entityData.Components || entityData.components || {};
+
+      let name = "Unnamed Entity";
+      Object.entries(rawComponents).forEach(([compName, compProps] : [string, any]) => {
+        if (compName.toLowerCase() === "name") {
+          name = compProps.name;
+          return;
+        }
+        const compId = compProps.id || compName.toLowerCase();
+        components[compId] = {
+          id: compId,
+          name: compName,
+          type: compName.toLowerCase(),
+          props: compProps,
+        };
+      });
+      
+      entities[entityId] = {
+        id: entityId,
+        name: name,
+        type: "entity",
+        components,
       };
     });
-    scenes[sceneData.id] = {
-      ...sceneData,
+
+    const sceneId = sceneData.sceneID || sceneData.id;
+    scenes[sceneId] = {
+      id: sceneId,
+      name: sceneData.sceneName || sceneData.name || "Unnamed Scene",
       entities,
     };
   });
-  useEngineStore.setState({
-    version: data.version,
-    scenes,
-  });
+
+  useEngineStore.setState({ version: data.version || "1.0.0", scenes });
 };
 
 

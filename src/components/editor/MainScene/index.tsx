@@ -68,7 +68,6 @@ const Entity = ({
     }
   }, []);
 
-  console.log(renderable,renderableShape);
 
   return (
     <LocalTransformShow
@@ -136,7 +135,7 @@ function Displayer({
     const entity = useEngineStore.getState().scenes[sceneId]?.entities[selectedId!];
     if (!entity) return;
     const transformComp = Object.values(entity.components).find(
-      (c) => c.type === "localTransform",
+      (c) => c.type === "localtransform",
     );
     if (!transformComp) return;
 
@@ -182,7 +181,7 @@ function Displayer({
     if (!entity) return;
 
     const transformId = Object.values(entity?.components || {}).find(
-      (c) => c.type === "localTransform",
+      (c) => c.type === "localtransform",
     )?.id;
     if (!transformId) return;
 
@@ -206,7 +205,7 @@ function Displayer({
     if (!entity) return;
 
     const transformId = Object.values(entity?.components || {}).find(
-      (c) => c.type === "localTransform",
+      (c) => c.type === "localtransform",
     )?.id;
     if (!transformId) return;
 
@@ -290,7 +289,7 @@ function ConnectedEntity({ entity, ...props }: ConnectedEntityProps) {
   }, [entity.components, liveOverrides]);
 
   const renderable = allProps["renderable"] || undefined;
-  const transform = allProps["localTransform"] || undefined;
+  const transform = allProps["localtransform"] || undefined;
   const sprite = allProps["sprite"] || undefined;
   const camera = allProps["camera"] || undefined;
   const renderableShape = allProps["renderableShape"] || undefined;
