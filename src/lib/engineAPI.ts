@@ -2,7 +2,10 @@ import { Command } from "@tauri-apps/plugin-shell";
 import { resolveResource } from "@tauri-apps/api/path";
 import { useEngineStore, exportToEngine } from "@/store/engineStore";
 import { tempDir, join } from "@tauri-apps/api/path";
-import { writeTextFile } from "@tauri-apps/plugin-fs";
+import { writeTextFile, readTextFile } from "@tauri-apps/plugin-fs";
+
+
+import { useProjectStore } from "@/store/projectStore";
 
 export const generateUint64Id = async (): Promise<string> => {
   const command = Command.sidecar("binaries/hylozoa", ["generate-uuid"]);
@@ -28,18 +31,27 @@ export const generateUint64Id = async (): Promise<string> => {
 
 export const createHylozoaCommand = async () => {
   try {
+    const projectStore = useProjectStore.getState();
+    const engineState = useEngineStore.getState();
+
     const settingsPath = await resolveResource(
       "ressources/EngineSettings.json",
     );
-    const engineState = useEngineStore.getState();
+    const raw = await readTextFile(settingsPath);
+    const settings = JSON.parse(raw);
+    settings.ProjectLocation = projectStore.currentProjectPath;
+    const tempSettingsPath = await join(await tempDir(), "EngineSettings.json");
+    await writeTextFile(tempSettingsPath, JSON.stringify(settings, null, 2));
+
     const exportData = exportToEngine(engineState);
     const stringifiedData = JSON.stringify(exportData.scenes[0], null, 2);
     const tempPath = await join(await tempDir(), "scene.json");
+
     await writeTextFile(tempPath, stringifiedData);
 
     const command = Command.sidecar("binaries/hylozoa", [
       "run",
-      settingsPath,
+      tempSettingsPath,
       tempPath,
     ]);
     return command;
