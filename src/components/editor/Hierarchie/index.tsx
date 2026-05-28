@@ -70,16 +70,20 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
               />
             </div>
           )}
-          <Icon icon={getIcon()} className="w-4 h-4" />
           <div
             className={`
-                font-normal text-sm px-1 py-0.5 rounded-md
-                hover:bg-primary/10 hover:cursor-pointer
-                ${isSelected ? "bg-gray-200" : "bg-transparent"}
-            `}
+                  flex flex-row overflow-hidden 
+                  text-sm px-1 py-0.5 text-ellipsis whitespace-nowrap 
+                  items-center gap-1 justify-start font-normal  rounded-md
+                  hover:bg-primary/10 hover:cursor-pointer
+                  ${isSelected ? "bg-gray-200" : "bg-transparent"}
+              `}
             onClick={handleNodeClick}
           >
-            {schemas[node.data.type]?.label || node.data.name}
+            <Icon icon={getIcon()} className="w-4 h-4 min-w-4 min-h-4" />
+            <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+              {schemas[node.data.type]?.label || node.data.name}
+            </div>
           </div>
         </div>
       </ContextMenuTrigger>
@@ -122,18 +126,22 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
             </Button>
           </div>
         ) : (
-          <Button variant={"ghost"} className="cursor-pointer w-full" onClick={() => {
-            const parentEntityId = node.parent?.data.id;
-            if (parentEntityId) {
-              useEngineStore
-                .getState()
-                .removeComponentFromEntity(
-                  useSelectionStore.getState().selectedSceneId!,
-                  parentEntityId,
-                  node.data.id,
-                );
-            }
-          }}>
+          <Button
+            variant={"ghost"}
+            className="cursor-pointer w-full"
+            onClick={() => {
+              const parentEntityId = node.parent?.data.id;
+              if (parentEntityId) {
+                useEngineStore
+                  .getState()
+                  .removeComponentFromEntity(
+                    useSelectionStore.getState().selectedSceneId!,
+                    parentEntityId,
+                    node.data.id,
+                  );
+              }
+            }}
+          >
             Remove {node.data.type}
           </Button>
         )}
@@ -164,6 +172,8 @@ export function Hierarchie() {
     }));
   }, [entities, currentSceneId]);
 
+  console.log("Tree Data:", treeData);
+
   const addEntityToScene = useEngineStore((state) => state.addEntityToScene);
 
   const handleAddEntity = async () => {
@@ -191,7 +201,12 @@ export function Hierarchie() {
           <div className="flex-1 w-full min-h-0 px-2 py-1">
             <AutoSizer
               renderProp={({ height, width }: AutoSizerChildProps) => (
-                <Tree data={treeData} height={height} width={width}>
+                <Tree 
+                  data={treeData} 
+                  height={height} 
+                  width={width}
+                  idAccessor="id"
+                >
                   {Node}
                 </Tree>
               )}

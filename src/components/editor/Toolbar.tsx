@@ -7,7 +7,7 @@ import { useEngineStore  } from "@/store/engineStore";
 import { Icon } from "@iconify/react";
 
 import { runHylozoa } from "@/lib/engineAPI";
-
+import { useTerminalStore } from "@/store/useTerminalStore";
 
 function HistoryButtons() {
   const temporal = (useEngineStore as any).temporal;
@@ -38,16 +38,21 @@ export function Toolbar() {
   const childRef = useRef<Child | null>(null);
   const windowRef = useRef<WebviewWindow | null>(null);
 
+  const addMessageInfo = useTerminalStore((state) => state.addMessageInfo);
+  const addMessageError = useTerminalStore((state) => state.addMessageError);
+  const clearMessages = useTerminalStore((state) => state.clearMessages);
+
   async function launchHylozoa() {
     if (status === "running") return;
 
     try {
+      clearMessages();
       const child = await runHylozoa({
         onStdout: (line) => {
-          console.log("Hylozoa:", line);
+          addMessageInfo(line);
         },
         onStderr: (line) => {
-          console.error(`[Hylozoa STDERR]: ${line}`);
+          addMessageError(line);
         },
         onClose: async () => {
           await closeGraphWindow();
@@ -63,6 +68,7 @@ export function Toolbar() {
 
     } catch (error) {
       console.error("Failed to launch Hylozoa:", error);
+      addMessageError("Failed to launch Hylozoa.");
     }
   }
 
