@@ -31,9 +31,14 @@ interface SceneState {
 interface EngineState {
   version: string;
   scenes: Record<string, SceneState>;
+  mainSceneId: string;
 
+  setMainScene: (sceneId: string | undefined) => void;
+  renameScene: (sceneId: string | undefined, newName: string) => void;
   addScene: (name: string) => Promise<string>;
-  removeScene: (id: string) => void;
+  removeScene: (id: string | undefined) => void;
+  duplicateScene: (id: string | undefined) => Promise<string | undefined>;
+
   addEntityToScene: (sceneId: string, entity: Entity) => Promise<void>;
   removeEntityFromScene: (sceneId: string, entityId: string) => void;
   addComponentToEntity: (
@@ -174,6 +179,7 @@ export const useEngineStore = create<EngineState>()(
       immer((set, _) => ({
         version: "1.0.0",
         scenes: {},
+        mainSceneId: "",
 
         addScene: async (name: string) => {
           const id = await generateUint64Id();
@@ -181,6 +187,37 @@ export const useEngineStore = create<EngineState>()(
             state.scenes[id] = { id, name, entities: {} };
           });
           return id;
+        },
+        duplicateScene: async (id: string | undefined) => {
+          if (!id) return;
+          const sceneToDuplicate = useEngineStore.getState().scenes[id];
+          if (!sceneToDuplicate) return;
+
+          const newId = await generateUint64Id();
+          set((state: EngineState) => {
+            state.scenes[newId] = {
+              id: newId,
+              name: `${sceneToDuplicate.name} Copy`,
+              entities: JSON.parse(JSON.stringify(sceneToDuplicate.entities)),
+            };
+          });
+          return newId;
+        },
+        setMainScene: (sceneId: string | undefined) => {
+          set((state: EngineState) => {
+            if (!sceneId || !state.scenes[sceneId]) return;
+            console.log(`Setting main scene to ${sceneId}`);
+            state.mainSceneId = sceneId;
+          });
+        },
+        renameScene: (sceneId: string | undefined, newName: string) => {
+          set((state: EngineState) => {
+            if (!sceneId) return;
+            const scene = state.scenes[sceneId];
+            if (scene) {
+              scene.name = newName;
+            }
+          });
         },
         addEntityToScene: async (sceneId: string, entity: Entity) => {
           // 1. Préparation de l'ID de l'entité
@@ -209,9 +246,14 @@ export const useEngineStore = create<EngineState>()(
             };
           });
         },
-        removeScene: (id: string) =>
+        removeScene: (id: string | undefined) =>
           set((state: EngineState) => {
-            delete state.scenes[id];
+            if (id && state.scenes[id]) {
+              delete state.scenes[id];
+              if (state.mainSceneId === id) {
+                state.mainSceneId = Object.keys(state.scenes)[0] || "";
+              }
+            }
           }),
         removeEntityFromScene: (sceneId: string, entityId: string) =>
           set((state: EngineState) => {

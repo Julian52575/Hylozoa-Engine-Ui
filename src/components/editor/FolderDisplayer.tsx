@@ -40,9 +40,9 @@ function Node({ node, style, dragHandle }: NodeRendererProps<FileData>) {
           {node.isLeaf ? (
             <Icon icon="lucide:file" className="w-4 h-4" />
           ) : node.isOpen ? (
-            <Icon icon="lucide:chevron-right" className="w-4 h-4" />
-          ) : (
             <Icon icon="lucide:chevron-down" className="w-4 h-4" />
+          ) : (
+            <Icon icon="lucide:chevron-right" className="w-4 h-4" />
           )}
           <div className="font-normal text-sm">{node.data.name}</div>
         </div>
