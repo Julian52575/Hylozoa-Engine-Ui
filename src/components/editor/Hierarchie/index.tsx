@@ -172,8 +172,6 @@ export function Hierarchie() {
     }));
   }, [entities, currentSceneId]);
 
-  console.log("Tree Data:", treeData);
-
   const addEntityToScene = useEngineStore((state) => state.addEntityToScene);
 
   const handleAddEntity = async () => {

@@ -138,8 +138,9 @@ export const loadEngineState = (data: any): void => {
           return;
         }
         const compId = compProps.id || compName.toLowerCase();
-        components[compId] = {
-          id: `${entityId}-${compId}`,
+        const componentId = `${entityId}-${compId}`;
+        components[componentId] = {
+          id: componentId,
           name: compName,
           type: compName.toLowerCase(),
           props: compProps,
