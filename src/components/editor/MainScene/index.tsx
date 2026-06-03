@@ -38,12 +38,11 @@ interface EntityProps extends Konva.NodeConfig {
         x: number;
         y: number;
       };
-
     };
   };
   renderable?: any;
   renderableShape?: any;
-  
+
   onRegister: (id: string, node: any) => void;
   onClick: (id: string) => void;
 }
@@ -68,7 +67,6 @@ const Entity = ({
     }
   }, []);
 
-
   return (
     <LocalTransformShow
       ref={(node) => {
@@ -85,21 +83,29 @@ const Entity = ({
       lineColor="red"
       {...rest}
     >
-      {sprite && <SpriteShow src={sprite.texture} scale={sprite.scale} offset={sprite.offset} />}
-      {camera && <CameraShow size={camera.viewportSize} />}
-      {renderable && renderableShape && renderableShape.shapeType === "rectangle" && (
-        <Rect
-          ref={rectRef}
-          width={renderableShape.width}
-          height={renderableShape.height}
-          fill={`rgba(${renderable.color.r}, ${renderable.color.g}, ${renderable.color.b}, ${renderable.color.a})`}
-          x={renderable.origin.x}
-          y={renderable.origin.y}
-          stroke={`rgba(${renderableShape.outlineColor.r}, ${renderableShape.outlineColor.g}, ${renderableShape.outlineColor.b}, ${renderableShape.outlineColor.a})`}
-          strokeWidth={renderableShape.outlineThickness}
-          strokeScaleEnabled={false}
+      {sprite && (
+        <SpriteShow
+          src={sprite.texture}
+          scale={sprite.scale}
+          offset={sprite.offset}
         />
       )}
+      {camera && <CameraShow size={camera.viewportSize} />}
+      {renderable &&
+        renderableShape &&
+        renderableShape.shapeType === "rectangle" && (
+          <Rect
+            ref={rectRef}
+            width={renderableShape.width}
+            height={renderableShape.height}
+            fill={`rgba(${renderable.color.r}, ${renderable.color.g}, ${renderable.color.b}, ${renderable.color.a})`}
+            x={renderable.origin.x}
+            y={renderable.origin.y}
+            stroke={`rgba(${renderableShape.outlineColor.r}, ${renderableShape.outlineColor.g}, ${renderableShape.outlineColor.b}, ${renderableShape.outlineColor.a})`}
+            strokeWidth={renderableShape.outlineThickness}
+            strokeScaleEnabled={false}
+          />
+        )}
     </LocalTransformShow>
   );
 };
@@ -123,6 +129,28 @@ function Displayer({
   const clearOverrides = useSessionStore((s) => s.clearOverrides);
   const updateComponentProps = useEngineStore((s) => s.updateComponentProps);
 
+  const [viewInfo, setViewInfo] = useState({
+    x: 0,
+    y: 0,
+    zoom: 1,
+  });
+  const stageRef = useRef<any>(null);
+
+  const updateViewInfo = () => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    const zoom = Number(stage.scaleX().toFixed(2));
+    const centerWorldX = (stage.width() / 2 - stage.x()) / zoom;
+    const centerWorldY = (stage.height() / 2 - stage.y()) / zoom;
+
+    setViewInfo({
+      x: Math.round(centerWorldX),
+      y: Math.round(centerWorldY),
+      zoom: zoom,
+    });
+  };
+
   const addToRefs = (id: string, node: any) => {
     if (node) {
       nodesRef.current.set(id, node);
@@ -132,7 +160,8 @@ function Displayer({
   };
   useEffect(() => {
     if (!sceneId) return;
-    const entity = useEngineStore.getState().scenes[sceneId]?.entities[selectedId!];
+    const entity =
+      useEngineStore.getState().scenes[sceneId]?.entities[selectedId!];
     if (!entity) return;
     const transformComp = Object.values(entity.components).find(
       (c) => c.type === "localtransform",
@@ -185,7 +214,9 @@ function Displayer({
     )?.id;
     if (!transformId) return;
 
-    const props = { position: { x: Math.floor(node.x()), y: Math.floor(node.y()) } };
+    const props = {
+      position: { x: Math.floor(node.x()), y: Math.floor(node.y()) },
+    };
 
     if (isEnd) {
       updateComponentProps(sceneId, id, transformId, props);
@@ -194,7 +225,6 @@ function Displayer({
     }
     setLiveProp(id, transformId, props);
   };
-
 
   const handleTransform = (e: any, isEnd: boolean) => {
     const node = e.target;
@@ -217,7 +247,10 @@ function Displayer({
     };
 
     if (isEnd) {
-      updateComponentProps(sceneId, id, transformId, {position: { x: Math.floor(node.x()), y: Math.floor(node.y()) },...props});
+      updateComponentProps(sceneId, id, transformId, {
+        position: { x: Math.floor(node.x()), y: Math.floor(node.y()) },
+        ...props,
+      });
       clearOverrides();
       return;
     }
@@ -225,40 +258,50 @@ function Displayer({
   };
 
   return (
-    <Stage
-      width={width}
-      height={height}
-      draggable
-      onWheel={handleWheel}
-      style={{ backgroundColor: "#242424" }}
-      onMouseUp={(e) => {
-        const stage = e.target.getStage();
-        if (stage) stage.container().style.cursor = "default";
-      }}
-      onMouseDown={(e) => {
-        const stage = e.target.getStage();
-        if (e.target === stage) {
-          useSelectionStore.getState().selectEntity(null);
-        }
-        if (stage) stage.container().style.cursor = "grabbing";
-      }}
-    >
-      <Layer>
-        {entities?.map((entity) => (
-          <ConnectedEntity
-            key={entity.id || ""}
-            entity={entity}
-            onRegister={addToRefs}
-            onClick={handleSelection}
-            onDragMove={(e: any) => handleDrag(e, false)}
-            onDragEnd={(e: any) => handleDrag(e, true)}
-            onTransform={(e: any) => handleTransform(e, false)}
-            onTransformEnd={(e: any) => handleTransform(e, true)}
-          />
-        ))}
-        {selectedId && <Transformer ref={trRef} flipEnabled={true} />}
-      </Layer>
-    </Stage>
+    <div className="relative w-full h-full">
+      <Stage
+        ref={stageRef}
+        width={width}
+        height={height}
+        draggable
+        onWheel={(e) => {
+          handleWheel(e);
+          updateViewInfo();
+        }}
+        onDragMove={updateViewInfo}
+        style={{ backgroundColor: "#242424" }}
+        onMouseUp={(e) => {
+          const stage = e.target.getStage();
+          if (stage) stage.container().style.cursor = "default";
+        }}
+        onMouseDown={(e) => {
+          const stage = e.target.getStage();
+          if (e.target === stage) {
+            useSelectionStore.getState().selectEntity(null);
+          }
+          if (stage) stage.container().style.cursor = "grabbing";
+        }}
+      >
+        <Layer>
+          {entities?.map((entity) => (
+            <ConnectedEntity
+              key={entity.id || ""}
+              entity={entity}
+              onRegister={addToRefs}
+              onClick={handleSelection}
+              onDragMove={(e: any) => handleDrag(e, false)}
+              onDragEnd={(e: any) => handleDrag(e, true)}
+              onTransform={(e: any) => handleTransform(e, false)}
+              onTransformEnd={(e: any) => handleTransform(e, true)}
+            />
+          ))}
+          {selectedId && <Transformer ref={trRef} flipEnabled={true} />}
+        </Layer>
+      </Stage>
+      <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+        {`x: ${viewInfo.x} y: ${viewInfo.y} zoom: ${viewInfo.zoom}x`}
+      </div>
+    </div>
   );
 }
 

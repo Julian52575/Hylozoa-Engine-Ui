@@ -5,8 +5,8 @@ import { FolderDisplayer } from "@/components/editor/FolderDisplayer";
 import { BottomPanel } from "@/components/editor/BottomPanel";
 import { MainScene } from "@/components/editor/MainScene";
 import { Inspector } from "@/components/editor/Inspector";
-import { SceneList } from "@/components/editor/SceneList";
-import { ViewportButtons } from "@/components/editor/Viewport";
+// import { SceneList } from "@/components/editor/SceneList";
+// import { ViewportButtons } from "@/components/editor/Viewport";
 import { SceneManager } from "@/components/editor/SceneManager";
 import { Toolbar } from "@/components/editor/Toolbar";
 import { useSchemaStore } from "@/store/useSchemaStore";
@@ -96,7 +96,7 @@ export default function EditorPage() {
         <ResizableHandle className="h-full w-0.5 bg-primary/20 cursor-col-resize" />
         <ResizablePanel>
           <ResizablePanelGroup orientation="vertical">
-            <ResizablePanel minSize={30} defaultSize={80}>
+            {/* <ResizablePanel minSize={30} defaultSize={80}>
               <div className="w-full h-full flex flex-col">
                 <div className="border-b border-zinc-300">
                   <SceneList />
@@ -106,7 +106,7 @@ export default function EditorPage() {
                 </div>
               </div>
             </ResizablePanel>
-            <ResizableHandle className="h-0.5 w-full bg-primary/20 cursor-row-resize" />
+            <ResizableHandle className="h-0.5 w-full bg-primary/20 cursor-row-resize" /> */}
             <ResizablePanel minSize={200}>
               <MainScene />
             </ResizablePanel>
