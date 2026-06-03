@@ -20,6 +20,7 @@ import {
 
 import { isTauri } from "@tauri-apps/api/core";
 import { SaveProjectFile } from "@/lib/utils";
+import { useProjectStore } from "@/store/projectStore";
 
 function ButtonsWindowHandler() {
     const appWindow = getCurrentWindow();
@@ -179,9 +180,18 @@ export function HeaderWindow({isHome = false}: headerWindowProps) {
     }
     const appWindow = getCurrentWindow();
     const [title, setTitle] = useState<string>("");
+    const currentProjectPath = useProjectStore((s) => s.currentProjectPath);
+    const projetcs = useProjectStore((s) => s.projects);
 
     useEffect(() => {
         async function fetchTitle() {
+            if (!isHome) {
+                const projetcName = currentProjectPath ? projetcs.find(p => p.folderPath === currentProjectPath)?.name : null;
+                if (projetcName) {
+                    setTitle(projetcName);
+                    return;
+                }
+            }
             const currentTitle = await appWindow.title();
             setTitle(currentTitle);
         }

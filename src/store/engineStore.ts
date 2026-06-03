@@ -65,6 +65,7 @@ export const saveEngineStateToFile = async (folderPath: string, projectName: str
   const jsonString = JSON.stringify(formattedData, null, 2);
   const fileName = `${projectName}.hlz`;
   const filePath = await join(folderPath, fileName);
+  console.log(`Engine state saved to ${filePath}`);
   await writeTextFile(filePath, jsonString);
 }
 
@@ -86,6 +87,7 @@ export const serializeEngineState = (state: EngineState): object => {
 export const exportToEngine = (state: EngineState) => {
   return {
     version: state.version,
+    MainScene: state.mainSceneId,
     scenes: Object.values(state.scenes).map((scene) => ({
       sceneID: scene.id,
       sceneName: scene.name,
@@ -127,6 +129,7 @@ export const loadEngineState = (data: any): void => {
     useEngineStore.setState({ version: "1.0.0", scenes: {} });
     return;
   }
+  useEngineStore.setState({ version: data.version || "1.0.0", scenes: {},mainSceneId: data.MainScene || "" });
 
   data.scenes.forEach((sceneData: any) => {
     const entities: Record<string, Entity> = {};
