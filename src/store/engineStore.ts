@@ -39,6 +39,7 @@ interface EngineState {
   removeScene: (id: string | undefined) => void;
   duplicateScene: (id: string | undefined) => Promise<string | undefined>;
 
+  renameEntity: (sceneId: string, entityId: string, newName: string) => void;
   addEntityToScene: (sceneId: string, entity: Entity) => Promise<void>;
   removeEntityFromScene: (sceneId: string, entityId: string) => void;
   addComponentToEntity: (
@@ -65,7 +66,6 @@ export const saveEngineStateToFile = async (folderPath: string, projectName: str
   const jsonString = JSON.stringify(formattedData, null, 2);
   const fileName = `${projectName}.hlz`;
   const filePath = await join(folderPath, fileName);
-  console.log(`Engine state saved to ${filePath}`);
   await writeTextFile(filePath, jsonString);
 }
 
@@ -209,7 +209,6 @@ export const useEngineStore = create<EngineState>()(
         setMainScene: (sceneId: string | undefined) => {
           set((state: EngineState) => {
             if (!sceneId || !state.scenes[sceneId]) return;
-            console.log(`Setting main scene to ${sceneId}`);
             state.mainSceneId = sceneId;
           });
         },
@@ -219,6 +218,16 @@ export const useEngineStore = create<EngineState>()(
             const scene = state.scenes[sceneId];
             if (scene) {
               scene.name = newName;
+            }
+          });
+        },
+        renameEntity: (sceneId: string, entityId: string, newName: string) => {
+          set((state: EngineState) => {
+            const scene = state.scenes[sceneId];
+            if (!scene) return;
+            const entity = scene.entities[entityId];
+            if (entity) {
+              entity.name = newName;
             }
           });
         },

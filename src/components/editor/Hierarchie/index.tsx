@@ -16,7 +16,7 @@ import ComponentModal from "./ComponentModal";
 import { useEngineStore } from "@/store/engineStore";
 import { useSchemaStore } from "@/store/useSchemaStore";
 import { Button } from "@/components/ui/button";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 type NodeData = {
   id: string;
@@ -27,6 +27,7 @@ type NodeData = {
 
 function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
   const schemas = useSchemaStore((state) => state.schemas);
+  const renameEntity = useEngineStore((state) => state.renameEntity);
 
   const isSelected = useSelectionStore(
     (state) => state.selectedEntityId === node.data.id,
@@ -45,6 +46,24 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
     }
     const schema = schemas[node.data.type];
     return schema?.icon || "lucide:puzzle";
+  };
+
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [cpyName, setCopyName] = useState(schemas[node.data.type]?.label || node.data.name);
+  
+  const handleRename = () => {
+    if (cpyName.trim() === "") {
+      setCopyName(node.data.name);
+      return;
+    }
+    setIsRenaming(false);
+    if (node.data.type === "entity") {
+      renameEntity(
+        useSelectionStore.getState().selectedSceneId!,
+        node.data.id,
+        cpyName,
+      );
+    }
   };
 
   return (
@@ -81,9 +100,30 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
             onClick={handleNodeClick}
           >
             <Icon icon={getIcon()} className="w-4 h-4 min-w-4 min-h-4" />
-            <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-              {schemas[node.data.type]?.label || node.data.name}
-            </div>
+            {!isRenaming && (
+              <div className="overflow-hidden text-ellipsis whitespace-nowrap" onDoubleClick={() => {if (node.data.type === "entity") setIsRenaming(true)}}>
+                {cpyName}
+              </div>
+            )}
+            {isRenaming && node.data.type === "entity" && (
+              <input
+                autoFocus
+                value={cpyName}
+                onChange={(e) => {
+                  setCopyName(e.target.value);
+                }}
+                onClick={(e) => e.stopPropagation()}
+                onBlur={handleRename}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                  if (e.key === "Escape") {
+                    setIsRenaming(false);
+                    setCopyName(node.data.name);
+                  }
+                }}
+                className="w-full bg-transparent border-b border-primary focus:outline-none"
+              />
+            )}
           </div>
         </div>
       </ContextMenuTrigger>
@@ -193,7 +233,9 @@ export function Hierarchie() {
 
   return (
     <div className="flex-1 h-full flex flex-col bg-secondary items-start">
-      <div className="w-full bg-primary/10 px-4 py-2 shrink-0">Hierarchy</div>
+      <div className="w-full bg-primary/10 px-4 py-2 shrink-0">
+        Entities
+      </div>
       <ContextMenu>
         <ContextMenuTrigger asChild onContextMenu={(e) => e.stopPropagation()}>
           <div className="flex-1 w-full min-h-0 px-2 py-1">
