@@ -14,7 +14,7 @@ import { useState } from "react";
 function Header({ onAddScene }: { onAddScene: () => Promise<string> }) {
   return (
     <div className="w-full bg-primary/10 px-4 py-2 flex items-center justify-between gap-2 shrink-0">
-      <span>Scènes</span>
+      <span>Scenes</span>
       <Button variant="ghost" size={"icon-sm"} className="cursor-pointer" onClick={onAddScene}>
         <Icon icon="lucide:plus" className="w-4 h-4" />
       </Button>
@@ -98,7 +98,7 @@ function SceneItem({
             onClick={() => useEngineStore.getState().setMainScene(sceneId)}
           >
             <Icon icon="lucide:star" className="w-4 h-4 shrink-0" />
-            <span>Définir comme scène principale</span>
+            <span>Define as Main Scene</span>
           </ContextMenuItem>
           <ContextMenuItem
             className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted cursor-pointer"
@@ -113,7 +113,7 @@ function SceneItem({
             }}
           >
             <Icon icon="lucide:edit" className="w-4 h-4 shrink-0" />
-            <span>Renommer</span>
+            <span>Rename</span>
           </ContextMenuItem>
           <ContextMenuItem
             className={`
@@ -127,7 +127,7 @@ function SceneItem({
             }}
           >
             <Icon icon="lucide:trash-2" className="w-4 h-4 shrink-0" />
-            <span>Supprimer</span>
+            <span>Delete</span>
           </ContextMenuItem>
           <ContextMenuItem
             className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted cursor-pointer"
@@ -136,7 +136,7 @@ function SceneItem({
             }}
           >
             <Icon icon="lucide:copy" className="w-4 h-4 shrink-0" />
-            <span>Dupliquer</span>
+            <span>Duplicate</span>
           </ContextMenuItem>
         </div>
       </ContextMenuContent>
