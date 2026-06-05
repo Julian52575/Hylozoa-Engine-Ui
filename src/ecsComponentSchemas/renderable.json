@@ -5,7 +5,7 @@
     "schema": {
         "color": { "type": "color", "label": "Color" },
         "visible": { "type": "boolean", "label": "Visible" },
-        "LayerBit": { "type": "enum", "label": "Layer", "options": [{"label": "Default","value": "Default"}, {"label": "UI","value": "UI"}, {"label": "Background","value": "Background"}] },
+        "layer": { "type": "enum", "label": "Layer", "options": [{"label": "Default","value": "Default"}, {"label": "UI","value": "UI"}, {"label": "Background","value": "Background"}] },
         "transparency": { "type": "number", "label": "Transparency" },
         "origin": { "type": "vector2", "label": "Origin" }
     },
@@ -17,7 +17,7 @@
             "a": 1
         },
         "visible": true,
-        "LayerBit": "Default",
+        "layer": "Default",
         "transparency": 255,
         "origin": { "x": 0, "y": 0 }
     }
