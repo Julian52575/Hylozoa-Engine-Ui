@@ -35,18 +35,22 @@ extern "C" {
     void generate_uuid(char* outPtr, size_t size);
 }
 
-void runEngine(std::string settingsPath , std::string scenePath) {
+template<typename... Args>
+void runEngine(std::string settingsPath,std::string mainID,  const std::vector<std::string>& scenePaths) {
     engine_create(settingsPath.c_str(), false);
     engine_init();
-    if (!scene_create(scenePath.c_str(), false)) {
-        std::cerr << "Failed to create scene." << std::endl;
-        engine_shutdown();
-        return;
+    for (const auto& scenePath : scenePaths) {
+        std::cout << "Creating scene: " << scenePath << std::endl;
+        if (!scene_create(scenePath.c_str(), false)) {
+            std::cerr << "Failed to create scene." << std::endl;
+            engine_shutdown();
+            return;
+        }
     }
-    // scene_load_uuid(8662741413288096373);
+    scene_load_uuid(std::stoull(mainID));
     engine_run();
 
-    // scene_destroy_uuid(8662741413288096373);
+    // scene_destroy_uuid(std::stoull(mainID));
     engine_shutdown();
 }
 
@@ -58,12 +62,13 @@ void generateUUID() {
 
 int main(int argc, char* argv[]) {
     if (argc > 3 && std::string(argv[1]) == "run") {
-        runEngine(argv[2], argv[3]);
+        std::vector<std::string> args(argv + 4, argv + argc);
+        runEngine(argv[2], argv[3], args);
     } else if (argc > 1 && std::string(argv[1]) == "generate-uuid") {
         generateUUID();
     } else {
         std::cout << "Usage:" << std::endl;
-        std::cout << "  " << argv[0] << " run <settingsPath> <scenePath>" << std::endl;
+        std::cout << "  " << argv[0] << " run <settingsPath> <mainID> [<scenesPath>...]" << std::endl;
         std::cout << "  " << argv[0] << " generate-uuid" << std::endl;
     }
     return 0;

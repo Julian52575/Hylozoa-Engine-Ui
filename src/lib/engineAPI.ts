@@ -40,20 +40,31 @@ export const createHylozoaCommand = async () => {
     const raw = await readTextFile(settingsPath);
     const settings = JSON.parse(raw);
     settings.ProjectLocation = projectStore.currentProjectPath;
+    if (!settings.ProjectLocation.endsWith("/")) {
+      settings.ProjectLocation += "/";
+    }
     const tempSettingsPath = await join(await tempDir(), "EngineSettings.json");
     await writeTextFile(tempSettingsPath, JSON.stringify(settings, null, 2));
 
     const exportData = exportToEngine(engineState);
-    const stringifiedData = JSON.stringify(exportData.scenes[0], null, 2);
-    const tempPath = await join(await tempDir(), "scene.json");
 
-    await writeTextFile(tempPath, stringifiedData);
+    const paths = [];
+    for (let i = 0; i < exportData.scenes.length; i++) {
+      const scene = exportData.scenes[i];
+      const stringifiedData = JSON.stringify(scene, null, 2);
+      const tempPath = await join(await tempDir(), `scene_${i}.json`);
+      paths.push(tempPath);
+
+      await writeTextFile(tempPath, stringifiedData);
+    }
 
     const command = Command.sidecar("binaries/hylozoa", [
       "run",
       tempSettingsPath,
-      tempPath,
+      engineState.mainSceneId || "0",
+        ...paths
     ]);
+
     return command;
   } catch (error) {
     console.error("Failed to launch Hylozoa:", error);
