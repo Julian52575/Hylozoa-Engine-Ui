@@ -35,7 +35,6 @@ extern "C" {
     void generate_uuid(char* outPtr, size_t size);
 }
 
-template<typename... Args>
 void runEngine(std::string settingsPath,std::string mainID,  const std::vector<std::string>& scenePaths) {
     engine_create(settingsPath.c_str(), false);
     engine_init();
