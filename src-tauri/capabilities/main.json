@@ -6,6 +6,7 @@
   "permissions": [
     "core:default",
     "opener:default",
+    "clipboard-manager:allow-write-text",
     "dialog:allow-open",
     "dialog:default",
     "fs:default",
@@ -23,6 +24,10 @@
     "core:webview:allow-create-webview-window",
     "shell:allow-kill",
     "shell:allow-execute",
+    {
+      "identifier":"opener:allow-open-path",
+      "allow": [{"path": "$HOME/**" }]
+    },
     {
       "identifier": "shell:allow-spawn",
       "allow": [

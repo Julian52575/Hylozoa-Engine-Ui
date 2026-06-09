@@ -1,7 +1,6 @@
 import { Tree, NodeRendererProps } from "react-arborist";
 import { Icon } from "@iconify/react";
 import { Input } from "@/components/ui/input";
-import { invoke } from "@tauri-apps/api/core";
 import {
   AutoSizer,
   type AutoSizerChildProps,
@@ -10,9 +9,17 @@ import {
 import {
   ContextMenu,
   ContextMenuContent,
+  ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { useEffect, useState } from "react";
+
+import { useProjectStore } from "@/store/projectStore";
+
+import { invoke } from "@tauri-apps/api/core";
+import { writeText } from "@tauri-apps/plugin-clipboard-manager";
+import { openPath } from "@tauri-apps/plugin-opener";
+
 
 type FileData = {
   id: string;
@@ -48,7 +55,6 @@ function Node({ node, style, dragHandle }: NodeRendererProps<FileData>) {
         </div>
       </ContextMenuTrigger>
       <ContextMenuContent>
-        {/* <div>{node.data.name} Options</div> */}
         <ExplorerContextMenu path={node.data.id} isDir={!node.isLeaf} />
       </ContextMenuContent>
     </ContextMenu>
@@ -72,6 +78,9 @@ const items = [
     label: "Ouvrir dans l'explorateur",
     action: "open",
     targets: ["file", "dir"],
+    function: async (path : string) => {
+      await openPath(path);
+    },
   },
   {
     icon: "lucide:folder-plus",
@@ -108,12 +117,23 @@ const items = [
     label: "Copier le chemin relatif",
     action: "copy-relative-path",
     targets: ["file", "dir"],
+    function: async (path: string) => {
+      const projectRoot = useProjectStore.getState().currentProjectPath;
+      let relativePath = path.replace(projectRoot, "");
+      if (relativePath.startsWith("/") || relativePath.startsWith ("\\")) {
+        relativePath = relativePath.substring(1);
+      }
+      await writeText(relativePath || ".");
+    },
   },
   {
     icon: "lucide:folder-root",
     label: "Copier le chemin absolu",
     action: "copy-absolute-path",
     targets: ["file", "dir"],
+    function: async (path: string) => {
+      await writeText(path);
+    },
   },
 ];
 
@@ -124,8 +144,11 @@ export function ExplorerContextMenu({
   path: string;
   isDir: boolean;
 }) {
-  const handleAction = (action: string) => {
-    console.log(action, path, isDir);
+  const handleAction = async (item: typeof items[0]) => {
+    // console.log(item, path, isDir);
+    if (item && item.function) {
+      await item.function(path);
+    }
   };
 
   const target = isDir ? "dir" : "file";
@@ -138,21 +161,21 @@ export function ExplorerContextMenu({
       {items
         .filter((item) => item.targets.includes(target))
         .map((item) => (
-          <button
+          <ContextMenuItem
             key={item.action}
-            type="button"
             role="menuitem"
-            onClick={() => handleAction(item.action)}
+            onClick={async () => await handleAction(item)}
             className="
             flex w-full items-center gap-2 rounded px-2 py-1
             text-left transition-colors
             hover:bg-primary/10
+            hover:cursor-pointer
           "
           >
             <Icon icon={item.icon} className="h-4 w-4 shrink-0" />
 
             <span>{item.label}</span>
-          </button>
+          </ContextMenuItem>
         ))}
     </div>
   );
