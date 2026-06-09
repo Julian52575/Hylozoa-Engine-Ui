@@ -32,6 +32,7 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
   const isSelected = useSelectionStore(
     (state) => state.selectedEntityId === node.data.id,
   );
+
   const handleNodeClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     const idToSelect = node.isLeaf ? node.parent?.data.id : node.data.id;
@@ -65,6 +66,18 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
       );
     }
   };
+
+  const getAllComponnentOfEntity = () => {
+    if (node.data.type !== "entity") return [];
+    const scene = useEngineStore.getState().scenes[useSelectionStore.getState().selectedSceneId!];
+    const entity = scene?.entities[node.data.id];
+    if (!entity) return [];
+    return Object.values(entity.components).map((comp: any) => ({
+      id: comp.id,
+      name: comp.name,
+      type: comp.type,
+    })) as NodeData[];
+   };
 
   return (
     <ContextMenu>
@@ -131,6 +144,7 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
         {node.data.type === "entity" ? (
           <div className="flex flex-col gap-1 items-start w-full">
             <ComponentModal
+              componentsDisallowed={getAllComponnentOfEntity().map(c => c.type)}    
               onValidate={async (componentType) => {
                 const createDefaultComponent =
                   useSchemaStore.getState().createDefaultComponent;

@@ -16,10 +16,13 @@ import { Icon } from "@iconify/react";
 
 export default function ComponentModal({
     onValidate,
+    componentsDisallowed = [],
 } : {
     onValidate?: (componentType: string) => void;
+    componentsDisallowed?: string[];
 }) {
-    const schemas = useSchemaStore((s) => s.schemas);
+    const baseSchemas = useSchemaStore((s) => s.schemas);
+    const schemas = Object.values(baseSchemas).filter(s => !componentsDisallowed.includes(s.type));
     const [open, setOpen] = useState(false);
     const [selected, setSelected] = useState<string | null>(null);
     const [search, setSearch] = useState("");
