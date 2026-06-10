@@ -69,20 +69,22 @@ export const saveEngineStateToFile = async (folderPath: string, projectName: str
   await writeTextFile(filePath, jsonString);
 }
 
-export const serializeEngineState = (state: EngineState): object => {
-  return {
-    version: state.version,
-    scenes: Object.values(state.scenes).map((scene) => ({
-      id: scene.id,
-      name: scene.name,
-      Entities: Object.values(scene.entities).map((entity) => ({
-        id: entity.id,
-        name: entity.name,
-        components: entity.components,
-      })),
-    })),
-  };
-};
+function unflattenProps(props: Record<string, any>) {
+  const result: Record<string, any> = {};
+  for (const [key, value] of Object.entries(props)) {
+    const parts = key.split(".");
+    let current = result;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const part = parts[i];
+      if (!current[part]) {
+        current[part] = {};
+      }
+      current = current[part];
+    }
+    current[parts[parts.length - 1]] = value;
+  }
+  return result;
+}
 
 export const exportToEngine = (state: EngineState) => {
   return {
@@ -96,15 +98,16 @@ export const exportToEngine = (state: EngineState) => {
           (acc, comp) => {
             const capitalizedName =
               comp.name.charAt(0).toUpperCase() + comp.name.slice(1);
+            const props = unflattenProps(comp.props);
             if (capitalizedName === "Camera") {
               acc[capitalizedName] = {
-                ...comp.props,
+                ...props,
                 cullingMask: Array.isArray(comp.props.cullingMask)
-                  ? comp.props.cullingMask
+                  ? props.cullingMask
                   : ["Default"],
               };
             } else {
-              acc[comp.name] = { ...comp.props };
+              acc[comp.name] = props;
             }
             return acc;
           },

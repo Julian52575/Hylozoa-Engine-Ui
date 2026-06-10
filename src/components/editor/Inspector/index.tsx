@@ -13,21 +13,17 @@ import { Icon } from "@iconify/react";
 import OptionsManager from "./OptionsManager";
 import { useSessionStore } from "@/store/useSessionStore";
 
-
 const EMPTY_OBJ = {};
 function ComponentManager({ component }: { component: any }) {
   const selectedEntityId = useSelectionStore((s) => s.selectedEntityId);
   const currentSceneId = useSelectionStore((s) => s.selectedSceneId);
-  
+
   const setLiveProp = useSessionStore((s) => s.setLiveProp);
   const updateComponentProps = useEngineStore((s) => s.updateComponentProps);
-  
-  const clearOverrides = useSessionStore((s) => s.clearOverrides);
 
-  const liveProps = useSessionStore((s) => {
-    if (!selectedEntityId || !component.id) return EMPTY_OBJ;
-    return s.overrides[selectedEntityId]?.[component.id!] || EMPTY_OBJ;
-  });
+  const liveProps = useSessionStore(
+    (s) => s.overrides[selectedEntityId!]?.[component.id!] ?? EMPTY_OBJ,
+  );
 
   const schemas = useSchemaStore((s) => s.schemas);
   const schema = schemas[component.type];
@@ -37,14 +33,22 @@ function ComponentManager({ component }: { component: any }) {
     if (!selectedEntityId) return;
     const current = liveProps?.[key] ?? component.props[key];
     if (JSON.stringify(current) === JSON.stringify(newValue)) return;
-    setLiveProp(selectedEntityId!, component.id!, { [key]: newValue });
+    setLiveProp(
+      selectedEntityId,
+      component.id!,
+      { [key]: newValue },
+    );
   };
 
   const handleCommit = (key: string, newValue: any) => {
-    updateComponentProps(currentSceneId!, selectedEntityId!, component.id!, {
-      [key]: newValue,
-    });
-    clearOverrides();
+    updateComponentProps(
+      currentSceneId!,
+      selectedEntityId!,
+      component.id!,
+      {
+        [key]: newValue,
+      }
+    );
   };
 
   return (

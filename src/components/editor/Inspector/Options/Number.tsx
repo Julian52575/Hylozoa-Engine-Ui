@@ -22,12 +22,12 @@ export function NumberOption({
   onChange,
   onCommit,
 }: NumberOptionProps) {
-  const safeValue = typeof value === "number" ? value : 0;
+  const safeValue = typeof value === "number" && !isNaN(value) ? value : 0;
   const [localValue, setLocalValue] = useState<number>(safeValue);
   const lastValueRef = useRef(localValue);
 
   useEffect(() => {
-    if (typeof value === "number") {
+    if (typeof value === "number" && !isNaN(value)) {
       setLocalValue(value);
     }
   }, [value]);

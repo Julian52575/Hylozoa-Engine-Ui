@@ -96,11 +96,11 @@ const Entity = ({
         renderableShape.shapeType === "rectangle" && (
           <Rect
             ref={rectRef}
-            width={renderableShape.width}
-            height={renderableShape.height}
+            width={renderableShape.specs.width}
+            height={renderableShape.specs.height}
             fill={`rgba(${renderable.color.r}, ${renderable.color.g}, ${renderable.color.b}, ${renderable.color.a})`}
-            x={renderable.origin.x}
-            y={renderable.origin.y}
+            offsetX={renderable.origin.x + renderableShape.specs.width / 2}
+            offsetY={renderable.origin.y + renderableShape.specs.height / 2}
             stroke={`rgba(${renderableShape.outlineColor.r}, ${renderableShape.outlineColor.g}, ${renderableShape.outlineColor.b}, ${renderableShape.outlineColor.a})`}
             strokeWidth={renderableShape.outlineThickness}
             strokeScaleEnabled={false}
@@ -126,7 +126,6 @@ function Displayer({
   const sceneId = useSelectionStore((s) => s.selectedSceneId);
 
   const setLiveProp = useSessionStore((s) => s.setLiveProp);
-  const clearOverrides = useSessionStore((s) => s.clearOverrides);
   const updateComponentProps = useEngineStore((s) => s.updateComponentProps);
 
   const [viewInfo, setViewInfo] = useState({
@@ -220,7 +219,6 @@ function Displayer({
 
     if (isEnd) {
       updateComponentProps(sceneId, id, transformId, props);
-      clearOverrides();
       return;
     }
     setLiveProp(id, transformId, props);
@@ -251,7 +249,6 @@ function Displayer({
         position: { x: Math.floor(node.x()), y: Math.floor(node.y()) },
         ...props,
       });
-      clearOverrides();
       return;
     }
     setLiveProp(id, transformId, props);

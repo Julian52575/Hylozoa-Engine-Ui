@@ -34,10 +34,10 @@ export default function OptionsManager({
   switch (type) {
     case "vector2":
       return (
-        <Vector2Option 
-          label={label} 
-          x={value.x} 
-          y={value.y} 
+        <Vector2Option
+          label={label}
+          x={value.x}
+          y={value.y}
           linked={true}
           onChange={onValueChange}
           onCommit={onCommit}
@@ -53,7 +53,9 @@ export default function OptionsManager({
         />
       );
     case "boolean":
-      return <BooleanOption label={label} checked={value} onChange={onCommit} />;
+      return (
+        <BooleanOption label={label} checked={value} onChange={onCommit} />
+      );
     case "text":
       return <TextOption label={label} value={value} />;
     case "number":
@@ -70,15 +72,22 @@ export default function OptionsManager({
       );
     case "file":
       return (
-        <FileOption 
-          label={label} 
-          value={value} 
+        <FileOption
+          label={label}
+          value={value}
           accept={accept}
           onCommit={onCommit}
         />
       );
     case "color":
-      return <ColorOption label={label} value={value} onChange={onValueChange} onCommit={onCommit} />;
+      return (
+        <ColorOption
+          label={label}
+          value={value}
+          onChange={onValueChange}
+          onCommit={onCommit}
+        />
+      );
     default:
       return <div className="font-semibold">Unsupported type: {type}</div>;
   }

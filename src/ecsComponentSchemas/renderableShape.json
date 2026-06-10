@@ -3,7 +3,7 @@
   "label": "Shape",
   "icon": "mdi:shape-outline",
   "schema": {
-    "shapeType": {
+    "type": {
       "type": "enum",
       "label": "Shape Type",
       "options": [
@@ -11,35 +11,35 @@
         { "label": "Circle", "value": "circle" }
       ]      
     },
-    "width": {
+    "specs.width": {
       "type": "number",
       "label": "Width",
-      "dependency": "shapeType-rectangle"
+      "dependency": "type-rectangle"
     },
-    "height": {
+    "specs.height": {
       "type": "number",
       "label": "Height",
-      "dependency": "shapeType-rectangle"
+      "dependency": "type-rectangle"
     },
-    "radius": {
+    "specs.radius": {
       "type": "number",
       "label": "Radius",
-      "dependency": "shapeType-circle"
+      "dependency": "type-circle"
     },
     "outlineColor": { "type": "color", "label": "Outline Color" },
     "outlineThickness": { "type": "number", "label": "Outline Thickness" }
   },
-  "values": {
-    "shapeType": "rectangle",
-    "width": 30,
-    "height": 30,
-    "radius": 30,
-    "outlineColor": {
-      "r": 0,
-      "g": 0,
-      "b": 0,
-      "a": 1
-    },
-    "outlineThickness": 1
-  }
+    "values": {
+      "type": "rectangle",
+      "specs.width": 30,
+      "specs.height": 30,
+      "specs.radius": 30,
+      "outlineColor": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 1
+      },
+      "outlineThickness": 1
+    }
 }

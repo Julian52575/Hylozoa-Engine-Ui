@@ -9,7 +9,6 @@ interface SessionState {
     props: Record<string, any>,
   ) => void;
 
-  clearOverrides: () => void;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -35,5 +34,4 @@ export const useSessionStore = create<SessionState>((set) => ({
         },
       };
     }),
-  clearOverrides: () => set({ overrides: {} }),
 }));
