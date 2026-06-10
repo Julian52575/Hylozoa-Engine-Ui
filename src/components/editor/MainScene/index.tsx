@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Stage, Layer, Transformer, Rect } from "react-konva";
+import { Stage, Layer, Transformer } from "react-konva";
 
 import { useEngineStore, type Entity } from "@/store/engineStore";
 import { useSelectionStore } from "@/store/useSelectionStore";
@@ -8,6 +8,8 @@ import Konva from "konva";
 import { LocalTransformShow } from "./LocalTransform";
 import { SpriteShow } from "./Sprite";
 import { CameraShow } from "./Camera";
+import { RenderableShapeShow } from "./RenderableShape";
+
 import { useSessionStore } from "@/store/useSessionStore";
 
 interface EntityProps extends Konva.NodeConfig {
@@ -58,14 +60,7 @@ const Entity = ({
   onClick,
   ...rest
 }: EntityProps) => {
-  const rectRef = useRef<Konva.Rect>(null);
-  useEffect(() => {
-    if (rectRef.current) {
-      rectRef.current.getClientRect = () => {
-        return { x: 0, y: 0, width: 0, height: 0 };
-      };
-    }
-  }, []);
+
 
   return (
     <LocalTransformShow
@@ -83,7 +78,7 @@ const Entity = ({
       lineColor="red"
       {...rest}
     >
-      {sprite && (
+      {renderable && sprite && (
         <SpriteShow
           src={sprite.texture}
           scale={sprite.scale}
@@ -93,17 +88,16 @@ const Entity = ({
       {camera && <CameraShow size={camera.viewportSize} />}
       {renderable &&
         renderableShape &&
-        renderableShape.shapeType === "rectangle" && (
-          <Rect
-            ref={rectRef}
-            width={renderableShape.specs.width}
-            height={renderableShape.specs.height}
-            fill={`rgba(${renderable.color.r}, ${renderable.color.g}, ${renderable.color.b}, ${renderable.color.a})`}
-            offsetX={renderable.origin.x + renderableShape.specs.width / 2}
-            offsetY={renderable.origin.y + renderableShape.specs.height / 2}
-            stroke={`rgba(${renderableShape.outlineColor.r}, ${renderableShape.outlineColor.g}, ${renderableShape.outlineColor.b}, ${renderableShape.outlineColor.a})`}
-            strokeWidth={renderableShape.outlineThickness}
-            strokeScaleEnabled={false}
+         ( <RenderableShapeShow
+              type={renderableShape.type}
+              width={renderableShape["specs.width"]}
+              height={renderableShape["specs.height"]}
+              radius={renderableShape["specs.radius"]}
+              originX={renderable.origin.x}
+              originY={renderable.origin.y}
+              fill={`rgba(${renderable.color.r}, ${renderable.color.g}, ${renderable.color.b}, ${renderable.color.a})`}
+              stroke={`rgba(${renderableShape.outlineColor.r}, ${renderableShape.outlineColor.g}, ${renderableShape.outlineColor.b}, ${renderableShape.outlineColor.a})`}
+              strokeWidth={renderableShape.outlineThickness}
           />
         )}
     </LocalTransformShow>
@@ -375,12 +369,16 @@ export function MainScene() {
     currentSceneId ? state.scenes[currentSceneId]?.entities : EMPTY_ENTITIES,
   );
 
+  const entitiesArray = entities ? Object.values(entities) : [];
+  if (entitiesArray)
+    entitiesArray.reverse()
+
   return (
     <div className="flex-1 w-full h-full min-h-0" ref={containerRef}>
       <Displayer
         width={dimensions.width}
         height={dimensions.height}
-        entities={entities ? Object.values(entities) : []}
+        entities={entitiesArray as Entity[]}
       />
     </div>
   );
