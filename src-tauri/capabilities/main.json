@@ -10,6 +10,8 @@
     "dialog:allow-open",
     "dialog:default",
     "fs:default",
+    "fs:allow-watch",
+    "fs:allow-unwatch",
     "fs:allow-temp-write",
     "fs:allow-write-text-file",
     "core:window:allow-set-title",
@@ -56,6 +58,10 @@
     },
     {
       "identifier": "fs:allow-read-text-file",
+      "allow": [{ "path": "$HOME/**" }]
+    },
+    {
+      "identifier": "fs:scope",
       "allow": [{ "path": "$HOME/**" }]
     }
   ]

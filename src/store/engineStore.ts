@@ -8,6 +8,8 @@ import { generateUint64Id } from "@/lib/engineAPI";
 import { writeTextFile } from "@tauri-apps/plugin-fs";
 import { join } from "@tauri-apps/api/path";
 
+import { useSelectionStore } from "./useSelectionStore";
+
 export interface Component {
   id?: string;
   name: string;
@@ -200,6 +202,7 @@ export const loadEngineState = (data: any): void => {
   console.log("Loaded scenes:", scenes);
 
   useEngineStore.setState({ version: data.version || "1.0.0", scenes });
+  useSelectionStore.setState({ selectedSceneId: data.MainScene || "" });
 };
 
 

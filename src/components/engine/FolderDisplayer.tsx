@@ -20,7 +20,7 @@ import { useSessionStore } from "@/store/useSessionStore";
 import { invoke } from "@tauri-apps/api/core";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { openPath } from "@tauri-apps/plugin-opener";
-
+import { watch } from "@tauri-apps/plugin-fs";
 
 type FileData = {
   id: string;
@@ -199,16 +199,40 @@ export function ExplorerContextMenu({
 
 export function FolderDisplayer({ path }: { path: string }) {
   const [searchTerm, setSearchTerm] = useState("");
-
   const [data, setData] = useState<FileData[]>([]);
+
+  const ReadDir = async () => {
+    const result: FileEntry = await invoke("read_dir_recursively", {
+      path: path,
+    });
+    setData([entryToData(result)]);
+  };
+
   useEffect(() => {
-    const ReadDir = async () => {
-      const result: FileEntry = await invoke("read_dir_recursively", {
-        path: path,
-      });
-      setData([entryToData(result)]);
-    };
     ReadDir();
+    let unwatch: (() => void) | undefined;
+    let cancelled = false;
+    (async () => {
+       const stop = await watch(
+        path,
+        (_event) => {
+          ReadDir();
+        },
+        { recursive: true,delayMs: 300 }
+      );
+      if (cancelled) {
+        stop();
+      } else {
+        unwatch = stop;
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      if (unwatch) {
+        unwatch();
+      }
+    };
   }, [path]);
 
   return (
