@@ -1,0 +1,11 @@
+{
+    "type": "script",
+    "label": "Script",
+    "icon": "lucide:code",
+    "schema": {
+        "scriptFile":{"type":"file","label":"Script File","accept":"script"}
+    },
+    "values": {
+        "scriptFile": null
+    }
+}

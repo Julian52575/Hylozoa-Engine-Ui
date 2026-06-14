@@ -6,12 +6,8 @@ import { useState, useEffect } from "react";
 import { getAssetUrl } from "@/lib/utils";
 import { useProjectStore } from "@/store/projectStore";
 import { resolveAssetPath } from "@/lib/utils";
+import { isPathInside } from "@/lib/utils";
 
-const isPathInside = (parent: string, child: string) => {
-  const normalizedParent = parent.replace(/[/\\]/g, "/");
-  const normalizedChild = child.replace(/[/\\]/g, "/");
-  return normalizedChild.startsWith(normalizedParent);
-};
 
 function ImageInput({
   image: initialImage,
@@ -116,7 +112,7 @@ function ImageInput({
       </div>
       <div className="flex flex-col items-start gap-0.5 overflow-hidden">
         <span
-          className="text-sm font-medium leading-none truncate w-full"
+          className="text-sm font-medium leading-none truncate w-full text-left pb-0.5"
           title={getFileName()}
         >
           {getFileName()}

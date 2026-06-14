@@ -1,10 +1,10 @@
 import { ImageAccept } from "./ImageAccept";
-
+import { ScriptAccept } from "./ScriptAccept";
 
 interface FileOptionProps {
     label: string;
     value: string;
-    accept?: "image" | "video" | "audio";
+    accept?: "image" | "video" | "audio" | "script";
     onCommit: (newValue: any) => void;
 }
 
@@ -17,6 +17,11 @@ export function FileOption({
     if (accept === "image") {
         return (
             <ImageAccept label={label} value={value} onChange={onCommit} />
+        );
+    }
+    if (accept === "script") {
+        return (
+            <ScriptAccept label={label} value={value} onChange={onCommit} />
         );
     }
     return (

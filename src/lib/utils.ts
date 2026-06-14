@@ -53,3 +53,9 @@ export const SaveProjectFile = async ()=> {
     }
     await saveEngineStateToFile(currentProject.folderPath, currentProject.name)
 }
+
+export const isPathInside = (parent: string, child: string) => {
+  const normalizedParent = parent.replace(/[/\\]/g, "/");
+  const normalizedChild = child.replace(/[/\\]/g, "/");
+  return normalizedChild.startsWith(normalizedParent);
+};
