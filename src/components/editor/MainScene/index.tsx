@@ -31,18 +31,25 @@ interface EntityProps extends Konva.NodeConfig {
       x: number;
       y: number;
     };
-    offset: {
+  };
+  camera?: {
+    viewportSize: {
       x: number;
       y: number;
     };
-    camera?: {
-      viewportSize: {
-        x: number;
-        y: number;
-      };
+  };
+  renderable?: {
+    color: {
+      r: number;
+      g: number;
+      b: number;
+      a: number;
+    };
+    origin: {
+      x: number;
+      y: number;
     };
   };
-  renderable?: any;
   renderableShape?: any;
 
   onRegister: (id: string, node: any) => void;
@@ -60,8 +67,6 @@ const Entity = ({
   onClick,
   ...rest
 }: EntityProps) => {
-
-
   return (
     <LocalTransformShow
       ref={(node) => {
@@ -82,24 +87,22 @@ const Entity = ({
         <SpriteShow
           src={sprite.texture}
           scale={sprite.scale}
-          offset={sprite.offset}
+          offset={renderable.origin}
         />
       )}
       {camera && <CameraShow size={camera.viewportSize} />}
-      {renderable &&
-        renderableShape &&
-         ( <RenderableShapeShow
-              type={renderableShape.type}
-              width={renderableShape["specs.width"]}
-              height={renderableShape["specs.height"]}
-              radius={renderableShape["specs.radius"]}
-              originX={renderable.origin.x}
-              originY={renderable.origin.y}
-              fill={`rgba(${renderable.color.r}, ${renderable.color.g}, ${renderable.color.b}, ${renderable.color.a})`}
-              stroke={`rgba(${renderableShape.outlineColor.r}, ${renderableShape.outlineColor.g}, ${renderableShape.outlineColor.b}, ${renderableShape.outlineColor.a})`}
-              strokeWidth={renderableShape.outlineThickness}
-          />
-        )}
+      {renderable && renderableShape && (
+        <RenderableShapeShow
+          type={renderableShape.type}
+          width={renderableShape["specs.width"]}
+          height={renderableShape["specs.height"]}
+          radius={renderableShape["specs.radius"]}
+          origin={renderable.origin}
+          fill={`rgba(${renderable.color.r}, ${renderable.color.g}, ${renderable.color.b}, ${renderable.color.a})`}
+          stroke={`rgba(${renderableShape.outlineColor.r}, ${renderableShape.outlineColor.g}, ${renderableShape.outlineColor.b}, ${renderableShape.outlineColor.a})`}
+          strokeWidth={renderableShape.outlineThickness}
+        />
+      )}
     </LocalTransformShow>
   );
 };
@@ -370,8 +373,7 @@ export function MainScene() {
   );
 
   const entitiesArray = entities ? Object.values(entities) : [];
-  if (entitiesArray)
-    entitiesArray.reverse()
+  if (entitiesArray) entitiesArray.reverse();
 
   return (
     <div className="flex-1 w-full h-full min-h-0" ref={containerRef}>

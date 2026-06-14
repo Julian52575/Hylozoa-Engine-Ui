@@ -1,24 +1,42 @@
 {
-    "type": "renderable",
-    "label": "Renderable",
-    "icon": "lucide:eye",
-    "schema": {
-        "color": { "type": "color", "label": "Color" },
-        "visible": { "type": "boolean", "label": "Visible" },
-        "LayerBit": { "type": "enum", "label": "Layer", "options": [{"label": "Default","value": "Default"}, {"label": "UI","value": "UI"}, {"label": "Background","value": "Background"}] },
-        "transparency": { "type": "number", "label": "Transparency" },
-        "origin": { "type": "vector2", "label": "Origin" }
+  "type": "renderable",
+  "label": "Renderable",
+  "icon": "lucide:eye",
+  "schema": {
+    "color": { "type": "color", "label": "Color" },
+    "visible": { "type": "boolean", "label": "Visible" },
+    "LayerBit": {
+      "type": "enum",
+      "label": "Layer",
+      "options": [
+        { "label": "Default", "value": "Default" },
+        { "label": "UI", "value": "UI" },
+        { "label": "Background", "value": "Background" }
+      ]
     },
-    "values": {
-        "color": {
-            "r": 255,
-            "g": 255,
-            "b": 255,
-            "a": 1
-        },
-        "visible": true,
-        "LayerBit": "Default",
-        "transparency": 255,
-        "origin": { "x": 0, "y": 0 }
+    "transparency": { "type": "number", "label": "Transparency" },
+    "origin": {
+      "type": "enum",
+      "label": "Origin",
+      "options": [
+          { "label": "Top Left", "value": {"x": 0, "y": 0} },
+          { "label": "Top Right", "value": {"x": 1, "y": 0} },
+          { "label": "Bottom Left", "value": {"x": 0, "y": 1} },
+          { "label": "Bottom Right", "value": {"x": 1, "y": 1} },
+          { "label": "Center", "value": {"x": 0.5, "y": 0.5} }
+      ]
     }
+  },
+  "values": {
+    "color": {
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 1
+    },
+    "visible": true,
+    "LayerBit": "Default",
+    "transparency": 255,
+    "origin": { "x": 0.5, "y": 0.5 }
+  }
 }

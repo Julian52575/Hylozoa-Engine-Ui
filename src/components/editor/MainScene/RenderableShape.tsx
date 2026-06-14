@@ -4,8 +4,10 @@ import { Rect, Circle } from "react-konva";
 
 interface RenderableShapeProps extends Konva.RectConfig, Konva.CircleConfig {
   type: string;
-  originX: number;
-  originY: number;
+  origin?: {
+    x: number;
+    y: number;
+  };
   width?: number;
   height?: number;
   radius?: number;
@@ -14,30 +16,32 @@ interface RenderableShapeProps extends Konva.RectConfig, Konva.CircleConfig {
 export const RenderableShapeShow = forwardRef<
   Konva.Rect | Konva.Circle,
   RenderableShapeProps
->(({ type, originX, originY,width, height, radius, ...rest }, ref) => {
+>(({ type, origin, width, height, radius, ...rest }, ref) => {
 
   if (type === "rectangle") {
     return (
       <Rect
         ref={ref as React.ForwardedRef<Konva.Rect>}
         {...rest}
-        x={originX}
-        y={originY}
         width={width}
         height={height}
-        offsetX={width / 2}
-        offsetY={height / 2}
+        offsetX={origin?.x * width}
+        offsetY={origin?.y * height}
         strokeScaleEnabled={false}
       />
     );
   }
 
   if (type === "circle") {
+    const offsetX = origin ? (origin.x - 0.5) * (radius * 2) : 0;
+    const offsetY = origin ? (origin.y - 0.5) * (radius * 2) : 0;
     return (
       <Circle
         ref={ref as React.ForwardedRef<Konva.Circle>}
         {...rest}
         radius={radius}
+        offsetX={offsetX}
+        offsetY={offsetY}
         strokeScaleEnabled={false}
       />
     );
