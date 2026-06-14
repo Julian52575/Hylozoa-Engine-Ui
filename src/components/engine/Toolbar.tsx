@@ -3,11 +3,12 @@ import { Child } from "@tauri-apps/plugin-shell";
 import { useState, useRef } from "react";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 
-import { useEngineStore  } from "@/store/engineStore";
+import { useEngineStore } from "@/store/engineStore";
 import { Icon } from "@iconify/react";
 
 import { runHylozoa } from "@/lib/engineAPI";
 import { useTerminalStore } from "@/store/useTerminalStore";
+import { useSessionStore } from "@/store/useSessionStore";
 
 function HistoryButtons() {
   const temporal = (useEngineStore as any).temporal;
@@ -28,6 +29,29 @@ function HistoryButtons() {
         onClick={() => temporal.getState().redo()}
       >
         <Icon icon="lucide:redo-2" className="w-4 h-4" />
+      </Button>
+    </div>
+  );
+}
+
+function OngletButtons() {
+  const { currentOnglet, setCurrentOnglet } = useSessionStore();
+
+  return (
+    <div className="flex flex-row gap-1">
+      <Button
+        variant={currentOnglet === "scene" ? "outline" : "ghost"}
+        className="cursor-pointer"
+        onClick={() => setCurrentOnglet("scene")}
+      >
+        Scene
+      </Button>
+      <Button
+        variant={currentOnglet === "console" ? "outline" : "ghost"}
+        className="cursor-pointer"
+        onClick={() => setCurrentOnglet("console")}
+      >
+        Scripts
       </Button>
     </div>
   );
@@ -65,7 +89,6 @@ export function Toolbar() {
 
       const webview = await createNodeWindow();
       windowRef.current = webview;
-
     } catch (error) {
       console.error("Failed to launch Hylozoa:", error);
       addMessageError("Failed to launch Hylozoa.");
@@ -111,6 +134,7 @@ export function Toolbar() {
   return (
     <div className="w-full h-12 bg-primary/10 flex items-center px-2 gap-2 justify-around border-b border-primary/20">
       <HistoryButtons />
+      <OngletButtons />
       <div className="flex flex-row gap-1">
         <Button
           variant="outline"

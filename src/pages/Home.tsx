@@ -9,7 +9,7 @@ export default function HomePage() {
     <div className="h-svh w-svw flex flex-col">
       <HeaderWindow isHome />
       <Home
-        onEditProject={() => {navigate("/editor")}}
+        onEditProject={() => {navigate("/engine")}}
       />
     </div>
   )

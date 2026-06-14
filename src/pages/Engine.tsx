@@ -1,15 +1,16 @@
 import { HeaderWindow } from "@/components/HeaderWindow";
 
-import { Hierarchie } from "@/components/editor/Hierarchie";
-import { FolderDisplayer } from "@/components/editor/FolderDisplayer";
-import { BottomPanel } from "@/components/editor/BottomPanel";
-import { MainScene } from "@/components/editor/MainScene";
-import { Inspector } from "@/components/editor/Inspector";
-// import { SceneList } from "@/components/editor/SceneList";
-// import { ViewportButtons } from "@/components/editor/Viewport";
-import { SceneManager } from "@/components/editor/SceneManager";
-import { Toolbar } from "@/components/editor/Toolbar";
+import { Hierarchie } from "@/components/engine/Hierarchie";
+import { FolderDisplayer } from "@/components/engine/FolderDisplayer";
+import { BottomPanel } from "@/components/engine/BottomPanel";
+import { MainScene } from "@/components/engine/MainScene";
+import { Inspector } from "@/components/engine/Inspector";
+import { SceneManager } from "@/components/engine/SceneManager";
+import { Toolbar } from "@/components/engine/Toolbar";
+import { EditorScreen } from "@/components/engine/EditorScreen";
+
 import { useSchemaStore } from "@/store/useSchemaStore";
+import { useSessionStore } from "@/store/useSessionStore";
 
 import {
   ResizableHandle,
@@ -22,7 +23,22 @@ import { useEffect } from "react";
 import { useProjectStore } from "@/store/projectStore";
 import { SaveProjectFile } from "@/lib/utils";
 
-export default function EditorPage() {
+function MainSceneHandler() {
+  const { currentOnglet } = useSessionStore();
+
+  return (
+    <>
+      <div className={currentOnglet === "scene" ? "w-full h-full" : "hidden"}>
+        <MainScene />
+      </div>
+
+      <div className={currentOnglet === "console" ? "w-full h-full" : "hidden"}>
+        <EditorScreen />
+      </div>
+    </>
+  );
+}
+export default function EnginePage() {
   useEffect(() => {
     const temporal = (useEngineStore as any).temporal;
     if (!temporal) {
@@ -62,8 +78,7 @@ export default function EditorPage() {
     loadSchemas();
   }, [loadSchemas]);
 
-  const {currentProjectPath} = useProjectStore();
-
+  const { currentProjectPath } = useProjectStore();
 
   return (
     <div className="h-svh w-svw flex flex-col">
@@ -96,24 +111,11 @@ export default function EditorPage() {
         <ResizableHandle className="h-full w-0.5 bg-primary/20 cursor-col-resize" />
         <ResizablePanel>
           <ResizablePanelGroup orientation="vertical">
-            {/* <ResizablePanel minSize={30} defaultSize={80}>
-              <div className="w-full h-full flex flex-col">
-                <div className="border-b border-zinc-300">
-                  <SceneList />
-                </div>
-                <div className="flex-1">
-                  <ViewportButtons />
-                </div>
-              </div>
-            </ResizablePanel>
-            <ResizableHandle className="h-0.5 w-full bg-primary/20 cursor-row-resize" /> */}
             <ResizablePanel minSize={200}>
-              <MainScene />
+              <MainSceneHandler />
             </ResizablePanel>
             <ResizableHandle className="h-0.5 w-full bg-primary/20 cursor-row-resize" />
-            {/* <ResizablePanel minSize={70} defaultSize={70}> */}
-              <BottomPanel />
-            {/* </ResizablePanel> */}
+            <BottomPanel />
           </ResizablePanelGroup>
         </ResizablePanel>
         <ResizableHandle className="h-full w-0.5 bg-primary/20 cursor-col-resize" />

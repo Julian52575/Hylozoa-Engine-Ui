@@ -15,6 +15,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { useProjectStore } from "@/store/projectStore";
+import { useSessionStore } from "@/store/useSessionStore";
 
 import { invoke } from "@tauri-apps/api/core";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
@@ -95,28 +96,39 @@ const items = [
     targets: ["dir"],
   },
   {
+    icon: "lucide:code",
+    label: "Editer",
+    action: "edit",
+    targets: ["code"],
+    function : async (path : string) => {
+      const sessionStore = useSessionStore.getState();
+      sessionStore.setCurrentCodeFilePath(path);
+      sessionStore.setCurrentOnglet("console");
+    }
+  },
+  {
     icon: "lucide:edit-3",
     label: "Renommer",
     action: "rename",
-    targets: ["file", "dir"],
+    targets: ["file", "dir", "code"],
   },
   {
     icon: "lucide:trash-2",
     label: "Supprimer",
     action: "delete",
-    targets: ["file", "dir"],
+    targets: ["file", "dir", "code"],
   },
   {
     icon: "lucide:files",
     label: "Dupliquer",
     action: "duplicate",
-    targets: ["file", "dir"],
+    targets: ["file", "dir", "code"],
   },
   {
     icon: "lucide:link",
     label: "Copier le chemin relatif",
     action: "copy-relative-path",
-    targets: ["file", "dir"],
+    targets: ["file", "dir", "code"],
     function: async (path: string) => {
       const projectRoot = useProjectStore.getState().currentProjectPath;
       let relativePath = path.replace(projectRoot, "");
@@ -130,7 +142,7 @@ const items = [
     icon: "lucide:folder-root",
     label: "Copier le chemin absolu",
     action: "copy-absolute-path",
-    targets: ["file", "dir"],
+    targets: ["file", "dir", "code"],
     function: async (path: string) => {
       await writeText(path);
     },
@@ -151,7 +163,11 @@ export function ExplorerContextMenu({
     }
   };
 
-  const target = isDir ? "dir" : "file";
+  let target = isDir ? "dir" : "file";
+  if (path.endsWith(".lua")) {
+    target = "code";
+  }
+  
 
   return (
     <div
