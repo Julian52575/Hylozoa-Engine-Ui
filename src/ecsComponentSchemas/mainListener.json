@@ -1,5 +1,5 @@
 {
-    "type": "mainListener",
+    "type": "mainlistener",
     "label": "Main Listener",
     "icon": "lucide:volume-2",
     "schema": {},

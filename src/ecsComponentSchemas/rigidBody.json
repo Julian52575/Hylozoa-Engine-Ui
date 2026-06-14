@@ -1,5 +1,5 @@
 {
-  "type": "rigidBody",
+  "type": "rigidbody",
   "label": "Rigid Body",
   "icon": "lucide:git-branch",
   "schema": {

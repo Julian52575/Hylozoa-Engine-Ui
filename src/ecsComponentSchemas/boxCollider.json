@@ -1,5 +1,5 @@
 {
-    "type" : "boxCollider",
+    "type" : "boxcollider",
     "label" : "Box Collider",
     "icon": "lucide:box",
     "schema":{

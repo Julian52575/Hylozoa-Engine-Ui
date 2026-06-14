@@ -1,5 +1,5 @@
 {
-    "type" : "capsuleCollider",
+    "type" : "capsulecollider",
     "label" : "Capsule Collider",
     "icon": "lucide:disc",
     "schema": {

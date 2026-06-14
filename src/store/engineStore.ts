@@ -150,6 +150,16 @@ export const loadEngineState = (data: any): void => {
         }
         const compId = compProps.id || compName.toLowerCase();
         const componentId = `${entityId}-${compId}`;
+        if (compProps && typeof compProps === "object") {
+          for (const [key, value] of Object.entries(compProps)) {
+            if (typeof value === "object" && value !== null && key === "specs") {
+              for (const [specKey, specValue] of Object.entries(value)) {
+                compProps[`${key}.${specKey}`] = specValue;
+              }
+              delete compProps[key];
+            }
+          }
+        }
         components[componentId] = {
           id: componentId,
           name: compName,
@@ -173,6 +183,8 @@ export const loadEngineState = (data: any): void => {
       entities,
     };
   });
+
+  console.log("Loaded scenes:", scenes);
 
   useEngineStore.setState({ version: data.version || "1.0.0", scenes });
 };

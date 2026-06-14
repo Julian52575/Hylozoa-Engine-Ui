@@ -1,5 +1,5 @@
 {
-    "type": "worldTransform",
+    "type": "worldtransform",
     "label": "World Transform",
     "icon": "lucide:globe",
     "schema": {

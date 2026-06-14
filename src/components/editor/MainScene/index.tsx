@@ -329,7 +329,7 @@ function ConnectedEntity({ entity, ...props }: ConnectedEntityProps) {
   const transform = allProps["localtransform"] || undefined;
   const sprite = allProps["sprite"] || undefined;
   const camera = allProps["camera"] || undefined;
-  const renderableShape = allProps["renderableShape"] || undefined;
+  const renderableShape = allProps["renderableshape"] || undefined;
 
   if (transform === undefined) {
     return null;

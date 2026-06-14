@@ -1,5 +1,5 @@
 {
-    "type": "noiseListener",
+    "type": "noiselistener",
     "label": "Noise Listener",
     "icon": "lucide:ear",
     "schema": {

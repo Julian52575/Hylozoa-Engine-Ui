@@ -1,5 +1,5 @@
 {
-  "type": "renderableShape",
+  "type": "renderableshape",
   "label": "Shape",
   "icon": "mdi:shape-outline",
   "schema": {
