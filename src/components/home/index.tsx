@@ -11,6 +11,7 @@ import { loadEngineState, useEngineStore } from "@/store/engineStore";
 
 import { readTextFile, exists } from '@tauri-apps/plugin-fs';
 import { join } from "@tauri-apps/api/path";
+import { useSelectionStore } from "@/store/useSelectionStore";
 
 export function Home({
     onEditProject,
@@ -65,6 +66,12 @@ export function Home({
                 loadEngineState(projectData);
                 setCurrentProjectPath(projectSelected.folderPath);
                 toast.success("Project loaded successfully!");
+            }
+            else{
+                const mainSceneId = useEngineStore.getState().mainSceneId;
+                if (mainSceneId) {
+                    useSelectionStore.getState().selectScene(mainSceneId);
+                }
             }
             if (onEditProject) {
                 onEditProject();
