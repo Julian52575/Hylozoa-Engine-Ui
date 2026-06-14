@@ -126,6 +126,18 @@ export const exportToEngine = (state: EngineState) => {
   };
 };
 
+const isNestedObject = (value: any): boolean => {
+  if (typeof value !== "object" || value === null) return false;
+
+  const keys = Object.keys(value);
+
+  const isVector2 = keys.includes("x") && keys.includes("y") && keys.length === 2;
+  
+  const isColor = keys.includes("r") && keys.includes("g") && keys.includes("b");
+
+  return !isVector2 && !isColor;
+};
+
 export const loadEngineState = (data: any): void => {
   const scenes: Record<string, SceneState> = {};
   if (!data || !data.scenes) {
@@ -151,10 +163,11 @@ export const loadEngineState = (data: any): void => {
         const compId = compProps.id || compName.toLowerCase();
         const componentId = `${entityId}-${compId}`;
         if (compProps && typeof compProps === "object") {
-          for (const [key, value] of Object.entries(compProps)) {
-            if (typeof value === "object" && value !== null && key === "specs") {
-              for (const [specKey, specValue] of Object.entries(value)) {
-                compProps[`${key}.${specKey}`] = specValue;
+          const entries = Object.entries(compProps);
+          for (const [key, value] of entries) {
+            if (isNestedObject(value)) {
+              for (const [nestedKey, nestedValue] of Object.entries(value as Record<string, any>)) {
+                compProps[`${key}.${nestedKey}`] = nestedValue;
               }
               delete compProps[key];
             }
