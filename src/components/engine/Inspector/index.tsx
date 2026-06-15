@@ -17,9 +17,13 @@ const EMPTY_OBJ = {};
 function ComponentManager({ component }: { component: any }) {
   const selectedEntityId = useSelectionStore((s) => s.selectedEntityId);
   const currentSceneId = useSelectionStore((s) => s.selectedSceneId);
+  const selectedType = useSelectionStore((s) => s.selectedType);
 
   const setLiveProp = useSessionStore((s) => s.setLiveProp);
   const updateComponentProps = useEngineStore((s) => s.updateComponentProps);
+  const updateComponentPropsFromPrefab = useEngineStore(
+    (s) => s.updateComponentPropsFromPrefab,
+  );
 
   const liveProps = useSessionStore(
     (s) => s.overrides[selectedEntityId!]?.[component.id!] ?? EMPTY_OBJ,
@@ -33,22 +37,19 @@ function ComponentManager({ component }: { component: any }) {
     if (!selectedEntityId) return;
     const current = liveProps?.[key] ?? component.props[key];
     if (JSON.stringify(current) === JSON.stringify(newValue)) return;
-    setLiveProp(
-      selectedEntityId,
-      component.id!,
-      { [key]: newValue },
-    );
+    setLiveProp(selectedEntityId, component.id!, { [key]: newValue });
   };
 
   const handleCommit = (key: string, newValue: any) => {
-    updateComponentProps(
-      currentSceneId!,
-      selectedEntityId!,
-      component.id!,
-      {
+    if (selectedType === "prefab") {
+      updateComponentPropsFromPrefab(selectedEntityId!, component.id!, {
         [key]: newValue,
-      }
-    );
+      });
+    } else {
+      updateComponentProps(currentSceneId!, selectedEntityId!, component.id!, {
+        [key]: newValue,
+      });
+    }
   };
 
   return (
@@ -89,13 +90,20 @@ export function Inspector() {
   const selectedEntityId = useSelectionStore((state) => state.selectedEntityId);
   const currentSceneId = useSelectionStore((state) => state.selectedSceneId);
   const openComponents = useSelectionStore((s) => s.openComponentIds);
+  const selectedType = useSelectionStore((s) => s.selectedType);
   const setOpenComponents = useSelectionStore((s) => s.setOpenComponents);
 
-  const entity = useEngineStore((s) =>
-    selectedEntityId && currentSceneId
-      ? s.scenes[currentSceneId]?.entities[selectedEntityId]
-      : null,
-  );
+  const entity = useEngineStore((s) => {
+    if (!selectedEntityId) return null;
+
+    if (selectedType === "prefab") {
+      return s.prefabs[selectedEntityId] ?? null;
+    }
+
+    return currentSceneId
+      ? (s.scenes[currentSceneId]?.entities[selectedEntityId] ?? null)
+      : null;
+  });
 
   if (!entity) {
     return (
@@ -108,7 +116,9 @@ export function Inspector() {
   return (
     <div className="w-full h-full flex flex-col">
       <div className="p-3 border-b bg-secondary/50 flex items-center gap-2">
-        <div className="w-3 h-3 rounded-full bg-blue-500" />
+        <div
+          className={`w-3 h-3 rounded-full ${selectedType === "entity" ? "bg-blue-500" : "bg-green-500"}`}
+        />
         <h2 className="font-bold text-sm uppercase tracking-wider">
           {entity.name}
         </h2>

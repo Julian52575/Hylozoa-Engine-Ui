@@ -34,6 +34,21 @@ interface EngineState {
   version: string;
   scenes: Record<string, SceneState>;
   mainSceneId: string;
+  prefabs: Record<string, Entity>;
+
+  addPrefab: (name: string, prefab: Entity) => Promise<string>;
+  addComponentToPrefab: (
+    prefabId: string,
+    component: Component,
+  ) => Promise<void>;
+  removeComponentFromPrefab: (prefabId: string, componentId: string) => void;
+  updateComponentPropsFromPrefab: (
+    prefabId: string,
+    componentId: string,
+    newProps: Record<string, any>,
+  ) => void;
+  removePrefab: (id: string) => void;
+  renamePrefab: (id: string, newName: string) => void;
 
   setMainScene: (sceneId: string | undefined) => void;
   renameScene: (sceneId: string | undefined, newName: string) => void;
@@ -62,14 +77,17 @@ interface EngineState {
   ) => void;
 }
 
-export const saveEngineStateToFile = async (folderPath: string, projectName: string): Promise<void> => {
+export const saveEngineStateToFile = async (
+  folderPath: string,
+  projectName: string,
+): Promise<void> => {
   const state = useEngineStore.getState();
   const formattedData = exportToEngine(state);
   const jsonString = JSON.stringify(formattedData, null, 2);
   const fileName = `${projectName}.hlz`;
   const filePath = await join(folderPath, fileName);
   await writeTextFile(filePath, jsonString);
-}
+};
 
 function unflattenProps(props: Record<string, any>) {
   const result: Record<string, any> = {};
@@ -92,6 +110,34 @@ export const exportToEngine = (state: EngineState) => {
   return {
     version: state.version,
     MainScene: state.mainSceneId,
+    prefabs: Object.values(state.prefabs).map((prefab) => {
+      const transformedComponents = Object.values(prefab.components).reduce(
+        (acc, comp) => {
+          const capitalizedName =
+            comp.name.charAt(0).toUpperCase() + comp.name.slice(1);
+          const props = unflattenProps(comp.props);
+          if (capitalizedName === "Camera") {
+            acc[capitalizedName] = {
+              ...props,
+              cullingMask: Array.isArray(comp.props.cullingMask)
+                ? props.cullingMask
+                : ["Default"],
+            };
+          } else {
+            acc[comp.name] = props;
+          }
+          return acc;
+        },
+        {} as Record<string, any>,
+      );
+      if (!transformedComponents["Name"]) {
+        transformedComponents["Name"] = { name: prefab.name };
+      }
+      return {
+        UUID: prefab.id,
+        Components: transformedComponents,
+      };
+    }),
     scenes: Object.values(state.scenes).map((scene) => ({
       sceneID: scene.id,
       sceneName: scene.name,
@@ -133,9 +179,11 @@ const isNestedObject = (value: any): boolean => {
 
   const keys = Object.keys(value);
 
-  const isVector2 = keys.includes("x") && keys.includes("y") && keys.length === 2;
-  
-  const isColor = keys.includes("r") && keys.includes("g") && keys.includes("b");
+  const isVector2 =
+    keys.includes("x") && keys.includes("y") && keys.length === 2;
+
+  const isColor =
+    keys.includes("r") && keys.includes("g") && keys.includes("b");
 
   return !isVector2 && !isColor;
 };
@@ -146,7 +194,12 @@ export const loadEngineState = (data: any): void => {
     useEngineStore.setState({ version: "1.0.0", scenes: {} });
     return;
   }
-  useEngineStore.setState({ version: data.version || "1.0.0", scenes: {},mainSceneId: data.MainScene || "" });
+  useEngineStore.setState({
+    version: data.version || "1.0.0",
+    scenes: {},
+    mainSceneId: data.MainScene || "",
+    prefabs: {},
+  });
 
   data.scenes.forEach((sceneData: any) => {
     const entities: Record<string, Entity> = {};
@@ -154,35 +207,40 @@ export const loadEngineState = (data: any): void => {
     entitiesList.forEach((entityData: any) => {
       const entityId = entityData.UUID || entityData.id;
       const components: Record<string, Component> = {};
-      const rawComponents = entityData.Components || entityData.components || {};
+      const rawComponents =
+        entityData.Components || entityData.components || {};
 
       let name = "Unnamed Entity";
-      Object.entries(rawComponents).forEach(([compName, compProps] : [string, any]) => {
-        if (compName.toLowerCase() === "name") {
-          name = compProps.name;
-          return;
-        }
-        const compId = compProps.id || compName.toLowerCase();
-        const componentId = `${entityId}-${compId}`;
-        if (compProps && typeof compProps === "object") {
-          const entries = Object.entries(compProps);
-          for (const [key, value] of entries) {
-            if (isNestedObject(value)) {
-              for (const [nestedKey, nestedValue] of Object.entries(value as Record<string, any>)) {
-                compProps[`${key}.${nestedKey}`] = nestedValue;
+      Object.entries(rawComponents).forEach(
+        ([compName, compProps]: [string, any]) => {
+          if (compName.toLowerCase() === "name") {
+            name = compProps.name;
+            return;
+          }
+          const compId = compProps.id || compName.toLowerCase();
+          const componentId = `${entityId}-${compId}`;
+          if (compProps && typeof compProps === "object") {
+            const entries = Object.entries(compProps);
+            for (const [key, value] of entries) {
+              if (isNestedObject(value)) {
+                for (const [nestedKey, nestedValue] of Object.entries(
+                  value as Record<string, any>,
+                )) {
+                  compProps[`${key}.${nestedKey}`] = nestedValue;
+                }
+                delete compProps[key];
               }
-              delete compProps[key];
             }
           }
-        }
-        components[componentId] = {
-          id: componentId,
-          name: compName,
-          type: compName.toLowerCase(),
-          props: compProps,
-        };
-      });
-      
+          components[componentId] = {
+            id: componentId,
+            name: compName,
+            type: compName.toLowerCase(),
+            props: compProps,
+          };
+        },
+      );
+
       entities[entityId] = {
         id: entityId,
         name: name,
@@ -199,13 +257,55 @@ export const loadEngineState = (data: any): void => {
     };
   });
 
-  console.log("Loaded scenes:", scenes);
+  data.prefabs?.forEach((prefabData: any) => {
+    const prefabId = prefabData.UUID || prefabData.id;
+    const components: Record<string, Component> = {};
+    const rawComponents = prefabData.Components || prefabData.components || {};
+
+    let name = "Unnamed Prefab";
+    Object.entries(rawComponents).forEach(
+      ([compName, compProps]: [string, any]) => {
+        if (compName.toLowerCase() === "name") {
+          name = compProps.name;
+          return;
+        }
+        const compId = compProps.id || compName.toLowerCase();
+        const componentId = `${prefabId}-${compId}`;
+        if (compProps && typeof compProps === "object") {
+          const entries = Object.entries(compProps);
+          for (const [key, value] of entries) {
+            if (isNestedObject(value)) {
+              for (const [nestedKey, nestedValue] of Object.entries(
+                value as Record<string, any>,
+              )) {
+                compProps[`${key}.${nestedKey}`] = nestedValue;
+              }
+              delete compProps[key];
+            }
+          }
+        }
+        components[componentId] = {
+          id: componentId,
+          name: compName,
+          type: compName.toLowerCase(),
+          props: compProps,
+        };
+      },
+    );
+
+    useEngineStore.setState((state) => {
+      state.prefabs[prefabId] = {
+        id: prefabId,
+        name: name,
+        type: "prefab",
+        components,
+      };
+    });
+  });
 
   useEngineStore.setState({ version: data.version || "1.0.0", scenes });
   useSelectionStore.setState({ selectedSceneId: data.MainScene || "" });
 };
-
-
 
 export const useEngineStore = create<EngineState>()(
   temporal(
@@ -214,6 +314,64 @@ export const useEngineStore = create<EngineState>()(
         version: "1.0.0",
         scenes: {},
         mainSceneId: "",
+        prefabs: {},
+
+        addPrefab: async (name: string, prefab: Entity) => {
+          const id = await generateUint64Id();
+          set((state: EngineState) => {
+            state.prefabs[id] = { ...prefab, id };
+            state.prefabs[id].name = name;
+          });
+          return id;
+        },
+        removeComponentFromPrefab: (prefabId: string, componentId: string) => {
+          set((state: EngineState) => {
+            const prefab = state.prefabs[prefabId];
+            if (prefab) {
+              delete prefab.components[componentId];
+            }
+          });
+        },
+        updateComponentPropsFromPrefab: (
+          prefabId: string,
+          componentId: string,
+          newProps: Record<string, any>,
+        ) => {
+          set((state: EngineState) => {
+            const prefab = state.prefabs[prefabId];
+            if (prefab) {
+              const component = prefab.components[componentId];
+              if (component) {
+                component.props = { ...component.props, ...newProps };
+              }
+            }
+          });
+        },
+        addComponentToPrefab: async (
+          prefabId: string,
+          component: Component,
+        ) => {
+          const id = await generateUint64Id();
+          set((state: EngineState) => {
+            const prefab = state.prefabs[prefabId];
+            if (prefab) {
+              prefab.components[id] = { ...component, id };
+            }
+          });
+        },
+        removePrefab: (id: string) =>
+          set((state: EngineState) => {
+            if (state.prefabs[id]) {
+              delete state.prefabs[id];
+            }
+          }),
+        renamePrefab: (id: string, newName: string) =>
+          set((state: EngineState) => {
+            const prefab = state.prefabs[id];
+            if (prefab) {
+              prefab.name = newName;
+            }
+          }),
 
         addScene: async (name: string) => {
           const id = await generateUint64Id();
@@ -263,10 +421,7 @@ export const useEngineStore = create<EngineState>()(
           });
         },
         addEntityToScene: async (sceneId: string, entity: Entity) => {
-          // 1. Préparation de l'ID de l'entité
           const entityId = await generateUint64Id();
-
-          // 2. Préparation des composants (en parallèle pour la performance)
           const processedComponents: Record<string, Component> = {};
           if (entity.components) {
             const entries = await Promise.all(
@@ -277,8 +432,6 @@ export const useEngineStore = create<EngineState>()(
             );
             Object.assign(processedComponents, Object.fromEntries(entries));
           }
-
-          // 3. Mutation finale de l'état
           set((state: EngineState) => {
             const scene = state.scenes[sceneId];
             if (!scene) return;

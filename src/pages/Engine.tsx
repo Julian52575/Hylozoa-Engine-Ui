@@ -5,7 +5,6 @@ import { FolderDisplayer } from "@/components/engine/FolderDisplayer";
 import { BottomPanel } from "@/components/engine/BottomPanel";
 import { MainScene } from "@/components/engine/MainScene";
 import { Inspector } from "@/components/engine/Inspector";
-import { SceneManager } from "@/components/engine/SceneManager";
 import { Toolbar } from "@/components/engine/Toolbar";
 import { EditorScreen } from "@/components/engine/EditorScreen";
 

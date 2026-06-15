@@ -29,6 +29,7 @@ type NodeData = {
 function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
   const schemas = useSchemaStore((state) => state.schemas);
   const renameEntity = useEngineStore((state) => state.renameEntity);
+  const renamePrefab = useEngineStore((state) => state.renamePrefab);
 
   const isSelected = useSelectionStore(
     (state) => state.selectedEntityId === node.data.id,
@@ -37,13 +38,15 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
   const handleNodeClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     const idToSelect = node.isLeaf ? node.parent?.data.id : node.data.id;
+    const typeToSelect = node.isLeaf ? node.parent?.data.type : node.data.type;
     if (idToSelect) {
       useSelectionStore.getState().selectEntity(idToSelect);
+      useSelectionStore.getState().selectType(typeToSelect || null);
     }
   };
 
   const getIcon = () => {
-    if (node.data.type === "entity") {
+    if (node.data.type === "entity" || node.data.type === "prefab") {
       return "lucide:box";
     }
     const schema = schemas[node.data.type];
@@ -68,21 +71,97 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
         cpyName,
       );
     }
+    if (node.data.type === "prefab") {
+      renamePrefab(node.data.id, cpyName);
+    }
   };
 
-  const getAllComponnentOfEntity = () => {
-    if (node.data.type !== "entity") return [];
-    const scene =
-      useEngineStore.getState().scenes[
-        useSelectionStore.getState().selectedSceneId!
-      ];
-    const entity = scene?.entities[node.data.id];
-    if (!entity) return [];
-    return Object.values(entity.components).map((comp: any) => ({
-      id: comp.id,
-      name: comp.name,
-      type: comp.type,
-    })) as NodeData[];
+  const getAllComponent = () => {
+    if (node.data.type === "entity") {
+      const scene =
+        useEngineStore.getState().scenes[
+          useSelectionStore.getState().selectedSceneId!
+        ];
+      const entity = scene?.entities[node.data.id];
+      if (!entity) return [];
+      return Object.values(entity.components).map((comp: any) => ({
+        id: comp.id,
+        name: comp.name,
+        type: comp.type,
+      })) as NodeData[];
+    }
+    if (node.data.type === "prefab") {
+      const prefab = useEngineStore.getState().prefabs[node.data.id];
+      if (!prefab) return [];
+      return Object.values(prefab.components).map((comp: any) => ({
+        id: comp.id,
+        name: comp.name,
+        type: comp.type,
+      })) as NodeData[];
+    }
+    return [];
+  };
+
+  const onValidateAddComponent = async (componentType: string) => {
+    const createDefaultComponent =
+      useSchemaStore.getState().createDefaultComponent;
+    const newComponentProps =
+      createDefaultComponent(componentType)?.values || {};
+    if (node.data.type === "entity") {
+      await useEngineStore
+        .getState()
+        .addComponentToEntity(
+          useSelectionStore.getState().selectedSceneId!,
+          node.data.id,
+          {
+            name: componentType,
+            type: componentType,
+            props: newComponentProps,
+          },
+        );
+    }
+    if (node.data.type === "prefab") {
+      await useEngineStore.getState().addComponentToPrefab(node.data.id, {
+        name: componentType,
+        type: componentType,
+        props: newComponentProps,
+      });
+    }
+    node.open();
+  };
+
+  const handleRemoveRootNode = () => {
+    if (node.data.type === "entity") {
+      useEngineStore
+        .getState()
+        .removeEntityFromScene(
+          useSelectionStore.getState().selectedSceneId!,
+          node.data.id,
+        );
+    }
+    if (node.data.type === "prefab") {
+      useEngineStore.getState().removePrefab(node.data.id);
+    }
+  };
+
+  const handleRemoveComponentNode = () => {
+    if (node.data.type !== "entity" && node.data.type !== "prefab") {
+      const parentEntityId = node.parent?.data.id;
+      if (parentEntityId && node.parent?.data.type === "entity") {
+        useEngineStore
+          .getState()
+          .removeComponentFromEntity(
+            useSelectionStore.getState().selectedSceneId!,
+            parentEntityId,
+            node.data.id,
+          );
+      }
+      if (parentEntityId && node.parent?.data.type === "prefab") {
+        useEngineStore
+          .getState()
+          .removeComponentFromPrefab(parentEntityId, node.data.id);
+      }
+    }
   };
 
   return (
@@ -123,91 +202,62 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
               <div
                 className="overflow-hidden text-ellipsis whitespace-nowrap"
                 onDoubleClick={() => {
-                  if (node.data.type === "entity") setIsRenaming(true);
+                  if (
+                    node.data.type === "entity" ||
+                    node.data.type === "prefab"
+                  )
+                    setIsRenaming(true);
                 }}
               >
                 {cpyName}
               </div>
             )}
-            {isRenaming && node.data.type === "entity" && (
-              <input
-                autoFocus
-                value={cpyName}
-                onChange={(e) => {
-                  setCopyName(e.target.value);
-                }}
-                onClick={(e) => e.stopPropagation()}
-                onBlur={handleRename}
-                onKeyDown={(e) => {
-                  e.stopPropagation();
-                  if (e.key === "Escape") {
-                    setIsRenaming(false);
-                    setCopyName(node.data.name);
-                  }
-                }}
-                className="w-full bg-transparent border-b border-primary focus:outline-none"
-              />
-            )}
+            {isRenaming &&
+              (node.data.type === "entity" || node.data.type === "prefab") && (
+                <input
+                  autoFocus
+                  value={cpyName}
+                  onChange={(e) => {
+                    setCopyName(e.target.value);
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                  onBlur={handleRename}
+                  onKeyDown={(e) => {
+                    e.stopPropagation();
+                    if (e.key === "Escape") {
+                      setIsRenaming(false);
+                      setCopyName(node.data.name);
+                    }
+                    if (e.key === "Enter") {
+                      handleRename();
+                    }
+                  }}
+                  className="w-full bg-transparent border-b border-primary focus:outline-none"
+                />
+              )}
           </div>
         </div>
       </ContextMenuTrigger>
       <ContextMenuContent>
-        {node.data.type === "entity" ? (
+        {node.data.type === "entity" || node.data.type === "prefab" ? (
           <div className="flex flex-col gap-1 items-start w-full">
             <ComponentModal
-              componentsDisallowed={getAllComponnentOfEntity().map(
-                (c) => c.type,
-              )}
-              onValidate={async (componentType) => {
-                const createDefaultComponent =
-                  useSchemaStore.getState().createDefaultComponent;
-                const newComponentProps =
-                  createDefaultComponent(componentType)?.values || {};
-                await useEngineStore
-                  .getState()
-                  .addComponentToEntity(
-                    useSelectionStore.getState().selectedSceneId!,
-                    node.data.id,
-                    {
-                      name: componentType,
-                      type: componentType,
-                      props: newComponentProps,
-                    },
-                  );
-                node.open();
-              }}
+              componentsDisallowed={getAllComponent().map((c) => c.type)}
+              onValidate={onValidateAddComponent}
             />
             <Button
               variant={"ghost"}
               className=""
-              onClick={() => {
-                useEngineStore
-                  .getState()
-                  .removeEntityFromScene(
-                    useSelectionStore.getState().selectedSceneId!,
-                    node.data.id,
-                  );
-              }}
+              onClick={handleRemoveRootNode}
             >
-              Remove Entity
+              Remove {node.data.type}
             </Button>
           </div>
         ) : (
           <Button
             variant={"ghost"}
             className="cursor-pointer w-full"
-            onClick={() => {
-              const parentEntityId = node.parent?.data.id;
-              if (parentEntityId) {
-                useEngineStore
-                  .getState()
-                  .removeComponentFromEntity(
-                    useSelectionStore.getState().selectedSceneId!,
-                    parentEntityId,
-                    node.data.id,
-                  );
-              }
-            }}
+            onClick={handleRemoveComponentNode}
           >
             Remove {node.data.type}
           </Button>
