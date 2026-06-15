@@ -7,20 +7,9 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
-
-function Header({ onAddScene }: { onAddScene: () => Promise<string> }) {
-  return (
-    <div className="w-full bg-primary/10 px-4 py-2 flex items-center justify-between gap-2 shrink-0">
-      <span>Scenes</span>
-      <Button variant="ghost" size={"icon-sm"} className="cursor-pointer" onClick={onAddScene}>
-        <Icon icon="lucide:plus" className="w-4 h-4" />
-      </Button>
-    </div>
-  );
-}
 
 function SceneItem({
   sceneId,
@@ -150,8 +139,7 @@ export function SceneManager() {
   const mainSceneId = useEngineStore((state) => state.mainSceneId);
 
   return (
-    <div className="flex-1 h-full flex flex-col bg-secondary items-start">
-      <Header onAddScene={async () => await addScene(`Scene ${Object.keys(scenes).length + 1}`)} />
+    <div className="flex-1 h-full flex flex-col items-start">
       <ContextMenu>
         <ContextMenuTrigger asChild onContextMenu={(e) => e.stopPropagation()}>
           <div className="flex flex-col gap-1.5 w-full p-2 overflow-auto h-full">

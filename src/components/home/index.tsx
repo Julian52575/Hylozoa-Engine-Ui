@@ -1,121 +1,128 @@
-
 import { useState } from "react";
 
 import { useProjectStore, Project } from "@/store/projectStore";
-import { toast } from "sonner"
+import { toast } from "sonner";
 import { CardContainer } from "./CardManager";
 import ButtonsContainer from "./ButtonsManager";
 import Header from "./header";
 
 import { loadEngineState, useEngineStore } from "@/store/engineStore";
 
-import { readTextFile, exists } from '@tauri-apps/plugin-fs';
+import { readTextFile, exists } from "@tauri-apps/plugin-fs";
 import { join } from "@tauri-apps/api/path";
 import { useSelectionStore } from "@/store/useSelectionStore";
 
 export function Home({
-    onEditProject,
-    onRemoveProject,
-} : {
-    onEditProject?: () => void;
-    onRemoveProject?: () => void;
+  onEditProject,
+  onRemoveProject,
+}: {
+  onEditProject?: () => void;
+  onRemoveProject?: () => void;
 }) {
-    const [searchTerm, setSearchTerm] = useState<string>("");
-    const [sortOption, setSortOption] = useState<string>("name");
-    const {projects,removeProject,setCurrentProjectPath,currentProjectPath} = useProjectStore();
-    const [projectSelected, setProjectSelected] = useState<Project | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [sortOption, setSortOption] = useState<string>("name");
+  const { projects, removeProject, setCurrentProjectPath, currentProjectPath } =
+    useProjectStore();
+  const [projectSelected, setProjectSelected] = useState<Project | null>(null);
 
-    const filteredProjects = projects.filter(project => 
-        project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.folderPath.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  const filteredProjects = projects.filter(
+    (project) =>
+      project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.folderPath.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
-    const sortedProjects : Project[] = [...filteredProjects].sort((a, b) => {
-        if (sortOption === "name") {
-        return a.name.localeCompare(b.name);
-        } else if (sortOption === "date") {
-        return new Date(b.modifiedDate).getTime() - new Date(a.modifiedDate).getTime();
-        } else if (sortOption === "path") {
-        return a.folderPath.localeCompare(b.folderPath);
-        } else if (sortOption === "favorite") {
-        return (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0);
-        }
-        return 0;
-    });
-
-    const handleProjectClick = async () => {
-        if (!projectSelected) {
-            toast.error("Please select a project to edit.");
-            return;
-        }
-        try {
-            const fileName = `${projectSelected.name}.hlz`;
-            const filePath = await join(projectSelected.folderPath, fileName);
-
-            const fileExists = await exists(filePath);
-            if (!fileExists) {
-                toast.error(`Project file not found at ${filePath}`);
-                return;
-            }
-            const isNewPath = currentProjectPath !== projectSelected.folderPath;
-            const isStoreEmpty = Object.keys(useEngineStore.getState().scenes).length === 0;
-            if (isNewPath || isStoreEmpty) {
-                const fileContent = await readTextFile(filePath);
-                const projectData = JSON.parse(fileContent);
-                useEngineStore.persist.clearStorage();
-                loadEngineState(projectData);
-                setCurrentProjectPath(projectSelected.folderPath);
-                toast.success("Project loaded successfully!");
-            }
-            else{
-                const mainSceneId = useEngineStore.getState().mainSceneId;
-                if (mainSceneId) {
-                    useSelectionStore.getState().selectScene(mainSceneId);
-                }
-            }
-            if (onEditProject) {
-                onEditProject();
-            }
-        }
-        catch (error) {
-            console.error("Error loading project:", error);
-            toast.error("Failed to load project. Please try again.");
-            return;
-        }
+  const sortedProjects: Project[] = [...filteredProjects].sort((a, b) => {
+    if (sortOption === "name") {
+      return a.name.localeCompare(b.name);
+    } else if (sortOption === "date") {
+      return (
+        new Date(b.modifiedDate).getTime() - new Date(a.modifiedDate).getTime()
+      );
+    } else if (sortOption === "path") {
+      return a.folderPath.localeCompare(b.folderPath);
+    } else if (sortOption === "favorite") {
+      return (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0);
     }
+    return 0;
+  });
 
-    const handleRemoveProject = () => {
-        if (projectSelected) {
-            removeProject(projectSelected.folderPath);
-            setProjectSelected(null);
-            onRemoveProject && onRemoveProject();
+  const handleProjectClick = async () => {
+    if (!projectSelected) {
+      toast.error("Please select a project to edit.");
+      return;
+    }
+    try {
+      const fileName = `${projectSelected.name}.hlz`;
+      const filePath = await join(projectSelected.folderPath, fileName);
+
+      const fileExists = await exists(filePath);
+      if (!fileExists) {
+        toast.error(`Project file not found at ${filePath}`);
+        return;
+      }
+      const isNewPath = currentProjectPath !== projectSelected.folderPath;
+      const isStoreEmpty =
+        Object.keys(useEngineStore.getState().scenes).length === 0;
+      if (isNewPath || isStoreEmpty) {
+        const fileContent = await readTextFile(filePath);
+        const projectData = JSON.parse(fileContent);
+        useEngineStore.persist.clearStorage();
+        loadEngineState(projectData);
+        setCurrentProjectPath(projectSelected.folderPath);
+      } else {
+        const mainSceneId = useEngineStore.getState().mainSceneId;
+        if (mainSceneId) {
+          useSelectionStore.getState().selectScene(mainSceneId);
         }
-        else {
-            toast.error("Please select a project to remove.");
-        }
-    };
+      }
+      if (onEditProject) {
+        onEditProject();
+        toast.success("Project loaded successfully!");
+      }
+    } catch (error) {
+      console.error("Error loading project:", error);
+      toast.error("Failed to load project. Please try again.");
+      return;
+    }
+  };
 
+  const handleRemoveProject = () => {
+    if (projectSelected) {
+      removeProject(projectSelected.folderPath);
+      setProjectSelected(null);
+      onRemoveProject && onRemoveProject();
+    } else {
+      toast.error("Please select a project to remove.");
+    }
+  };
 
-    return (
-        <div className="flex-1 overflow-hidden">
-            <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} sortOption={sortOption} setSortOption={setSortOption} />
-            <div className="flex-1 h-full flex flex-row">
-                {projects.length === 0 ? (
-                    <div className="flex-1 flex flex-col items-center justify-center gap-4">
-                        <span className="text-lg text-zinc-600">No projects found. Create or import a project to get started.</span>
-                    </div>
-                ) : (
-                    <CardContainer 
-                        projects={sortedProjects} 
-                        projectSelected={projectSelected} 
-                        setProjectSelected={setProjectSelected} 
-                    />
-                )}
-                <ButtonsContainer 
-                    onEditProject={handleProjectClick}
-                    onRemoveProject={handleRemoveProject}
-                />
-            </div>
+  return (
+    <div className="flex-1 overflow-hidden">
+      <Header
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        sortOption={sortOption}
+        setSortOption={setSortOption}
+      />
+      <div className="flex-1 h-full flex flex-row">
+        {projects.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center gap-4">
+            <span className="text-lg text-zinc-600">
+              No projects found. Create or import a project to get started.
+            </span>
+          </div>
+        ) : (
+          <CardContainer
+            projects={sortedProjects}
+            projectSelected={projectSelected}
+            setProjectSelected={setProjectSelected}
+          />
+        )}
+        <ButtonsContainer
+          onEditProject={handleProjectClick}
+          onRemoveProject={handleRemoveProject}
+        />
       </div>
-    );
+    </div>
+  );
 }

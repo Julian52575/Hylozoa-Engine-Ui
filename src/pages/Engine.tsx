@@ -22,6 +22,7 @@ import { useEngineStore } from "@/store/engineStore";
 import { useEffect } from "react";
 import { useProjectStore } from "@/store/projectStore";
 import { SaveProjectFile } from "@/lib/utils";
+import { ProjectPanel } from "@/components/engine/ProjectPanel";
 
 function MainSceneHandler() {
   const { currentOnglet } = useSessionStore();
@@ -95,7 +96,8 @@ export default function EnginePage() {
             orientation="vertical"
           >
             <ResizablePanel minSize={40} defaultSize={300}>
-              <SceneManager />
+              {/* <SceneManager /> */}
+              <ProjectPanel />
             </ResizablePanel>
             <ResizableHandle className="h-0.5 w-full bg-primary/20 cursor-row-resize" />
             <ResizablePanel minSize={40} defaultSize={300}>
