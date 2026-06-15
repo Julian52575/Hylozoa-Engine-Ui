@@ -9,8 +9,9 @@
     "order": { "type": "number", "label": "Order" },
     "isUI": { "type": "boolean", "label": "Is UI" },
     "cullingMask": {
-      "type": "enum",
+      "type": "array",
       "label": "Culling Mask",
+      "min": 1,
       "options": [
         { "label": "All", "value": "All" },
         { "label": "Default", "value": "Default" },
@@ -24,6 +25,6 @@
     "zoom": 1,
     "order": 0,
     "isUI": false,
-    "cullingMask": "Default"
+    "cullingMask": ["Default"]
   }
 }

@@ -41,13 +41,15 @@ function ComponentManager({ component }: { component: any }) {
   };
 
   const handleCommit = (key: string, newValue: any) => {
+    const safeValue = Array.isArray(newValue) ? [...newValue] : newValue;
+
     if (selectedType === "prefab") {
       updateComponentPropsFromPrefab(selectedEntityId!, component.id!, {
-        [key]: newValue,
+        [key]: safeValue,
       });
     } else {
       updateComponentProps(currentSceneId!, selectedEntityId!, component.id!, {
-        [key]: newValue,
+        [key]: safeValue,
       });
     }
   };

@@ -5,6 +5,7 @@ import { TextOption } from "./Options/Text";
 import { NumberOption } from "./Options/Number";
 import { FileOption } from "./Options/File";
 import { ColorOption } from "./Options/Color";
+import { ArrayOption } from "./Options/Array";
 
 interface OptionsManagerProps {
   propConfig: Record<string, any>;
@@ -86,6 +87,16 @@ export default function OptionsManager({
           value={value}
           onChange={onValueChange}
           onCommit={onCommit}
+        />
+      );
+    case "array":
+      return (
+        <ArrayOption
+          label={label}
+          options={options || []}
+          values={value}
+          min={min}
+          onChange={onCommit}
         />
       );
     default:

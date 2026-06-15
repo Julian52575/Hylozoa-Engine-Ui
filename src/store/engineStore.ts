@@ -111,24 +111,11 @@ export const exportToEngine = (state: EngineState) => {
     version: state.version,
     MainScene: state.mainSceneId,
     prefabs: Object.values(state.prefabs).map((prefab) => {
-      const transformedComponents = Object.values(prefab.components).reduce(
-        (acc, comp) => {
-          const capitalizedName =
-            comp.name.charAt(0).toUpperCase() + comp.name.slice(1);
-          const props = unflattenProps(comp.props);
-          if (capitalizedName === "Camera") {
-            acc[capitalizedName] = {
-              ...props,
-              cullingMask: Array.isArray(comp.props.cullingMask)
-                ? props.cullingMask
-                : ["Default"],
-            };
-          } else {
-            acc[comp.name] = props;
-          }
-          return acc;
-        },
-        {} as Record<string, any>,
+      const transformedComponents = Object.fromEntries(
+        Object.values(prefab.components).map((comp) => [
+          comp.name,
+          unflattenProps(comp.props),
+        ]),
       );
       if (!transformedComponents["Name"]) {
         transformedComponents["Name"] = { name: prefab.name };
@@ -142,24 +129,11 @@ export const exportToEngine = (state: EngineState) => {
       sceneID: scene.id,
       sceneName: scene.name,
       Entities: Object.values(scene.entities).map((entity) => {
-        const transformedComponents = Object.values(entity.components).reduce(
-          (acc, comp) => {
-            const capitalizedName =
-              comp.name.charAt(0).toUpperCase() + comp.name.slice(1);
-            const props = unflattenProps(comp.props);
-            if (capitalizedName === "Camera") {
-              acc[capitalizedName] = {
-                ...props,
-                cullingMask: Array.isArray(comp.props.cullingMask)
-                  ? props.cullingMask
-                  : ["Default"],
-              };
-            } else {
-              acc[comp.name] = props;
-            }
-            return acc;
-          },
-          {} as Record<string, any>,
+        const transformedComponents = Object.fromEntries(
+          Object.values(entity.components).map((comp) => [
+            comp.name,
+            unflattenProps(comp.props),
+          ]),
         );
         if (!transformedComponents["Name"]) {
           transformedComponents["Name"] = { name: entity.name };
@@ -176,6 +150,7 @@ export const exportToEngine = (state: EngineState) => {
 
 const isNestedObject = (value: any): boolean => {
   if (typeof value !== "object" || value === null) return false;
+  if (Array.isArray(value)) return false;
 
   const keys = Object.keys(value);
 
@@ -302,7 +277,7 @@ export const loadEngineState = (data: any): void => {
       };
     });
   });
-
+  console.log("Loaded engine state:", data);
   useEngineStore.setState({ version: data.version || "1.0.0", scenes });
   useSelectionStore.setState({ selectedSceneId: data.MainScene || "" });
 };
