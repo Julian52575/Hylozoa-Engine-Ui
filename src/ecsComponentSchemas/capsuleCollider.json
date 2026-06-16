@@ -5,7 +5,7 @@
     "schema": {
         "center1" : { "type" : "vector2", "label" : "Center 1" },
         "center2" : { "type" : "vector2", "label" : "Center 2" },
-        "radius" : { "type" : "number", "label" : "Radius" }
+        "radius" : { "type" : "number", "label" : "Radius", "min": 0 }
     },
     "values": {
         "center1" : { "x" : 0, "y" : -0.5 },

@@ -3,7 +3,7 @@
     "label" : "Circle Collider",
     "icon": "lucide:circle",
     "schema": {
-        "radius": { "type": "number", "label": "Radius" },
+        "radius": { "type": "number", "label": "Radius","min": 0 },
         "offset": { "type": "vector2", "label": "Offset" }
     },
     "values": {

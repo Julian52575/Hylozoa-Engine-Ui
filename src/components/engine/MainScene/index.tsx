@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Stage, Layer, Transformer } from "react-konva";
+import {
+  Stage,
+  Layer,
+  Transformer,
+  Rect,
+  Circle,
+  Group,
+  Arc,
+} from "react-konva";
 
 import { useEngineStore, type Entity } from "@/store/engineStore";
 import { useSelectionStore } from "@/store/useSelectionStore";
@@ -45,12 +53,62 @@ interface EntityProps extends Konva.NodeConfig {
       b: number;
       a: number;
     };
+    visible: boolean;
+    LayerBit: string;
+    transparency: number;
     origin: {
       x: number;
       y: number;
     };
   };
-  renderableShape?: any;
+  renderableShape?: {
+    type: "rectangle" | "circle";
+    "specs.width"?: number;
+    "specs.height"?: number;
+    "specs.radius"?: number;
+    outlineColor: {
+      r: number;
+      g: number;
+      b: number;
+      a: number;
+    };
+    outlineThickness: number;
+  };
+  collider?: {
+    density: number;
+    friction: number;
+    restitution: number;
+    rollingResistance: number;
+    tangentSpeed: number;
+    isSensor: boolean;
+    enableContactEvents: boolean;
+    enableSensorEvents: boolean;
+    enableHitEvents: boolean;
+  };
+  circleCollider?: {
+    radius: number;
+    offset: {
+      x: number;
+      y: number;
+    };
+  };
+  boxCollider?: {
+    size: {
+      x: number;
+      y: number;
+    };
+  };
+  capsuleCollider?: {
+    center1: {
+      x: number;
+      y: number;
+    };
+    center2: {
+      x: number;
+      y: number;
+    };
+    radius: number;
+  };
 
   onRegister: (id: string, node: any) => void;
   onClick: (id: string) => void;
@@ -63,6 +121,10 @@ const Entity = ({
   camera,
   renderable,
   renderableShape,
+  collider,
+  boxCollider,
+  circleCollider,
+  capsuleCollider,
   onRegister,
   onClick,
   ...rest
@@ -102,6 +164,66 @@ const Entity = ({
           stroke={`rgba(${renderableShape.outlineColor.r}, ${renderableShape.outlineColor.g}, ${renderableShape.outlineColor.b}, ${renderableShape.outlineColor.a})`}
           strokeWidth={renderableShape.outlineThickness}
         />
+      )}
+      {collider && boxCollider && (
+        <Rect
+          x={-10}
+          y={-10}
+          width={boxCollider.size.x}
+          height={boxCollider.size.y}
+          fill="lightblue"
+          stroke="blue"
+          strokeWidth={1}
+        />
+      )}
+      {collider && circleCollider && (
+        <Circle
+          x={0}
+          y={0}
+          offsetX={circleCollider.offset.x}
+          offsetY={circleCollider.offset.y}
+          radius={circleCollider.radius}
+          fill="lightgreen"
+          stroke="green"
+          strokeWidth={1}
+        />
+      )}
+      {collider && capsuleCollider && (
+        <Group>
+          <Arc
+            x={capsuleCollider.center1.x}
+            y={capsuleCollider.center1.y}
+            innerRadius={0}
+            outerRadius={capsuleCollider.radius}
+            angle={180}
+            rotation={180} // demi-cercle du haut
+            fill="lightcoral"
+            stroke="red"
+            strokeWidth={1}
+          />
+          <Rect
+            x={capsuleCollider.center1.x - capsuleCollider.radius}
+            y={capsuleCollider.center1.y}
+            width={capsuleCollider.radius * 2}
+            height={Math.abs(
+              capsuleCollider.center2.y - capsuleCollider.center1.y,
+            )}
+            fill="lightcoral"
+            stroke="red"
+            strokeWidth={1}
+          />
+          <Arc
+            x={capsuleCollider.center2.x}
+            y={capsuleCollider.center2.y}
+            innerRadius={0}
+            outerRadius={capsuleCollider.radius}
+            angle={180}
+            rotation={0} // demi-cercle du bas
+            fill="lightcoral"
+            stroke="red"
+            strokeWidth={1}
+          />
+        </Group>
       )}
     </LocalTransformShow>
   );
@@ -330,6 +452,10 @@ function ConnectedEntity({ entity, ...props }: ConnectedEntityProps) {
   const sprite = allProps["sprite"] || undefined;
   const camera = allProps["camera"] || undefined;
   const renderableShape = allProps["renderableshape"] || undefined;
+  const collider = allProps["collider"] || undefined;
+  const boxcollider = allProps["boxcollider"] || undefined;
+  const circlecollider = allProps["circlecollider"] || undefined;
+  const capsulecollider = allProps["capsulecollider"] || undefined;
 
   if (transform === undefined) {
     return null;
@@ -343,6 +469,10 @@ function ConnectedEntity({ entity, ...props }: ConnectedEntityProps) {
       camera={camera}
       renderable={renderable}
       renderableShape={renderableShape}
+      collider={collider}
+      boxCollider={boxcollider}
+      circleCollider={circlecollider}
+      capsuleCollider={capsulecollider}
       {...props}
     />
   );
