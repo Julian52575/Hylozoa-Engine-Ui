@@ -8,7 +8,6 @@ import { Inspector } from "@/components/engine/Inspector";
 import { Toolbar } from "@/components/engine/Toolbar";
 import { EditorScreen } from "@/components/engine/EditorScreen";
 
-import { useSchemaStore } from "@/store/useSchemaStore";
 import { useSessionStore } from "@/store/useSessionStore";
 
 import {
@@ -34,6 +33,12 @@ function MainSceneHandler() {
 
       <div className={currentOnglet === "console" ? "w-full h-full" : "hidden"}>
         <EditorScreen />
+      </div>
+
+      <div className={currentOnglet === "prefabs" ? "w-full h-full" : "hidden"}>
+        <div className="w-full h-full flex items-center justify-center text-primary/50">
+          Prefabs panel is under development.
+        </div>
       </div>
     </>
   );
@@ -71,12 +76,6 @@ export default function EnginePage() {
     window.addEventListener("keydown", handleKeyDown, true);
     return () => window.removeEventListener("keydown", handleKeyDown, true);
   }, []);
-
-  const loadSchemas = useSchemaStore((s) => s.loadSchemas);
-
-  useEffect(() => {
-    loadSchemas();
-  }, [loadSchemas]);
 
   const { currentProjectPath } = useProjectStore();
 

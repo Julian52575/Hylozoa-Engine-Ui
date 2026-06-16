@@ -9,6 +9,7 @@ import { writeTextFile } from "@tauri-apps/plugin-fs";
 import { join } from "@tauri-apps/api/path";
 
 import { useSelectionStore } from "./useSelectionStore";
+import { useSchemaStore } from "./useSchemaStore";
 
 export interface Component {
   id?: string;
@@ -113,7 +114,7 @@ export const exportToEngine = (state: EngineState) => {
     prefabs: Object.values(state.prefabs).map((prefab) => {
       const transformedComponents = Object.fromEntries(
         Object.values(prefab.components).map((comp) => [
-          comp.name,
+          comp.type,
           unflattenProps(comp.props),
         ]),
       );
@@ -131,7 +132,7 @@ export const exportToEngine = (state: EngineState) => {
       Entities: Object.values(scene.entities).map((entity) => {
         const transformedComponents = Object.fromEntries(
           Object.values(entity.components).map((comp) => [
-            comp.name,
+            comp.type,
             unflattenProps(comp.props),
           ]),
         );
@@ -176,6 +177,8 @@ export const loadEngineState = (data: any): void => {
     prefabs: {},
   });
 
+  const schemas = useSchemaStore.getState().schemas;
+
   data.scenes.forEach((sceneData: any) => {
     const entities: Record<string, Entity> = {};
     const entitiesList = sceneData.Entities || sceneData.entities || [];
@@ -207,10 +210,19 @@ export const loadEngineState = (data: any): void => {
               }
             }
           }
+          const type = compName.toLowerCase();
+          const schema = schemas[type];
+          if (!schema) {
+            console.warn(
+              `Component type "${type}" not found in schemas. Skipping component.`,
+            );
+            return;
+          }
+
           components[componentId] = {
             id: componentId,
-            name: compName,
-            type: compName.toLowerCase(),
+            name: schema.label || compName,
+            type: type,
             props: compProps,
           };
         },
@@ -259,10 +271,19 @@ export const loadEngineState = (data: any): void => {
             }
           }
         }
+        const type = compName.toLowerCase();
+        const schema = schemas[type];
+        if (!schema) {
+          console.warn(
+            `Component type "${type}" not found in schemas. Skipping component.`,
+          );
+          return;
+        }
+
         components[componentId] = {
           id: componentId,
-          name: compName,
-          type: compName.toLowerCase(),
+          name: schema.label || compName,
+          type: type,
           props: compProps,
         };
       },

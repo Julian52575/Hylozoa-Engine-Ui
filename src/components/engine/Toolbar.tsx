@@ -47,6 +47,13 @@ function OngletButtons() {
         Scene
       </Button>
       <Button
+        variant={currentOnglet === "prefabs" ? "outline" : "ghost"}
+        className="cursor-pointer"
+        onClick={() => setCurrentOnglet("prefabs")}
+      >
+        Prefabs
+      </Button>
+      <Button
         variant={currentOnglet === "console" ? "outline" : "ghost"}
         className="cursor-pointer"
         onClick={() => setCurrentOnglet("console")}
