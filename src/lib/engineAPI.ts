@@ -2,8 +2,12 @@ import { Command } from "@tauri-apps/plugin-shell";
 import { resolveResource } from "@tauri-apps/api/path";
 import { useEngineStore, exportToEngine } from "@/store/engineStore";
 import { tempDir, join } from "@tauri-apps/api/path";
-import { writeTextFile, readTextFile } from "@tauri-apps/plugin-fs";
-
+import {
+  writeTextFile,
+  readTextFile,
+  exists,
+  mkdir,
+} from "@tauri-apps/plugin-fs";
 
 import { useProjectStore } from "@/store/projectStore";
 
@@ -58,11 +62,30 @@ export const createHylozoaCommand = async () => {
       await writeTextFile(tempPath, stringifiedData);
     }
 
+    if (exportData.prefabs) {
+      const prefabsDir = settings.ProjectLocation + "Assets/prefabs/";
+      if (!(await exists(prefabsDir))) {
+        await mkdir(prefabsDir, { recursive: true });
+      }
+
+      for (const prefab of exportData.prefabs) {
+        const fileName = `${prefab.Components.Name.name}.prefab.json`;
+        const { UUID, ...prefabWithoutUUID } = prefab;
+        const prefabFileContent = {
+          Entities: [{...prefabWithoutUUID, id:0}]
+        };
+        await writeTextFile(
+          prefabsDir + fileName,
+          JSON.stringify(prefabFileContent, null, 2),
+        );
+      }
+    }
+
     const command = Command.sidecar("binaries/hylozoa", [
       "run",
       tempSettingsPath,
       engineState.mainSceneId || "0",
-        ...paths
+      ...paths,
     ]);
 
     return command;

@@ -503,7 +503,7 @@ export function MainScene() {
   );
 
   const entitiesArray = entities ? Object.values(entities) : [];
-  if (entitiesArray) entitiesArray.reverse();
+  // if (entitiesArray) entitiesArray.reverse();
 
   return (
     <div className="flex-1 w-full h-full min-h-0" ref={containerRef}>

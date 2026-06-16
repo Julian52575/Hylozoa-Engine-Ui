@@ -166,6 +166,7 @@ const isNestedObject = (value: any): boolean => {
 
 export const loadEngineState = (data: any): void => {
   const scenes: Record<string, SceneState> = {};
+  const prefabs: Record<string, Entity> = {};
   if (!data || !data.scenes) {
     useEngineStore.setState({ version: "1.0.0", scenes: {} });
     return;
@@ -244,8 +245,11 @@ export const loadEngineState = (data: any): void => {
     };
   });
 
-  data.prefabs?.forEach((prefabData: any) => {
-    const prefabId = prefabData.UUID || prefabData.id;
+  data.prefabs?.forEach((prefabData: any, index: number) => {
+    const prefabId =
+      prefabData.UUID && prefabData.UUID !== "0"
+        ? prefabData.UUID
+        : `prefab-${index}-${Date.now()}`;
     const components: Record<string, Component> = {};
     const rawComponents = prefabData.Components || prefabData.components || {};
 
@@ -289,17 +293,19 @@ export const loadEngineState = (data: any): void => {
       },
     );
 
-    useEngineStore.setState((state) => {
-      state.prefabs[prefabId] = {
-        id: prefabId,
-        name: name,
-        type: "prefab",
-        components,
-      };
-    });
+    prefabs[prefabId] = {
+      id: prefabId,
+      name: name,
+      type: "prefab",
+      components,
+    };
   });
-  console.log("Loaded engine state:", data);
-  useEngineStore.setState({ version: data.version || "1.0.0", scenes });
+  console.log("Loaded engine prefabs:", prefabs);
+  useEngineStore.setState({
+    version: data.version || "1.0.0",
+    scenes,
+    prefabs,
+  });
   useSelectionStore.setState({ selectedSceneId: data.MainScene || "" });
 };
 
