@@ -7,6 +7,7 @@ import { MainScene } from "@/components/engine/MainScene";
 import { Inspector } from "@/components/engine/Inspector";
 import { Toolbar } from "@/components/engine/Toolbar";
 import { EditorScreen } from "@/components/engine/EditorScreen";
+import { PrefabsScene } from "@/PrefabsScene";
 
 import { useSessionStore } from "@/store/useSessionStore";
 
@@ -21,6 +22,7 @@ import { useEffect } from "react";
 import { useProjectStore } from "@/store/projectStore";
 import { SaveProjectFile } from "@/lib/utils";
 import { ProjectPanel } from "@/components/engine/ProjectPanel";
+import { useSchemaStore } from "@/store/useSchemaStore";
 
 function MainSceneHandler() {
   const { currentOnglet } = useSessionStore();
@@ -30,20 +32,22 @@ function MainSceneHandler() {
       <div className={currentOnglet === "scene" ? "w-full h-full" : "hidden"}>
         <MainScene />
       </div>
-
       <div className={currentOnglet === "console" ? "w-full h-full" : "hidden"}>
         <EditorScreen />
       </div>
-
       <div className={currentOnglet === "prefabs" ? "w-full h-full" : "hidden"}>
-        <div className="w-full h-full flex items-center justify-center text-primary/50">
-          Prefabs panel is under development.
-        </div>
+        <PrefabsScene />
       </div>
     </>
   );
 }
 export default function EnginePage() {
+  const loadSchemas = useSchemaStore((s) => s.loadSchemas);
+
+  useEffect(() => {
+    loadSchemas();
+  }, [loadSchemas]);
+
   useEffect(() => {
     const temporal = (useEngineStore as any).temporal;
     if (!temporal) {

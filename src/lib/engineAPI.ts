@@ -7,6 +7,8 @@ import {
   readTextFile,
   exists,
   mkdir,
+  readDir,
+  remove,
 } from "@tauri-apps/plugin-fs";
 
 import { useProjectStore } from "@/store/projectStore";
@@ -66,13 +68,18 @@ export const createHylozoaCommand = async () => {
       const prefabsDir = settings.ProjectLocation + "Assets/prefabs/";
       if (!(await exists(prefabsDir))) {
         await mkdir(prefabsDir, { recursive: true });
+      } else {
+        const files = await readDir(prefabsDir);
+        await Promise.all(
+          files.map(async (file) => remove(await join(prefabsDir, file.name))),
+        );
       }
 
       for (const prefab of exportData.prefabs) {
         const fileName = `${prefab.Components.Name.name}.prefab.json`;
         const { UUID, ...prefabWithoutUUID } = prefab;
         const prefabFileContent = {
-          Entities: [{...prefabWithoutUUID, id:0}]
+          Entities: [{ ...prefabWithoutUUID, id: 0 }],
         };
         await writeTextFile(
           prefabsDir + fileName,

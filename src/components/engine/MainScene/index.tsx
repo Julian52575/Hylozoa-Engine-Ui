@@ -229,14 +229,16 @@ const Entity = ({
   );
 };
 
-function Displayer({
+export function Displayer({
   width,
   height,
   entities,
+  fromPrefabs
 }: {
   width: number;
   height: number;
   entities?: Entity[];
+  fromPrefabs: boolean;
 }) {
   const trRef = useRef<any>(null);
   const nodesRef = useRef<Map<string, any>>(new Map());
@@ -246,6 +248,7 @@ function Displayer({
 
   const setLiveProp = useSessionStore((s) => s.setLiveProp);
   const updateComponentProps = useEngineStore((s) => s.updateComponentProps);
+  const updateComponentPropsFromPrefab = useEngineStore((s) => s.updateComponentPropsFromPrefab);
 
   const [viewInfo, setViewInfo] = useState({
     x: 0,
@@ -278,8 +281,12 @@ function Displayer({
   };
   useEffect(() => {
     if (!sceneId) return;
-    const entity =
-      useEngineStore.getState().scenes[sceneId]?.entities[selectedId!];
+    let entity = null;
+    if (fromPrefabs) {
+      entity = useEngineStore.getState().prefabs[selectedId!];
+    } else {
+      entity = useEngineStore.getState().scenes[sceneId]?.entities[selectedId!];
+    }
     if (!entity) return;
     const transformComp = Object.values(entity.components).find(
       (c) => c.type === "localtransform",
@@ -294,6 +301,12 @@ function Displayer({
 
   const handleSelection = (id: string) => {
     useSelectionStore.getState().selectEntity(id);
+    if (fromPrefabs) {
+      useSelectionStore.getState().selectType("prefab");
+    } else {
+      useSelectionStore.getState().selectType("entity");
+    }
+
   };
 
   const handleWheel = (e: any) => {
@@ -324,7 +337,12 @@ function Displayer({
     const id = node.id();
     if (!sceneId) return;
 
-    const entity = useEngineStore.getState().scenes[sceneId]?.entities[id];
+    let entity = null;
+    if (fromPrefabs) {
+      entity = useEngineStore.getState().prefabs[id];
+    } else {
+      entity = useEngineStore.getState().scenes[sceneId]?.entities[id];
+    }
     if (!entity) return;
 
     const transformId = Object.values(entity?.components || {}).find(
@@ -337,7 +355,11 @@ function Displayer({
     };
 
     if (isEnd) {
-      updateComponentProps(sceneId, id, transformId, props);
+      if (fromPrefabs) {
+        updateComponentPropsFromPrefab(id, transformId, props);
+      } else {
+        updateComponentProps(sceneId, id, transformId, props);
+      }
       return;
     }
     setLiveProp(id, transformId, props);
@@ -348,7 +370,12 @@ function Displayer({
     const id = node.id();
     if (!sceneId) return;
 
-    const entity = useEngineStore.getState().scenes[sceneId]?.entities[id];
+    let entity = null;
+    if (fromPrefabs) {
+      entity = useEngineStore.getState().prefabs[id];
+    } else {
+      entity = useEngineStore.getState().scenes[sceneId]?.entities[id];
+    }
     if (!entity) return;
 
     const transformId = Object.values(entity?.components || {}).find(
@@ -364,10 +391,17 @@ function Displayer({
     };
 
     if (isEnd) {
-      updateComponentProps(sceneId, id, transformId, {
-        position: { x: Math.floor(node.x()), y: Math.floor(node.y()) },
-        ...props,
-      });
+      if (fromPrefabs) {
+        updateComponentPropsFromPrefab(id, transformId, {
+          position: { x: Math.floor(node.x()), y: Math.floor(node.y()) },
+          ...props,
+        });
+      } else {
+        updateComponentProps(sceneId, id, transformId, {
+          position: { x: Math.floor(node.x()), y: Math.floor(node.y()) },
+          ...props,
+        });
+      }
       return;
     }
     setLiveProp(id, transformId, props);
@@ -414,7 +448,7 @@ function Displayer({
           {selectedId && <Transformer ref={trRef} flipEnabled={true} />}
         </Layer>
       </Stage>
-      <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+      <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded select-none pointer-events-none">
         {`x: ${viewInfo.x} y: ${viewInfo.y} zoom: ${viewInfo.zoom}x`}
       </div>
     </div>
@@ -486,12 +520,13 @@ export function MainScene() {
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+    const { width, height } = container.getBoundingClientRect();
+    if (width > 0 && height > 0) setDimensions({ width, height });
+
     const observer = new ResizeObserver((entries) => {
       const rect = entries[0].contentRect;
-      setDimensions({
-        width: rect.width,
-        height: rect.height,
-      });
+      if (rect.width === 0 || rect.height === 0) return;
+      setDimensions({ width: rect.width, height: rect.height });
     });
     observer.observe(container);
     return () => observer.disconnect();
@@ -511,6 +546,7 @@ export function MainScene() {
         width={dimensions.width}
         height={dimensions.height}
         entities={entitiesArray as Entity[]}
+        fromPrefabs={false}
       />
     </div>
   );

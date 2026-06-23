@@ -12,6 +12,7 @@
   "app": {
     "windows": [
       {
+        "devtools": true,
         "title": "Hylozoa Engine - Project Manager",
         "width": 1000,
         "height": 600,

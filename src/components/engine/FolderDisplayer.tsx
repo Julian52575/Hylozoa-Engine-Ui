@@ -79,7 +79,7 @@ const items = [
     label: "Ouvrir dans l'explorateur",
     action: "open",
     targets: ["file", "dir"],
-    function: async (path : string) => {
+    function: async (path: string) => {
       await openPath(path);
     },
   },
@@ -100,11 +100,11 @@ const items = [
     label: "Editer",
     action: "edit",
     targets: ["code"],
-    function : async (path : string) => {
+    function: async (path: string) => {
       const sessionStore = useSessionStore.getState();
       sessionStore.setCurrentCodeFilePath(path);
       sessionStore.setCurrentOnglet("console");
-    }
+    },
   },
   {
     icon: "lucide:edit-3",
@@ -132,7 +132,7 @@ const items = [
     function: async (path: string) => {
       const projectRoot = useProjectStore.getState().currentProjectPath;
       let relativePath = path.replace(projectRoot, "");
-      if (relativePath.startsWith("/") || relativePath.startsWith ("\\")) {
+      if (relativePath.startsWith("/") || relativePath.startsWith("\\")) {
         relativePath = relativePath.substring(1);
       }
       await writeText(relativePath || ".");
@@ -156,7 +156,7 @@ export function ExplorerContextMenu({
   path: string;
   isDir: boolean;
 }) {
-  const handleAction = async (item: typeof items[0]) => {
+  const handleAction = async (item: (typeof items)[0]) => {
     // console.log(item, path, isDir);
     if (item && item.function) {
       await item.function(path);
@@ -167,7 +167,6 @@ export function ExplorerContextMenu({
   if (path.endsWith(".lua")) {
     target = "code";
   }
-  
 
   return (
     <div
@@ -201,24 +200,39 @@ export function FolderDisplayer({ path }: { path: string }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState<FileData[]>([]);
 
-  const ReadDir = async () => {
-    const result: FileEntry = await invoke("read_dir_recursively", {
-      path: path,
-    });
-    setData([entryToData(result)]);
-  };
-
   useEffect(() => {
-    ReadDir();
-    let unwatch: (() => void) | undefined;
     let cancelled = false;
+    let unwatch: (() => void) | undefined;
+
+    const ReadDir = async () => {
+      const result: FileEntry = await invoke("read_dir_recursively", {
+        path: path,
+      });
+      if (cancelled) return;
+      setData([entryToData(result)]);
+    };
+
+    const cleanup = () => {
+      cancelled = true;
+      if (unwatch) {
+        try {
+          unwatch();
+        } catch (error) {
+          console.error("Error occurred while unwatching directory:", error);
+        }
+        unwatch = undefined;
+      }
+    };
+
+    ReadDir();
+
     (async () => {
-       const stop = await watch(
+      const stop = await watch(
         path,
         (_event) => {
           ReadDir();
         },
-        { recursive: true,delayMs: 300 }
+        { recursive: true, delayMs: 300 },
       );
       if (cancelled) {
         stop();
@@ -227,11 +241,10 @@ export function FolderDisplayer({ path }: { path: string }) {
       }
     })();
 
+    window.addEventListener("beforeunload", cleanup);
     return () => {
-      cancelled = true;
-      if (unwatch) {
-        unwatch();
-      }
+      cleanup();
+      window.removeEventListener("beforeunload", cleanup);
     };
   }, [path]);
 
