@@ -69,7 +69,8 @@ jobs:
                 build-essential \
                 curl \
                 wget \
-                libssl-dev
+                libssl-dev \
+                libfuse2
             
             - name: Setup Rust
               uses: actions-rs/toolchain@v1
