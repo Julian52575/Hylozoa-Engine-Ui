@@ -2,7 +2,7 @@ name: Build App
 
 on:
     push:
-        branches: ["main"]
+        branches: ["main", "dev"]
 
 jobs:
     build_web:
@@ -20,6 +20,9 @@ jobs:
             
             - name: Install dependencies
               run: npm install
+
+            - name : Fix dependency issues
+              run: npm audit fix
 
             - name: Build web app
               run: npm run build
@@ -84,3 +87,51 @@ jobs:
               with:
                   name: linux-build
                   path: src-tauri/target/release/bundle
+
+    build_windows:
+      needs: build_web
+      runs-on: windows-latest
+      steps:
+      # Etape 1: Checkout code
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+
+      # Etape 2: Setup Node.js
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: '18'
+
+
+        # Etape 3: Install dependencies
+        - name: Install dependencies
+          run: npm install
+
+
+        # Etape 4: Build project
+        - name: Download build artifact
+          uses: actions/download-artifact@v4
+          with:
+              name: web-build
+              path: ./dist
+
+        # Etape 5: Setup Tauri prerequisites
+        - name: Setup Rust (required for Tauri)
+          uses: actions-rs/toolchain@v1
+          with:
+            profile: minimal
+            toolchain: stable
+            override: true
+
+
+        # Etape 6: build Tauri Windows executable
+        - name: Build Tauri Windows executable
+          run: |
+            npm run tauri:build -- --target x86_64-pc-windows-msvc
+        # Etape 7: Create Windows installer
+        - name: Upload Windows installer artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: tauri_windows_installer
+            path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
