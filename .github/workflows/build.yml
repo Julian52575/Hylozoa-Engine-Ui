@@ -11,10 +11,10 @@ jobs:
             build_dir: ${{ steps.set_output.outputs.build_dir }}
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
             
             - name: Set up Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
                   node-version: "lts/*"
             
@@ -28,7 +28,7 @@ jobs:
               run: npm run build
             
             - name: Upload build artifact
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: web-build
                   path: dist/
@@ -38,10 +38,10 @@ jobs:
         runs-on: "ubuntu-latest"
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
                 node-version: "lts/*"
             
@@ -49,7 +49,7 @@ jobs:
               run: npm install
             
             - name: Download web build artifact
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v7
               with:
                     name: web-build
                     path: ./dist
@@ -83,7 +83,7 @@ jobs:
                 npm run tauri build
             
             - name: Upload Linux build artifact
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: linux-build
                   path: src-tauri/target/release/bundle
@@ -94,12 +94,12 @@ jobs:
       steps:
       # Etape 1: Checkout code
         - name: Checkout code
-          uses: actions/checkout@v4
+          uses: actions/checkout@v7
 
 
       # Etape 2: Setup Node.js
         - name: Setup Node.js
-          uses: actions/setup-node@v4
+          uses: actions/setup-node@v6
           with:
             node-version: 'lts/*'
 
@@ -111,7 +111,7 @@ jobs:
 
         # Etape 4: Build project
         - name: Download build artifact
-          uses: actions/download-artifact@v4
+          uses: actions/download-artifact@v7
           with:
               name: web-build
               path: ./dist
@@ -131,7 +131,7 @@ jobs:
             npm run tauri build -- --target x86_64-pc-windows-msvc
         # Etape 7: Create Windows installer
         - name: Upload Windows installer artifact
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v7
           with:
             name: tauri_windows_installer
             path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
