@@ -78,20 +78,10 @@ jobs:
                 profile: minimal
                 toolchain: "stable"
                 override: true
-            
-            - name: Debug linuxdeploy
-              env:
-                APPIMAGE_EXTRACT_AND_RUN: 1
-              run: |
-                wget -q https://github.com/tauri-apps/binary-releases/releases/download/linuxdeploy/linuxdeploy-x86_64.AppImage
-                chmod +x linuxdeploy-x86_64.AppImage
-                ./linuxdeploy-x86_64.AppImage --help || true
 
             - name:  Build Tauri Linux executable
-              env:
-                APPIMAGE_EXTRACT_AND_RUN: 1
               run: |
-                npm run tauri build
+                npm run tauri build --verbose
             
             - name: Upload Linux build artifact
               uses: actions/upload-artifact@v7
