@@ -80,7 +80,7 @@ jobs:
 
             - name:  Build Tauri Linux executable
               run: |
-                npm run tauri:build
+                npm run tauri build
             
             - name: Upload Linux build artifact
               uses: actions/upload-artifact@v4
@@ -128,7 +128,7 @@ jobs:
         # Etape 6: build Tauri Windows executable
         - name: Build Tauri Windows executable
           run: |
-            npm run tauri:build -- --target x86_64-pc-windows-msvc
+            npm run tauri build -- --target x86_64-pc-windows-msvc
         # Etape 7: Create Windows installer
         - name: Upload Windows installer artifact
           uses: actions/upload-artifact@v4
