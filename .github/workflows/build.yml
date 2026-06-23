@@ -70,7 +70,7 @@ jobs:
                 curl \
                 wget \
                 libssl-dev \
-                libfuse2
+                libfuse2t64
             
             - name: Setup Rust
               uses: actions-rs/toolchain@v1
