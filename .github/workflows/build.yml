@@ -81,8 +81,6 @@ jobs:
 
       - name: Build Tauri Linux executable
         env:
-          APPIMAGE_EXTRACT_AND_RUN: 1
-          NO_STRIP: "true"
           CARGO_HTTP_MULTIPLEXING: "false"
         run: |
           npm run tauri build --verbose
