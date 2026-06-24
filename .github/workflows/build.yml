@@ -1,141 +1,137 @@
 name: Build App
 
 on:
-    push:
-        branches: ["main", "dev"]
+  push:
+    branches: ["main", "dev"]
 
 jobs:
-    build_web:
-        runs-on: "ubuntu-latest"
-        outputs:
-            build_dir: ${{ steps.set_output.outputs.build_dir }}
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v7
-            
-            - name: Set up Node.js
-              uses: actions/setup-node@v6
-              with:
-                  node-version: "lts/*"
-            
-            - name: Install dependencies
-              run: npm install
+  build_web:
+    runs-on: "ubuntu-latest"
+    outputs:
+      build_dir: ${{ steps.set_output.outputs.build_dir }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
 
-            - name : Fix dependency issues
-              run: npm audit fix
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "lts/*"
 
-            - name: Build web app
-              run: npm run build
-            
-            - name: Upload build artifact
-              uses: actions/upload-artifact@v7
-              with:
-                  name: web-build
-                  path: dist/
+      - name: Install dependencies
+        run: npm install
 
-    build_linux:
-        needs: build_web
-        runs-on: "ubuntu-latest"
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v7
+      - name: Fix dependency issues
+        run: npm audit fix
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v6
-              with:
-                node-version: "lts/*"
-            
-            - name: Install dependencies
-              run: npm install
-            
-            - name: Download web build artifact
-              uses: actions/download-artifact@v7
-              with:
-                    name: web-build
-                    path: ./dist
-                
-            - name: Install System Dependencies
-              run: |
-                sudo apt update
-                sudo apt install -y \
-                libwebkit2gtk-4.1-dev \
-                libjavascriptcoregtk-4.1-dev \
-                libsoup-3.0-dev \
-                libglib2.0-dev \
-                libgtk-3-dev \
-                libayatana-appindicator3-dev \
-                librsvg2-dev \
-                pkg-config \
-                build-essential \
-                curl \
-                wget \
-                libssl-dev \
-                libfuse2t64
-            
-            - name: Setup Rust
-              uses: actions-rs/toolchain@v1
-              with:
-                profile: minimal
-                toolchain: "stable"
-                override: true
+      - name: Build web app
+        run: npm run build
 
-            - name:  Build Tauri Linux executable
-              env:
-                APPIMAGE_EXTRACT_AND_RUN: 1
-                CARGO_HTTP_MULTIPLEXING: "false"
-              run: |
-                npm run tauri build --verbose
-            
-            - name: Upload Linux build artifact
-              uses: actions/upload-artifact@v7
-              with:
-                  name: linux-build
-                  path: src-tauri/target/release/bundle
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: web-build
+          path: dist/
 
-    build_windows:
-      needs: build_web
-      runs-on: windows-latest
-      steps:
+  build_linux:
+    needs: build_web
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "lts/*"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Download web build artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: web-build
+          path: ./dist
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+          libwebkit2gtk-4.1-dev \
+          libjavascriptcoregtk-4.1-dev \
+          libsoup-3.0-dev \
+          libglib2.0-dev \
+          libgtk-3-dev \
+          libayatana-appindicator3-dev \
+          librsvg2-dev \
+          pkg-config \
+          build-essential \
+          curl \
+          wget \
+          libssl-dev \
+          libfuse2t64
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: "stable"
+          override: true
+
+      - name: Build Tauri Linux executable
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+          CARGO_HTTP_MULTIPLEXING: "false"
+        run: |
+          npm run tauri build --verbose
+
+      - name: Upload Linux build artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-build
+          path: src-tauri/target/release/bundle
+
+  build_windows:
+    needs: build_web
+    runs-on: windows-latest
+    steps:
       # Etape 1: Checkout code
-        - name: Checkout code
-          uses: actions/checkout@v7
-
+      - name: Checkout code
+        uses: actions/checkout@v7
 
       # Etape 2: Setup Node.js
-        - name: Setup Node.js
-          uses: actions/setup-node@v6
-          with:
-            node-version: 'lts/*'
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "lts/*"
 
+      # Etape 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
 
-        # Etape 3: Install dependencies
-        - name: Install dependencies
-          run: npm install
+      # Etape 4: Build project
+      - name: Download build artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: web-build
+          path: ./dist
 
+      # Etape 5: Setup Tauri prerequisites
+      - name: Setup Rust (required for Tauri)
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
 
-        # Etape 4: Build project
-        - name: Download build artifact
-          uses: actions/download-artifact@v7
-          with:
-              name: web-build
-              path: ./dist
-
-        # Etape 5: Setup Tauri prerequisites
-        - name: Setup Rust (required for Tauri)
-          uses: actions-rs/toolchain@v1
-          with:
-            profile: minimal
-            toolchain: stable
-            override: true
-
-
-        # Etape 6: build Tauri Windows executable
-        - name: Build Tauri Windows executable
-          run: |
-            npm run tauri build -- --target x86_64-pc-windows-msvc
-        # Etape 7: Create Windows installer
-        - name: Upload Windows installer artifact
-          uses: actions/upload-artifact@v7
-          with:
-            name: tauri_windows_installer
-            path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+      # Etape 6: build Tauri Windows executable
+      - name: Build Tauri Windows executable
+        run: |
+          npm run tauri build -- --target x86_64-pc-windows-msvc
+      # Etape 7: Create Windows installer
+      - name: Upload Windows installer artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: tauri_windows_installer
+          path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
