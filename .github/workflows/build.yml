@@ -83,13 +83,25 @@ jobs:
         env:
           CARGO_HTTP_MULTIPLEXING: "false"
         run: |
-          npm run tauri build --verbose
+          npm run tauri build
 
-      - name: Upload Linux build artifact
+      - name: Upload Debian Package
         uses: actions/upload-artifact@v7
         with:
-          name: linux-build
-          path: src-tauri/target/release/bundle
+          name: hylozoa-ui-debian
+          path: src-tauri/target/release/bundle/deb/*.deb
+    
+      - name: Upload RPM Package
+        uses: actions/upload-artifact@v7
+        with:
+          name: hylozoa-ui-rpm
+          path: src-tauri/target/release/bundle/rpm/*.rpm
+
+      - name: Upload Raw Binary
+        uses: actions/upload-artifact@v7
+        with:
+          name: hylozoa-ui-binary
+          path: src-tauri/target/release/hylozoa-ui
 
   build_windows:
     needs: build_web
