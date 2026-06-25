@@ -3,7 +3,7 @@
   "label": "Shape",
   "icon": "mdi:shape-outline",
   "schema": {
-    "type": {
+    "shapeType": {
       "type": "enum",
       "label": "Shape Type",
       "options": [
@@ -14,26 +14,26 @@
     "specs.width": {
       "type": "number",
       "label": "Width",
-      "dependency": "type-rectangle",
+      "dependency": "shapeType-rectangle",
       "min": 0
     },
     "specs.height": {
       "type": "number",
       "label": "Height",
-      "dependency": "type-rectangle",
+      "dependency": "shapeType-rectangle",
       "min": 0
     },
     "specs.radius": {
       "type": "number",
       "label": "Radius",
-      "dependency": "type-circle",
+      "dependency": "shapeType-circle",
       "min": 0
     },
     "outlineColor": { "type": "color", "label": "Outline Color" },
     "outlineThickness": { "type": "number", "label": "Outline Thickness", "min": 0}
   },
     "values": {
-      "type": "rectangle",
+      "shapeType": "rectangle",
       "specs.width": 30,
       "specs.height": 30,
       "specs.radius": 30,

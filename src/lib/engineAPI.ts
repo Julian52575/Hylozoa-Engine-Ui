@@ -1,17 +1,13 @@
 import { Command } from "@tauri-apps/plugin-shell";
 import { resolveResource } from "@tauri-apps/api/path";
-import { useEngineStore, exportToEngine } from "@/store/engineStore";
 import { tempDir, join } from "@tauri-apps/api/path";
 import {
   writeTextFile,
-  readTextFile,
-  exists,
-  mkdir,
-  readDir,
-  remove,
+  readTextFile
 } from "@tauri-apps/plugin-fs";
 
 import { useProjectStore } from "@/store/projectStore";
+import { SaveProjectFile } from "./utils";
 
 export const generateUint64Id = async (): Promise<string> => {
   const command = Command.sidecar("binaries/hylozoa", ["generate-uuid"]);
@@ -37,8 +33,11 @@ export const generateUint64Id = async (): Promise<string> => {
 
 export const createHylozoaCommand = async () => {
   try {
+    const saveResult = await SaveProjectFile();
+    if (!saveResult) {
+      throw new Error("Failed to save project file");
+    }
     const projectStore = useProjectStore.getState();
-    const engineState = useEngineStore.getState();
 
     const settingsPath = await resolveResource(
       "ressources/EngineSettings.json",
@@ -52,48 +51,15 @@ export const createHylozoaCommand = async () => {
     const tempSettingsPath = await join(await tempDir(), "EngineSettings.json");
     await writeTextFile(tempSettingsPath, JSON.stringify(settings, null, 2));
 
-    const exportData = exportToEngine(engineState);
 
-    const paths = [];
-    for (let i = 0; i < exportData.scenes.length; i++) {
-      const scene = exportData.scenes[i];
-      const stringifiedData = JSON.stringify(scene, null, 2);
-      const tempPath = await join(await tempDir(), `scene_${i}.json`);
-      paths.push(tempPath);
-
-      await writeTextFile(tempPath, stringifiedData);
-    }
-
-    if (exportData.prefabs) {
-      const prefabsDir = settings.ProjectLocation + "Assets/prefabs/";
-      if (!(await exists(prefabsDir))) {
-        await mkdir(prefabsDir, { recursive: true });
-      } else {
-        const files = await readDir(prefabsDir);
-        await Promise.all(
-          files.map(async (file) => remove(await join(prefabsDir, file.name))),
-        );
-      }
-
-      for (const prefab of exportData.prefabs) {
-        const fileName = `${prefab.Components.Name.name}.prefab.json`;
-        const { UUID, ...prefabWithoutUUID } = prefab;
-        const prefabFileContent = {
-          prefabName: prefab.Components.Name.name,
-          Entities: [{ ...prefabWithoutUUID, id: 0, parent: null }],
-        };
-        await writeTextFile(
-          prefabsDir + fileName,
-          JSON.stringify(prefabFileContent, null, 2),
-        );
-      }
-    }
+    const projectPath = projectStore.currentProjectPath;
+    const projectName = projectPath.split("/").filter(Boolean).pop() || "project";
+    const fileProjectPath = projectPath + "/" + projectName + ".hlz";
 
     const command = Command.sidecar("binaries/hylozoa", [
-      "run",
+      "run-hylozoa",
       tempSettingsPath,
-      engineState.mainSceneId || "0",
-      ...paths,
+      fileProjectPath
     ]);
 
     return command;

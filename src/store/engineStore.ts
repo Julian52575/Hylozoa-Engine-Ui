@@ -122,8 +122,14 @@ export const exportToEngine = (state: EngineState) => {
         transformedComponents["Name"] = { name: prefab.name };
       }
       return {
-        UUID: prefab.id,
-        Components: transformedComponents,
+        prefabName: prefab.name,
+        Entities: [
+          {
+            id: 0,
+            Parent: null,
+            Components: transformedComponents,
+          },
+        ],
       };
     }),
     scenes: Object.values(state.scenes).map((scene) => ({
@@ -246,14 +252,14 @@ export const loadEngineState = (data: any): void => {
   });
 
   data.prefabs?.forEach((prefabData: any, index: number) => {
-    const prefabId =
-      prefabData.UUID && prefabData.UUID !== "0"
-        ? prefabData.UUID
-        : `prefab-${index}-${Date.now()}`;
+    const prefabId = `prefab-${index}-${Date.now()}`;
     const components: Record<string, Component> = {};
-    const rawComponents = prefabData.Components || prefabData.components || {};
 
-    let name = "Unnamed Prefab";
+    const prefabName = prefabData.prefabName || "Unnamed Prefab";
+    const rootEntity = prefabData.Entities?.[0];
+    const rawComponents = rootEntity?.Components || {};
+
+    let name = prefabName;
     Object.entries(rawComponents).forEach(
       ([compName, compProps]: [string, any]) => {
         if (compName.toLowerCase() === "name") {
@@ -262,6 +268,7 @@ export const loadEngineState = (data: any): void => {
         }
         const compId = compProps.id || compName.toLowerCase();
         const componentId = `${prefabId}-${compId}`;
+
         if (compProps && typeof compProps === "object") {
           const entries = Object.entries(compProps);
           for (const [key, value] of entries) {
@@ -275,6 +282,7 @@ export const loadEngineState = (data: any): void => {
             }
           }
         }
+
         const type = compName.toLowerCase();
         const schema = schemas[type];
         if (!schema) {
@@ -295,7 +303,7 @@ export const loadEngineState = (data: any): void => {
 
     prefabs[prefabId] = {
       id: prefabId,
-      name: name,
+      name,
       type: "prefab",
       components,
     };

@@ -44,14 +44,15 @@ export const SaveProjectFile = async ()=> {
     const {projects, currentProjectPath} = useProjectStore.getState();
     if (!currentProjectPath) {
         alert("No project selected to save.");
-        return;
+        return false;
     }
     const currentProject = projects.find(p => p.folderPath === currentProjectPath);
     if (!currentProject) {
         alert("Current project not found in the store.");
-        return;
+        return false;
     }
     await saveEngineStateToFile(currentProject.folderPath, currentProject.name)
+    return true;
 }
 
 export const isPathInside = (parent: string, child: string) => {

@@ -7,6 +7,8 @@
 
 // isRaw a boolean indicating whether the sceneData parameter is a raw JSON string (true) or a file path to a JSON file (false).
 extern "C" {
+    void project_create(const char* projectData, bool isRaw);
+
     void engine_create(const char *settings, bool isRaw);
     void engine_init(void);
     void engine_run(void);
@@ -59,16 +61,30 @@ void generateUUID() {
     std::cout << uuid << std::endl;
 }
 
+void runEngineHylozoa(std::string settingsPath, std::string filePath) {
+    engine_create(settingsPath.c_str(), false);
+    engine_init();
+    
+    project_create(filePath.c_str(), false);
+    engine_run();
+
+    // scene_destroy_uuid(std::stoull(mainID));
+    engine_shutdown();
+}
+
 int main(int argc, char* argv[]) {
     if (argc > 3 && std::string(argv[1]) == "run") {
         std::vector<std::string> args(argv + 4, argv + argc);
         runEngine(argv[2], argv[3], args);
     } else if (argc > 1 && std::string(argv[1]) == "generate-uuid") {
         generateUUID();
+    }else if (argc > 3 && std::string(argv[1]) == "run-hylozoa") {
+        runEngineHylozoa(argv[2], argv[3]);
     } else {
         std::cout << "Usage:" << std::endl;
         std::cout << "  " << argv[0] << " run <settingsPath> <mainID> [<scenesPath>...]" << std::endl;
         std::cout << "  " << argv[0] << " generate-uuid" << std::endl;
+        std::cout << "  " << argv[0] << " run-hylozoa <settingsPath> <filePath>" << std::endl;
     }
     return 0;
 }
