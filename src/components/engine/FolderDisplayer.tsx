@@ -27,6 +27,7 @@ import { watch } from "@tauri-apps/plugin-fs";
 type FileData = {
   id: string;
   name: string;
+  isDir?: boolean;
   children?: FileData[];
 };
 
@@ -67,7 +68,7 @@ function Node({ node, style, dragHandle }: NodeRendererProps<FileData>) {
           onClick={() => node.toggle()}
           className="flex items-center gap-1 hover:bg-primary/10 px-2 w-max rounded cursor-pointer select-none"
         >
-          {node.isLeaf ? (
+          {!node.data.isDir ? (
             <FileIcon 
               fileName={node.data.name} 
               className="w-4 h-4"
@@ -84,7 +85,7 @@ function Node({ node, style, dragHandle }: NodeRendererProps<FileData>) {
         </div>
       </ContextMenuTrigger>
       <ContextMenuContent>
-        <ExplorerContextMenu path={node.data.id} isDir={!node.isLeaf} />
+        <ExplorerContextMenu path={node.data.id} isDir={node.data.isDir || false} />
       </ContextMenuContent>
     </ContextMenu>
   );
@@ -94,6 +95,7 @@ function entryToData(entry: FileEntry): FileData {
   return {
     id: entry.path,
     name: entry.name,
+    isDir: entry.is_dir,
     children:
       entry.children && entry.children.length > 0
         ? entry.children.map(entryToData)
