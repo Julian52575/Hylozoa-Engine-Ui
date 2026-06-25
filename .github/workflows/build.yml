@@ -90,7 +90,7 @@ jobs:
         with:
           name: hylozoa-ui-debian
           path: src-tauri/target/release/bundle/deb/*.deb
-    
+
       - name: Upload RPM Package
         uses: actions/upload-artifact@v7
         with:

@@ -79,7 +79,8 @@ export const createHylozoaCommand = async () => {
         const fileName = `${prefab.Components.Name.name}.prefab.json`;
         const { UUID, ...prefabWithoutUUID } = prefab;
         const prefabFileContent = {
-          Entities: [{ ...prefabWithoutUUID, id: 0 }],
+          prefabName: prefab.Components.Name.name,
+          Entities: [{ ...prefabWithoutUUID, id: 0, parent: null }],
         };
         await writeTextFile(
           prefabsDir + fileName,

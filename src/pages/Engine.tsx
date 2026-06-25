@@ -7,7 +7,7 @@ import { MainScene } from "@/components/engine/MainScene";
 import { Inspector } from "@/components/engine/Inspector";
 import { Toolbar } from "@/components/engine/Toolbar";
 import { EditorScreen } from "@/components/engine/EditorScreen";
-import { PrefabsScene } from "@/PrefabsScene";
+import { PrefabsScene } from "@/components/engine/PrefabsScene";
 
 import { useSessionStore } from "@/store/useSessionStore";
 
