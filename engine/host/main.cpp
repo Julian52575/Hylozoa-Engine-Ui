@@ -37,54 +37,31 @@ extern "C" {
     void generate_uuid(char* outPtr, size_t size);
 }
 
-void runEngine(std::string settingsPath,std::string mainID,  const std::vector<std::string>& scenePaths) {
-    engine_create(settingsPath.c_str(), false);
-    engine_init();
-    for (const auto& scenePath : scenePaths) {
-        std::cout << "Creating scene: " << scenePath << std::endl;
-        if (!scene_create(scenePath.c_str(), false)) {
-            std::cerr << "Failed to create scene." << std::endl;
-            engine_shutdown();
-            return;
-        }
-    }
-    scene_load_uuid(std::stoull(mainID));
-    engine_run();
-
-    // scene_destroy_uuid(std::stoull(mainID));
-    engine_shutdown();
-}
-
 void generateUUID() {
     char uuid[21];
     generate_uuid(uuid, sizeof(uuid));
     std::cout << uuid << std::endl;
 }
 
-void runEngineHylozoa(std::string settingsPath, std::string filePath) {
+void runEngine(std::string settingsPath, std::string filePath) {
     engine_create(settingsPath.c_str(), false);
     engine_init();
     
     project_create(filePath.c_str(), false);
     engine_run();
 
-    // scene_destroy_uuid(std::stoull(mainID));
     engine_shutdown();
 }
 
 int main(int argc, char* argv[]) {
-    if (argc > 3 && std::string(argv[1]) == "run") {
-        std::vector<std::string> args(argv + 4, argv + argc);
-        runEngine(argv[2], argv[3], args);
-    } else if (argc > 1 && std::string(argv[1]) == "generate-uuid") {
+    if (argc > 1 && std::string(argv[1]) == "generate-uuid") {
         generateUUID();
-    }else if (argc > 3 && std::string(argv[1]) == "run-hylozoa") {
-        runEngineHylozoa(argv[2], argv[3]);
+    }else if (argc > 3 && std::string(argv[1]) == "run") {
+        runEngine(argv[2], argv[3]);
     } else {
         std::cout << "Usage:" << std::endl;
-        std::cout << "  " << argv[0] << " run <settingsPath> <mainID> [<scenesPath>...]" << std::endl;
+        std::cout << "  " << argv[0] << " run <settingsPath> <filePath>" << std::endl;
         std::cout << "  " << argv[0] << " generate-uuid" << std::endl;
-        std::cout << "  " << argv[0] << " run-hylozoa <settingsPath> <filePath>" << std::endl;
     }
     return 0;
 }

@@ -11,6 +11,7 @@ import { loadEngineState, useEngineStore } from "@/store/engineStore";
 import { readTextFile, exists } from "@tauri-apps/plugin-fs";
 import { join } from "@tauri-apps/api/path";
 import { useSelectionStore } from "@/store/useSelectionStore";
+import { runHylozoa } from "@/lib/engineAPI";
 
 export function Home({
   onEditProject,
@@ -96,6 +97,15 @@ export function Home({
     }
   };
 
+  const handlePlayProject = async () => {
+    if (!projectSelected) {
+      toast.error("Please select a project to play.");
+      return;
+    }
+    await runHylozoa({ projectPath: projectSelected.folderPath });
+    toast.error("Play functionality is not implemented yet.");
+  }
+
   return (
     <div className="flex-1 overflow-hidden">
       <Header
@@ -121,6 +131,7 @@ export function Home({
         <ButtonsContainer
           onEditProject={handleProjectClick}
           onRemoveProject={handleRemoveProject}
+          onPlayProject={handlePlayProject}
         />
       </div>
     </div>

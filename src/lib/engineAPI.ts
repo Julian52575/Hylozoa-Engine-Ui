@@ -5,8 +5,6 @@ import {
   writeTextFile,
   readTextFile
 } from "@tauri-apps/plugin-fs";
-
-import { useProjectStore } from "@/store/projectStore";
 import { SaveProjectFile } from "./utils";
 
 export const generateUint64Id = async (): Promise<string> => {
@@ -31,33 +29,31 @@ export const generateUint64Id = async (): Promise<string> => {
   });
 };
 
-export const createHylozoaCommand = async () => {
+export const createHylozoaCommand = async (projectPath: string) => {
   try {
     const saveResult = await SaveProjectFile();
     if (!saveResult) {
       throw new Error("Failed to save project file");
     }
-    const projectStore = useProjectStore.getState();
 
     const settingsPath = await resolveResource(
       "ressources/EngineSettings.json",
     );
     const raw = await readTextFile(settingsPath);
     const settings = JSON.parse(raw);
-    settings.ProjectLocation = projectStore.currentProjectPath;
+
+    settings.ProjectLocation = projectPath;
     if (!settings.ProjectLocation.endsWith("/")) {
       settings.ProjectLocation += "/";
     }
     const tempSettingsPath = await join(await tempDir(), "EngineSettings.json");
     await writeTextFile(tempSettingsPath, JSON.stringify(settings, null, 2));
 
-
-    const projectPath = projectStore.currentProjectPath;
     const projectName = projectPath.split("/").filter(Boolean).pop() || "project";
     const fileProjectPath = projectPath + "/" + projectName + ".hlz";
 
     const command = Command.sidecar("binaries/hylozoa", [
-      "run-hylozoa",
+      "run",
       tempSettingsPath,
       fileProjectPath
     ]);
@@ -70,16 +66,18 @@ export const createHylozoaCommand = async () => {
 };
 
 export const runHylozoa = async ({
+  projectPath,
   onStdout,
   onStderr,
   onClose,
 }: {
+  projectPath: string;
   onStdout?: (line: string) => void;
   onStderr?: (line: string) => void;
   onClose?: () => void;
 }) => {
   try {
-    const command = await createHylozoaCommand();
+    const command = await createHylozoaCommand(projectPath);
     if (!command) {
       throw new Error("Failed to create command");
     }

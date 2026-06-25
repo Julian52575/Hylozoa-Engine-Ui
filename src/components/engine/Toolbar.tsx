@@ -9,6 +9,7 @@ import { Icon } from "@iconify/react";
 import { runHylozoa } from "@/lib/engineAPI";
 import { useTerminalStore } from "@/store/useTerminalStore";
 import { useSessionStore } from "@/store/useSessionStore";
+import { useProjectStore } from "@/store/projectStore";
 
 function HistoryButtons() {
   const temporal = (useEngineStore as any).temporal;
@@ -73,12 +74,16 @@ export function Toolbar() {
   const addMessageError = useTerminalStore((state) => state.addMessageError);
   const clearMessages = useTerminalStore((state) => state.clearMessages);
 
+
+  const currentProjectPath = useProjectStore((state) => state.currentProjectPath);
+
   async function launchHylozoa() {
     if (status === "running") return;
 
     try {
       clearMessages();
       const child = await runHylozoa({
+        projectPath: currentProjectPath,
         onStdout: (line) => {
           addMessageInfo(line);
         },
