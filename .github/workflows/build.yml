@@ -33,6 +33,30 @@ jobs:
           name: web-build
           path: dist/
 
+  build_engine_linux:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Install CMake & build tools
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake
+
+      - name: Configure CMake
+        run: |
+          cd engine/host
+          mkdir -p build && cd build
+          cmake ..
+          make
+
+      - name: Upload engine Linux binary
+        uses: actions/upload-artifact@v7
+        with:
+          name: hylozoa-engine-linux
+          path: engine/host/build/hylozoa
+
   build_linux:
     needs: build_web
     runs-on: "ubuntu-latest"
