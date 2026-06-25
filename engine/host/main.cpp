@@ -2,8 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <nlohmann/json.hpp>
-
+#include <cstdint>
 
 // isRaw a boolean indicating whether the sceneData parameter is a raw JSON string (true) or a file path to a JSON file (false).
 extern "C" {
