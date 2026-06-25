@@ -37,6 +37,26 @@ type FileEntry = {
   children?: FileEntry[];
 };
 
+const HlzIcon = ({ width = 24, height = 24 }: { width?: number; height?: number }) => (
+  <svg width={width} height={height} viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="40" cy="40" r="38" fill="#0d0d1a"/>
+    <circle cx="40" cy="40" r="36" fill="none" stroke="#3a2a6e" strokeWidth="2"/>
+    <circle cx="40" cy="14" rx="12" fill="#2a1060" opacity="0.4"/>
+    {/* tige */}
+    <path d="M40,55 Q40,40 40,26" fill="none" stroke="#6c3fc5" strokeWidth="2" strokeLinecap="round"/>
+    {/* branches */}
+    <path d="M40,38 Q31,33 26,36" fill="none" stroke="#7b4fd4" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M40,38 Q49,33 54,36" fill="none" stroke="#7b4fd4" strokeWidth="1.5" strokeLinecap="round"/>
+    {/* feuilles */}
+    <ellipse cx="25" cy="35" rx="7" ry="3.5" transform="rotate(-20,25,35)" fill="#5e2db8"/>
+    <ellipse cx="55" cy="35" rx="7" ry="3.5" transform="rotate(20,55,35)" fill="#5e2db8"/>
+    <ellipse cx="40" cy="24" rx="5" ry="3" fill="#7a3de0"/>
+    {/* racines */}
+    <path d="M40,55 Q30,62 24,68" fill="none" stroke="#8b1a3a" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M40,55 Q50,62 56,68" fill="none" stroke="#8b1a3a" strokeWidth="1.5" strokeLinecap="round"/>
+  </svg>
+);
+
 function Node({ node, style, dragHandle }: NodeRendererProps<FileData>) {
   return (
     <ContextMenu>
@@ -48,7 +68,13 @@ function Node({ node, style, dragHandle }: NodeRendererProps<FileData>) {
           className="flex items-center gap-1 hover:bg-primary/10 px-2 w-max rounded cursor-pointer select-none"
         >
           {node.isLeaf ? (
-            <FileIcon fileName={node.data.name} className="w-4 h-4" />
+            <FileIcon 
+              fileName={node.data.name} 
+              className="w-4 h-4"
+              editFileExtensionData={{
+                hlz: () => <HlzIcon width={16} height={16} />,
+              }}
+            />
           ) : node.isOpen ? (
             <Icon icon="lucide:chevron-down" className="w-4 h-4" />
           ) : (
