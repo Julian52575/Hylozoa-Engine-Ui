@@ -81,13 +81,13 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: hylozoa-engine-linux
-          path: ./binaries/hylozoa
+          path: ./engine-bin
       
       - name: Place engine binary for Tauri sidecar
         run: |
           mkdir -p src-tauri/binaries
-          cp ./binaries/hylozoa ./src-tauri/binaries/hylozoa
-          chmod +x ./src-tauri/binaries/hylozoa
+          cp ./engine-bin/* ./src-tauri/binaries/
+          chmod +x src-tauri/binaries/*
 
       - name: Install System Dependencies
         run: |
