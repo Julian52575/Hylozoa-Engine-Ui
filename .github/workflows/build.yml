@@ -57,7 +57,7 @@ jobs:
           path: engine/build/hylozoa-x86_64-unknown-linux-gnu
 
   build_linux:
-    needs: build_web
+    needs: [build_web, build_engine_linux]
     runs-on: "ubuntu-latest"
     steps:
       - name: Checkout code
@@ -76,6 +76,18 @@ jobs:
         with:
           name: web-build
           path: ./dist
+
+      - name: Download engine Linux binary
+        uses: actions/download-artifact@v7
+        with:
+          name: hylozoa-engine-linux
+          path: ./binaries/hylozoa
+      
+      - name: Place engine binary for Tauri sidecar
+        run: |
+          mkdir -p src-tauri/binaries
+          cp ./binaries/hylozoa ./src-tauri/binaries/hylozoa
+          chmod +x ./src-tauri/binaries/hylozoa
 
       - name: Install System Dependencies
         run: |
