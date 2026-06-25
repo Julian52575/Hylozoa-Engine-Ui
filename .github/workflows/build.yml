@@ -56,6 +56,28 @@ jobs:
           name: hylozoa-engine-linux
           path: engine/build/hylozoa-x86_64-unknown-linux-gnu
 
+  build_engine_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Install CMake & build tools
+        run: |
+          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' --yes
+
+      - name: Build engine
+        run: |
+          mkdir engine\build
+          cmake -S engine -B engine\build -DCMAKE_BUILD_TYPE=Release
+          cmake --build engine\build --config Release
+
+      - name: Upload engine Windows binary
+        uses: actions/upload-artifact@v7
+        with:
+          name: hylozoa-engine-windows
+          path: engine/build/hylozoa-x86_64-pc-windows-msvc
+
   build_linux:
     needs: [build_web, build_engine_linux]
     runs-on: "ubuntu-latest"
@@ -139,7 +161,7 @@ jobs:
           path: src-tauri/target/release/hylozoa-ui
 
   build_windows:
-    needs: build_web
+    needs: [build_web, build_engine_windows]
     runs-on: windows-latest
     steps:
       # Etape 1: Checkout code
@@ -162,6 +184,18 @@ jobs:
         with:
           name: web-build
           path: ./dist
+
+      - name: Download engine Windows binary
+        uses: actions/download-artifact@v7
+        with:
+          name: hylozoa-engine-windows
+          path: ./engine-bin
+      
+      - name: Place engine binary for Tauri sidecar
+        run: |
+          mkdir -p src-tauri/binaries
+          cp ./engine-bin/* ./src-tauri/binaries/
+          chmod +x src-tauri/binaries/*
 
       # Etape 5: Setup Tauri prerequisites
       - name: Setup Rust (required for Tauri)
