@@ -1,4 +1,28 @@
 {
+    "type": "renderable",
+    "label": "Renderable",
+    "icon": "lucide:eye",
+    "schema": {
+        "color": { "type": "color", "label": "Color" },
+        "visible": { "type": "boolean", "label": "Visible" },
+        "layer": { "type": "enum", "label": "Layer", "options": [{"label": "Default","value": "Default"}, {"label": "UI","value": "UI"}, {"label": "Background","value": "Background"}] },
+        "zindex": { "type": "number", "label": "Z-Index" },
+        "transparency": { "type": "number", "label": "Transparency" },
+        "origin": { "type": "vector2", "label": "Origin" }
+    },
+    "values": {
+        "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 1
+        },
+        "visible": true,
+        "layer": "Default",
+        "zindex": 0,
+        "transparency": 255,
+        "origin": { "x": 0, "y": 0 }
+    }
   "type": "renderable",
   "label": "Renderable",
   "icon": "lucide:eye",
