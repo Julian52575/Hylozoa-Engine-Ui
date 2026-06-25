@@ -46,15 +46,15 @@ jobs:
 
       - name: Build engine
         run: |
-          mkdir -p engine/host/build
-          cmake -S engine/host -B engine/host/build -DCMAKE_BUILD_TYPE=Release
-          cmake --build engine/host/build --config Release
+          mkdir -p engine/build
+          cmake -S engine -B engine/build -DCMAKE_BUILD_TYPE=Release
+          cmake --build engine/build --config Release
 
       - name: Upload engine Linux binary
         uses: actions/upload-artifact@v7
         with:
           name: hylozoa-engine-linux
-          path: engine/host/build/hylozoa-x86_64-unknown-linux-gnu
+          path: engine/build/hylozoa-x86_64-unknown-linux-gnu
 
   build_linux:
     needs: build_web
