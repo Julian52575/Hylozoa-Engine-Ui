@@ -6,6 +6,8 @@ import {
   type AutoSizerChildProps,
 } from "react-virtualized-auto-sizer";
 
+import { FileIcon } from "@react-symbols/icons/utils";
+
 import {
   ContextMenu,
   ContextMenuContent,
@@ -46,7 +48,7 @@ function Node({ node, style, dragHandle }: NodeRendererProps<FileData>) {
           className="flex items-center gap-1 hover:bg-primary/10 px-2 w-max rounded cursor-pointer select-none"
         >
           {node.isLeaf ? (
-            <Icon icon="lucide:file" className="w-4 h-4" />
+            <FileIcon fileName={node.data.name} className="w-4 h-4" />
           ) : node.isOpen ? (
             <Icon icon="lucide:chevron-down" className="w-4 h-4" />
           ) : (
@@ -157,7 +159,6 @@ export function ExplorerContextMenu({
   isDir: boolean;
 }) {
   const handleAction = async (item: (typeof items)[0]) => {
-    // console.log(item, path, isDir);
     if (item && item.function) {
       await item.function(path);
     }
@@ -188,7 +189,6 @@ export function ExplorerContextMenu({
           "
           >
             <Icon icon={item.icon} className="h-4 w-4 shrink-0" />
-
             <span>{item.label}</span>
           </ContextMenuItem>
         ))}
