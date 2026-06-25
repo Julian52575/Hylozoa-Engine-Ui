@@ -54,7 +54,8 @@ interface EntityProps extends Konva.NodeConfig {
       a: number;
     };
     visible: boolean;
-    LayerBit: string;
+    layer: string;
+    zindex: number;
     transparency: number;
     origin: {
       x: number;
@@ -233,7 +234,7 @@ export function Displayer({
   width,
   height,
   entities,
-  fromPrefabs
+  fromPrefabs,
 }: {
   width: number;
   height: number;
@@ -248,7 +249,9 @@ export function Displayer({
 
   const setLiveProp = useSessionStore((s) => s.setLiveProp);
   const updateComponentProps = useEngineStore((s) => s.updateComponentProps);
-  const updateComponentPropsFromPrefab = useEngineStore((s) => s.updateComponentPropsFromPrefab);
+  const updateComponentPropsFromPrefab = useEngineStore(
+    (s) => s.updateComponentPropsFromPrefab,
+  );
 
   const [viewInfo, setViewInfo] = useState({
     x: 0,
@@ -306,7 +309,6 @@ export function Displayer({
     } else {
       useSelectionStore.getState().selectType("entity");
     }
-
   };
 
   const handleWheel = (e: any) => {
@@ -537,8 +539,27 @@ export function MainScene() {
     currentSceneId ? state.scenes[currentSceneId]?.entities : EMPTY_ENTITIES,
   );
 
-  const entitiesArray = entities ? Object.values(entities) : [];
+  // const entitiesArray = entities ? Object.values(entities) : [];
   // if (entitiesArray) entitiesArray.reverse();
+  const entitiesArray = entities
+    ? Object.values(entities).sort((a, b) => {
+        const getZindex = (entity: Entity): number | null => {
+          const renderableComp = Object.values(entity.components).find(
+            (c) => c.type === "renderable",
+          );
+          if (!renderableComp) return null;
+          const zindex = renderableComp.props?.zindex;
+          return zindex !== undefined ? Number(zindex) : 0;
+        };
+
+        const aZindex = getZindex(a as Entity);
+        const bZindex = getZindex(b as Entity);
+        if (aZindex === null && bZindex === null) return 0;
+        if (aZindex === null) return -1;
+        if (bZindex === null) return 1;
+        return aZindex - bZindex;
+      })
+    : [];
 
   return (
     <div className="flex-1 w-full h-full min-h-0" ref={containerRef}>
