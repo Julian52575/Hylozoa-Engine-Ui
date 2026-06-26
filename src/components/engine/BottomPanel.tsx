@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { ResizablePanel } from "@/components/ui/resizable";
 import { PanelImperativeHandle } from "react-resizable-panels";
@@ -7,24 +7,47 @@ import { useRef } from "react";
 
 import { useTerminalStore } from "@/store/useTerminalStore";
 
+import { useVirtualizer } from "@tanstack/react-virtual";
+
+const typeClassMap: Record<string, string> = {
+  success: "text-green-400",
+  warning: "text-yellow-400",
+  error: "text-red-400",
+  info: "text-zinc-300",
+};
+
 function Console() {
   const messages = useTerminalStore((state) => state.messages);
-  const handleTypeClass = (type: string) => {
-    switch (type) {
-      case "success":
-        return "text-green-400";
-      case "warning":
-        return "text-yellow-400";
-      case "error":
-        return "text-red-400";
-      case "info":
-      default:
-        return "text-zinc-300";
+  const containerRef = useRef<HTMLPreElement>(null);
+
+  const virtualizer = useVirtualizer({
+    count: messages.length,
+    getScrollElement: () => containerRef.current,
+    estimateSize: () => 24,
+    overscan: 10,
+  });
+
+  const wasAtBottom = useRef(true);
+  useEffect(() => {
+    if (wasAtBottom.current) {
+      virtualizer.scrollToIndex(messages.length - 1);
     }
-  };
+  }, [messages.length]);
+
+  const handleScroll = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    wasAtBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 30;
+  }, []);
+
+  const getTypeClass = useCallback((type: string) => {
+    return typeClassMap[type] ?? typeClassMap.info;
+  }, []);
 
   return (
-    <div
+    <pre
+      ref={containerRef}
+      onScroll={handleScroll}
       className="w-full h-full bg-primary p-2 overflow-auto 
             [&::-webkit-scrollbar]:w-1
             [&::-webkit-scrollbar-track]:bg-zinc-900/20
@@ -33,15 +56,21 @@ function Console() {
             hover:[&::-webkit-scrollbar-thumb]:bg-zinc-400
             "
     >
-      {messages.map((message, index) => (
-        <div
-          key={index}
-          className={handleTypeClass(message.type) + " font-mono text-sm mb-1"}
-        >
-          {message.text}
-        </div>
-      ))}
-    </div>
+      <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
+        {virtualizer.getVirtualItems().map((item) => {
+          const message = messages[item.index];
+          return (
+            <div
+              key={item.key}
+              style={{ position: "absolute", top: item.start, width: "100%" }}
+              className={getTypeClass(message.type) + " text-sm font-mono mb-1"}
+            >
+              {message.text}
+            </div>
+          );
+        })}
+      </div>
+    </pre>
   );
 }
 

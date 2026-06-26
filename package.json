@@ -20,6 +20,7 @@
     "@radix-ui/react-switch": "^1.2.6",
     "@react-symbols/icons": "^1.4.1",
     "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/react-virtual": "^3.14.4",
     "@tauri-apps/api": "^2.11.0",
     "@tauri-apps/plugin-clipboard-manager": "^2.3.2",
     "@tauri-apps/plugin-dialog": "^2.7.1",

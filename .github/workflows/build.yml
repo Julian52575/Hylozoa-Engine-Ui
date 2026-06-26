@@ -42,7 +42,7 @@ jobs:
       - name: Fetch .so from GitHub Release
         env:
           REPO: "Julian52575/Hylozoa-Engine-Engine"
-          REF: "26-06-26"
+          REF: "project_create"
         run: |
           RELEASE=$(curl -fsSL \
             -H "Accept: application/vnd.github+json" \

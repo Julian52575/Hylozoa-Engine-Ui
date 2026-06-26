@@ -22,7 +22,7 @@ import { isTauri } from "@tauri-apps/api/core";
 import { SaveProjectFile } from "@/lib/utils";
 import { useProjectStore } from "@/store/projectStore";
 
-function ButtonsWindowHandler() {
+function ButtonsWindowHandler({ isHome }: { isHome: boolean }) {
     const appWindow = getCurrentWindow();
     const [isMaximized, setIsMaximized] = useState(false);
     useEffect(() => {
@@ -62,7 +62,9 @@ function ButtonsWindowHandler() {
                 size={"icon-sm"}
                 className="h-6 w-6 hover:bg-secondary/10"
                 onClick={async () => {
-                    await SaveProjectFile();
+                    if (!isHome) {
+                        await SaveProjectFile();
+                    }
                     await appWindow.close();
                 }}
                 aria-label="Close window"
@@ -208,7 +210,7 @@ export function HeaderWindow({isHome = false}: headerWindowProps) {
             <span className="absolute left-1/2 -translate-x-1/2 text-sm pointer-events-none" aria-hidden>
                 {title}
             </span>
-            <ButtonsWindowHandler />
+            <ButtonsWindowHandler isHome={isHome} />
         </div>
     );
 }
