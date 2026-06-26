@@ -145,12 +145,12 @@ function readEngineConfig(): EngineConfig {
 }
 
 /**
- * Try to find and download a prebuilt library from the release assets.
- * Returns true if one was successfully downloaded.
+ * Download every prebuilt library asset from the release that matches the
+ * host platform's library extension (.so / .dylib / .dll).
+ * Returns true if at least one asset was downloaded.
  */
 function tryDownloadPrebuiltLib(release: GithubRelease): boolean {
   const { ext } = getHostLibPattern();
-  const platform = os.platform();
 
   const candidates = release.assets.filter(
     (a) => a.name.includes("hylozoa_engine") && a.name.endsWith(ext)
@@ -159,20 +159,11 @@ function tryDownloadPrebuiltLib(release: GithubRelease): boolean {
   log(`Found ${candidates.length} matching library asset(s) in release.`);
   if (candidates.length === 0) return false;
 
-  // Prefer an asset whose name contains the current OS hint.
-  const osSuffix: Record<string, string> = {
-    linux: "linux",
-    darwin: "macos",
-    win32: "windows",
-  };
-  const hint = osSuffix[platform] ?? platform;
-
-  const asset =
-    candidates.find((a) => a.name.toLowerCase().includes(hint)) ?? candidates[0];
-
-  log(`Selected asset: ${asset.name}`);
   fs.mkdirSync(LIBS_DIR, { recursive: true });
-  downloadFile(asset.browser_download_url, path.join(LIBS_DIR, asset.name));
+  for (const asset of candidates) {
+    log(`Downloading asset: ${asset.name}`);
+    downloadFile(asset.browser_download_url, path.join(LIBS_DIR, asset.name));
+  }
   return true;
 }
 
@@ -226,30 +217,65 @@ function buildFromSource(repo: string, ref: string) {
   log(`Library produced: ${lib}`);
 }
 
+// ─── Override helper ─────────────────────────────────────────────────────────
+
+/**
+ * Copy a single library file into LIBS_DIR.
+ * Clears any previously installed libhylozoa_engine* first so only one lib
+ * is present after the operation.
+ */
+function installLibOverride(overridePath: string, source: string) {
+  if (!fs.existsSync(overridePath))
+    die(`Override path not found: ${overridePath} (from ${source})`);
+
+  if (fs.existsSync(LIBS_DIR)) {
+    for (const f of fs.readdirSync(LIBS_DIR)) {
+      if (f.startsWith(LIB_PREFIX)) {
+        fs.rmSync(path.join(LIBS_DIR, f));
+        log(`Removed existing lib: ${f}`);
+      }
+    }
+  }
+
+  fs.mkdirSync(LIBS_DIR, { recursive: true });
+  const dest = path.join(LIBS_DIR, path.basename(overridePath));
+  fs.copyFileSync(overridePath, dest);
+  log(`Installed override lib → ${dest}  [source: ${source}]`);
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
   const config = readEngineConfig();
   log(`Engine config: repo=${config.repo}  ref=${config.ref}`);
 
-  // ── localBuildOverride: skip everything and copy a local lib ──
-  if (config.localBuildOverride && config.localBuildOverride.trim() !== "") {
-    const overridePath = config.localBuildOverride.trim();
-    log(`localBuildOverride is set → using ${overridePath}`);
-    if (!fs.existsSync(overridePath)) die(`localBuildOverride path not found: ${overridePath}`);
+  const args = process.argv.slice(2);
+  const replaceFlag = args.includes("--replace");
 
-    fs.mkdirSync(LIBS_DIR, { recursive: true });
-    const dest = path.join(LIBS_DIR, path.basename(overridePath));
-    fs.copyFileSync(overridePath, dest);
-    log(`Copied override lib to ${dest}`);
+  // ── CLI override: npx ts-node fetch-he-engine.ts /path/to/lib.so [--replace] ──
+  const cliLib = args.find((a) => !a.startsWith("--"));
+  if (cliLib) {
+    log(`CLI lib override: ${cliLib}${replaceFlag ? " (--replace)" : ""}`);
+    installLibOverride(cliLib, "CLI argument");
     return;
   }
 
-  // ── Already installed? ──
-  const existing = findExistingLib();
-  if (existing) {
-    log(`Library already present: ${existing} — nothing to do.`);
+  // ── engine.json localBuildOverride ──
+  if (config.localBuildOverride && config.localBuildOverride.trim() !== "") {
+    const overridePath = config.localBuildOverride.trim();
+    log(`localBuildOverride is set → using ${overridePath}`);
+    installLibOverride(overridePath, "he-engine.json localBuildOverride");
     return;
+  }
+
+  // ── Already installed? Skip unless --replace was passed ──
+  const existing = findExistingLib();
+  if (existing && !replaceFlag) {
+    log(`Library already present: ${existing} — nothing to do. (Pass --replace to force reinstall.)`);
+    return;
+  }
+  if (existing && replaceFlag) {
+    log(`--replace set: reinstalling over existing lib ${existing}`);
   }
 
   const ref = config.ref;
@@ -261,11 +287,10 @@ async function main() {
     // ── Tagged release: try prebuilt assets first ──
     const hasPrebuilt = tryDownloadPrebuiltLib(release);
     if (hasPrebuilt) {
-      log(`Prebuilt library installed: ${findExistingLib()}`);
+      log(`Prebuilt library/libraries installed in ${LIBS_DIR}`);
       return;
     }
-    // No prebuilt assets in the release → fall through to CMake build using
-    // the release tarball (same ref, the Archive API handles tags too).
+    // No prebuilt assets in the release → fall through to CMake build.
     log(`No prebuilt assets found in release. Falling back to CMake build…`);
   }
 
