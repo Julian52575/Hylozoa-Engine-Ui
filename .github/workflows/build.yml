@@ -84,6 +84,10 @@ jobs:
           name: hylozoa-engine-linux
           path: engine/build/hylozoa-x86_64-unknown-linux-gnu
 
+      - name: Set output for build directory
+        run: echo "build_dir=dist" >> $GITHUB_OUTPUT
+
+
   build_engine_windows:
     runs-on: windows-latest
     steps:
