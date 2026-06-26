@@ -1,6 +1,7 @@
 #!/usr/bin/env npx ts-node
 
 import * as fs from "fs";
+import { readdir, copyFile, rename } from "fs";
 import * as path from "path";
 import * as os from "os";
 import { execSync, spawnSync } from "child_process";
@@ -243,6 +244,66 @@ function installLibOverride(overridePath: string, source: string) {
   log(`Installed override lib → ${dest}  [source: ${source}]`);
 }
 
+function removeAllLibrariesExtension() {
+    // Parse every item of LIBS_DIR
+    // copy the item without its extension within LIBS_DIR 
+    const entries = fs.readdirSync(LIBS_DIR, {
+        withFileTypes: true,
+    });
+
+    if (entries.length === 0) {
+        console.log("No files found.");
+        return;
+    }
+    for (const entry of entries) {
+        if (!entry.isFile()) {
+            console.log(`Skipping "${entry.name}" (not a file).`);
+            continue;
+        }
+        const source = path.join(LIBS_DIR, entry.name);
+        const destination = path.join(
+            LIBS_DIR,
+            path.parse(entry.name).name
+        );
+
+        console.log(`Processing "${entry.name}"...`);
+        try {
+            fs.renameSync(source, destination);
+            console.log(`  ✓ Created "${path.basename(destination)}"`);
+        } catch (error) {
+            console.error(`  ✗ Failed to copy "${entry.name}"`);
+            console.error(error);
+            throw error;
+        }
+    }
+}
+
+function removeLibrairiePrefixLinux() {
+    const entries = fs.readdirSync(LIBS_DIR, {
+        withFileTypes: true,
+    });
+
+    for (const entry of entries) {
+        if (!entry.isFile()) {
+            continue;
+        }
+        if (!entry.name.startsWith("lib")) {
+            continue;
+        }
+        const newName = entry.name.substring(3);
+        const source = path.join(LIBS_DIR, entry.name);
+        const destination = path.join(LIBS_DIR, newName);
+
+        console.log(`Renaming "${entry.name}" -> "${newName}"`);
+        try {
+            fs.renameSync(source, destination);
+        } catch (error) {
+            throw error;
+        }
+    }
+}
+
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -288,6 +349,8 @@ async function main() {
     const hasPrebuilt = tryDownloadPrebuiltLib(release);
     if (hasPrebuilt) {
       log(`Prebuilt library/libraries installed in ${LIBS_DIR}`);
+      removeAllLibrariesExtension();
+      removeLibrairiePrefixLinux();
       return;
     }
     // No prebuilt assets in the release → fall through to CMake build.
@@ -296,6 +359,8 @@ async function main() {
 
   // ── branch / commit / tag-without-prebuilt: build from source ──
   buildFromSource(config.repo, ref);
+  removeAllLibrariesExtension();
+  removeLibrairiePrefixLinux();
 }
 
 main().catch((err) => {
