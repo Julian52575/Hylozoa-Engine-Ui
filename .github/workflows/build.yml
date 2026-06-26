@@ -41,13 +41,13 @@ jobs:
 
       - name: Fetch .so from GitHub Release
         env:
-          REPO: "Julian52575/Hylozoa-Engine-Engine" 
+          REPO: "Julian52575/Hylozoa-Engine-Engine"
           REF: "26-06-26"
         run: |
           RELEASE=$(curl -fsSL \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${REPO}/releases/tags/${REF}")
-        
+
           DOWNLOAD_URL=$(echo "$RELEASE" | \
             python3 -c "
           import sys, json
@@ -78,7 +78,9 @@ jobs:
       - name: Build binary
         run: |
           mkdir -p engine/build
-          cmake -S engine -B engine/build -DCMAKE_BUILD_TYPE=Release
+          cmake -S engine -B engine/build \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_EXE_LINKER_FLAGS="-L${{ github.workspace }}/engine/lib -lhylozoa_engine"
           cmake --build engine/build --config Release
 
       - name: Upload engine Linux binary
@@ -135,7 +137,7 @@ jobs:
         with:
           name: hylozoa-engine-linux
           path: ./engine-bin
-      
+
       - name: Place engine binary for Tauri sidecar
         run: |
           mkdir -p src-tauri/binaries
@@ -221,7 +223,7 @@ jobs:
         with:
           name: hylozoa-engine-windows
           path: ./engine-bin
-      
+
       - name: Place engine binary for Tauri sidecar
         run: |
           mkdir -p src-tauri/binaries
