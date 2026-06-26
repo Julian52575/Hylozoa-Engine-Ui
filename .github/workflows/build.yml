@@ -2,7 +2,16 @@ name: Build App
 
 on:
     push:
-        branches: ["main"]
+        branches:
+            - "main"
+            - "26-ui-release"
+            - "cicd-tests"
+        paths:
+          - "src/*"
+          - "src-tauri/*"
+          - "public/"
+          - "engine/"
+    workflow_dispatch:
 
 jobs:
     build_web:
