@@ -39,12 +39,39 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
 
+      - name: Fetch .so from GitHub Release
+        env:
+          REPO: "Julian52575/Hylozoa-Engine-Engine" 
+          REF: "v1.0.0"
+        run: |
+          RELEASE=$(curl -fsSL \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${REPO}/releases/tags/${REF}")
+          DOWNLOAD_URL=$(echo "$RELEASE" | \
+            python3 -c "
+          import sys, json
+          assets = json.load(sys.stdin)['assets']
+          match = [a['browser_download_url'] for a in assets if 'hylozoa_engine' in a['name'] and a['name'].endswith('.so')]
+          print(match[0] if match else '')
+          ")
+
+          if [ -z "$DOWNLOAD_URL" ]; then
+            echo "No .so asset found in release ${REF}"
+            exit 1
+          fi
+
+          echo "Downloading: $DOWNLOAD_URL"
+
+          mkdir -p engine/lib
+          curl -fsSL -o engine/lib/hylozoa_engine.so "$DOWNLOAD_URL"
+
+
       - name: Install CMake & build tools
         run: |
           sudo apt update
           sudo apt install -y build-essential cmake
 
-      - name: Build engine
+      - name: Build binary
         run: |
           mkdir -p engine/build
           cmake -S engine -B engine/build -DCMAKE_BUILD_TYPE=Release
