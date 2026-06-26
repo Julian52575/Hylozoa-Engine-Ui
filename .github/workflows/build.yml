@@ -65,11 +65,6 @@ jobs:
           mkdir -p engine/lib
           curl -fsSL -o engine/lib/libhylozoa_engine.so "$DOWNLOAD_URL"
 
-      - name: Debug lib
-        run: |
-          ls -la engine/lib/
-          file engine/lib/libhylozoa_engine.so
-
       - name: Install CMake & build tools
         run: |
           sudo apt update
