@@ -82,7 +82,13 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: hylozoa-engine-linux
-          path: engine/build/hylozoa-x86_64-unknown-linux-gnu
+          path: engine/build/hylozoa-*
+      
+      - name: Upload engine .so
+        uses: actions/upload-artifact@v7
+        with:
+          name: hylozoa-engine-so
+          path: engine/lib/libhylozoa_engine.so
 
 
   build_engine_windows:
@@ -134,11 +140,18 @@ jobs:
           name: hylozoa-engine-linux
           path: ./engine-bin
 
-      - name: Place engine binary for Tauri sidecar
+      - name: Download engine .so
+        uses: actions/download-artifact@v7
+        with:
+          name: hylozoa-engine-so
+          path: ./engine-so
+      
+      - name: Place engine binary and .so for Tauri sidecar
         run: |
-          mkdir -p src-tauri/binaries
+          mkdir -p src-tauri/binaries/libs
           cp ./engine-bin/* ./src-tauri/binaries/
           chmod +x src-tauri/binaries/*
+          cp ./engine-so/libhylozoa_engine.so src-tauri/binaries/libs/libhylozoa_engine.so
 
       - name: Install System Dependencies
         run: |
