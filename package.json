@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "he-engine": "tsx scripts/fetch-he-engine"
   },
   "dependencies": {
     "@iconify/react": "^6.0.2",
@@ -58,7 +59,7 @@
   "devDependencies": {
     "@tauri-apps/cli": "^2",
     "@types/lodash.throttle": "^4.1.9",
-    "@types/node": "^25.0.10",
+    "@types/node": "^25.9.4",
     "@types/react": "^19.1.8",
     "@types/react-cytoscapejs": "^1.2.6",
     "@types/react-dom": "^19.1.6",

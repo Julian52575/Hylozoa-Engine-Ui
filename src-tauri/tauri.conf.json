@@ -39,7 +39,7 @@
   "bundle": {
     "active": true,
     "resources": ["ressources/EngineSettings.json"],
-    "externalBin": ["binaries/hylozoa"],
+    "externalBin": ["binaries/libs/hylozoa_engine"],
     "targets": ["deb", "rpm", "nsis", "msi", "dmg", "app"],
     "icon": [
       "icons/32x32.png",
