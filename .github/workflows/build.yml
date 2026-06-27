@@ -292,7 +292,7 @@ jobs:
         - name: Create release
           run: |
             ls -R
-            FILES=$(find . -type f)
+            FILES=$(find . -type f | grep "hylozoa-ui")
             echo $FILES
             echo "$GITHUB_REPOSITORY : $GITHUB_SHA"
             RELEASE_TYPE="prerelease"
