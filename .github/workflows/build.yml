@@ -3,6 +3,10 @@ name: Build App
 on:
   push:
     branches: ["main", "dev"]
+  workflow_dispatch:
+
+env:
+  RELEASE_NAME: UI
 
 jobs:
   build_web:
@@ -257,3 +261,48 @@ jobs:
         with:
           name: tauri_windows_installer
           path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+
+  expose_version_tag:
+      needs: [build_windows, build_linux]
+      if: always()
+      runs-on: ubuntu-latest
+      outputs:
+        version_tag: ${{ steps.set_version_tag.outputs.version_tag }}
+      steps:
+        - name: Set
+          id: set_version_tag
+          run: |
+            version_tag=$(date +"%g-%m-%d")
+            echo "version_tag=${version_tag}" >> $GITHUB_OUTPUT
+
+  release:
+      permissions:
+        contents: write
+      needs: expose_version_tag
+      if: always()
+      runs-on: ubuntu-latest
+      env:
+        GH_TOKEN: ${{ github.token }}
+        VERSION_TAG: ${{ needs.expose_version_tag.outputs.version_tag }}
+        BUILD_DIR: ${{ github.workspace }}
+      steps:
+        - name: Download all uploaded artifacts
+          uses: actions/download-artifact@v8
+
+        - name: Create release
+          run: |
+            ls -R
+            FILES=$(find . -type f | grep "hylozoa-ui")
+            echo $FILES
+            echo "$GITHUB_REPOSITORY : $GITHUB_SHA"
+            RELEASE_TYPE="prerelease"
+            if [[ "${{ github.ref_name }}" = "main" ]]; then
+              RELEASE_TYPE="latest"
+            fi
+            gh release create "$VERSION_TAG" \
+                --repo="$GITHUB_REPOSITORY" \
+                --title="${GITHUB_REPOSITORY#*/}_Release#${VERSION_TAG}" \
+                --generate-notes \
+                --$RELEASE_TYPE \
+                --target "$GITHUB_SHA" \
+                $FILES
