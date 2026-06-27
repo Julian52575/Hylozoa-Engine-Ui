@@ -110,12 +110,7 @@ export function BottomPanel() {
             >
               <Console />
             </TabsContent>
-            <TabsContent
-              value="password"
-              className="w-full h-full m-0 p-0 border-none bg-transparent text-white"
-            >
-              Change your password here.
-            </TabsContent>
+            
           </div>
         )}
 
@@ -126,13 +121,6 @@ export function BottomPanel() {
             className="w-10 h-10 p-0 m-0 inline-flex items-center justify-center rounded-none data-[state=active]:text-black truncate select-none shadow-none border-none data-[state=active]:shadow-none data-[state=active]:bg-primary/20 hover:text-primary data-[state=active]:translate-y-0"
           >
             Console
-          </TabsTrigger>
-          <TabsTrigger
-            value="password"
-            onClick={() => toggleTab("password")}
-            className="w-10 h-10 p-0 m-0 inline-flex items-center justify-center rounded-none data-[state=active]:text-black truncate select-none shadow-none border-none data-[state=active]:shadow-none data-[state=active]:bg-primary/20 hover:text-primary data-[state=active]:translate-y-0"
-          >
-            Password
           </TabsTrigger>
         </TabsList>
       </Tabs>

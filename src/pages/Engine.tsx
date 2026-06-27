@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/resizable";
 
 import { useEngineStore } from "@/store/engineStore";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useProjectStore } from "@/store/projectStore";
 import { SaveProjectFile } from "@/lib/utils";
 import { ProjectPanel } from "@/components/engine/ProjectPanel";
@@ -41,8 +41,15 @@ function MainSceneHandler() {
     </>
   );
 }
+
 export default function EnginePage() {
   const loadSchemas = useSchemaStore((s) => s.loadSchemas);
+  const { currentOnglet } = useSessionStore();
+  const currentOngletRef = useRef(currentOnglet);
+
+  useEffect(() => {
+    currentOngletRef.current = currentOnglet;
+  }, [currentOnglet]);
 
   useEffect(() => {
     loadSchemas();
@@ -55,6 +62,7 @@ export default function EnginePage() {
     }
 
     const handleKeyDown = async (e: KeyboardEvent) => {
+      if (currentOngletRef.current === "console") return;
       const isMod = e.ctrlKey || e.metaKey;
 
       if (isMod && e.key === "z") {
