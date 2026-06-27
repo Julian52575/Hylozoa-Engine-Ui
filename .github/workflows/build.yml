@@ -279,6 +279,7 @@ jobs:
       permissions:
         contents: write
       needs: expose_version_tag
+      if: always()
       runs-on: ubuntu-latest
       env:
         GH_TOKEN: ${{ github.token }}
