@@ -132,7 +132,7 @@ const items = [
     targets: ["code"],
     function: async (path: string) => {
       const sessionStore = useSessionStore.getState();
-      sessionStore.setCurrentCodeFilePath(path);
+      sessionStore.addCodeFilePaths(path);
       sessionStore.setCurrentOnglet("console");
     },
   },

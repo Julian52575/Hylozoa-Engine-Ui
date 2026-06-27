@@ -6,7 +6,6 @@ interface SelectionState {
     selectedSceneId: string | null;
     openComponentIds: string[];
 
-    
     selectEntity: (entityId: string | null) => void;
     selectType: (type: string | null) => void;
     selectScene: (sceneId: string | null) => void;

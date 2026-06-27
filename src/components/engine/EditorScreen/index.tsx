@@ -6,9 +6,10 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { useProjectStore } from "@/store/projectStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { Loader2 } from "lucide-react";
+import { Icon } from "@iconify/react";
 
 interface EditorManagerProps {
-  filePath: string;
+  filePath: string | null;
   language?: string;
 }
 
@@ -24,6 +25,7 @@ function FileEditor({ filePath, language = "lua" }: EditorManagerProps) {
   useEffect(() => {
     async function loadFile() {
       try {
+        if (!filePath) return;
         setLoading(true);
         const content = await readTextFile(filePath);
         setFileContent(content);
@@ -42,6 +44,7 @@ function FileEditor({ filePath, language = "lua" }: EditorManagerProps) {
   }, [filePath]);
 
   useEffect(() => {
+    if (!filePath) return;
     if (saveStatus !== "modified") return;
 
     const delayDebounceTimer = setTimeout(async () => {
@@ -283,7 +286,6 @@ function FileEditor({ filePath, language = "lua" }: EditorManagerProps) {
         ];
         return {
           suggestions: suggestions as any[],
-
         };
       },
     });
@@ -314,8 +316,10 @@ function FileEditor({ filePath, language = "lua" }: EditorManagerProps) {
 }
 
 export function EditorScreen() {
-  const { currentCodeFilePath, setCurrentCodeFilePath } = useSessionStore();
+  const { currentCodeFilePaths, addCodeFilePaths, removeCodeFilePath } =
+    useSessionStore();
   const { currentProjectPath } = useProjectStore();
+  const [selectedScript, setSelectedScript] = useState<string | null>(null);
 
   const handleFileSelect = async () => {
     try {
@@ -332,14 +336,21 @@ export function EditorScreen() {
       });
 
       if (selected && typeof selected === "string") {
-        setCurrentCodeFilePath(selected);
+        addCodeFilePaths(selected);
+        setSelectedScript(selected);
       }
     } catch (error) {
       console.error("Error selecting file:", error);
     }
   };
 
-  if (!currentCodeFilePath) {
+  useEffect(() => {
+    if (currentCodeFilePaths && currentCodeFilePaths.length > 0) {
+      setSelectedScript(currentCodeFilePaths[currentCodeFilePaths.length - 1]);
+    }
+  }, [currentCodeFilePaths]);
+
+  if (!currentCodeFilePaths || currentCodeFilePaths.length === 0) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
         No file selected
@@ -349,8 +360,50 @@ export function EditorScreen() {
   }
 
   return (
-    <div className="w-full h-full mt-5">
-      <FileEditor filePath={currentCodeFilePath} />
+    <div className="w-full h-full flex overflow-hidden">
+      {currentCodeFilePaths.length > 0 && (
+        <div className="h-full flex flex-col gap-1 p-2 border-r border-gray-300 overflow-y-scroll min-w-[160px]">
+          {currentCodeFilePaths.map((filePath) => (
+            <div
+              key={filePath}
+              title={filePath}
+              className={`
+                group flex items-center justify-between gap-2 px-2 py-1 rounded cursor-pointer
+                border border-transparent hover:border-gray-200 hover:bg-gray-100
+                ${selectedScript === filePath ? "bg-gray-100 border-gray-200" : ""}
+              `}
+            >
+              <span
+                className="text-sm truncate flex-1 min-w-0"
+                onClick={() =>
+                  selectedScript !== filePath && setSelectedScript(filePath)
+                }
+              >
+                {filePath.split("/").pop()}
+              </span>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="shrink-0 h-5 w-5 p-0 opacity-0 group-hover:opacity-100 cursor-pointer"
+                onClick={() => removeCodeFilePath(filePath)}
+              >
+                <Icon icon="mdi:close" className="h-3 w-3 text-red-500" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="w-full h-full mt-2 relative">
+        {currentCodeFilePaths.map((filePath) => (
+          <div
+            key={filePath}
+            className="absolute inset-0"
+            style={{ display: selectedScript === filePath ? "block" : "none" }}
+          >
+            <FileEditor filePath={filePath} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

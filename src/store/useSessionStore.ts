@@ -4,8 +4,10 @@ interface SessionState {
   overrides: Record<string, Record<string, any>>;
   currentOnglet: string;
   setCurrentOnglet: (onglet: string) => void;
-  currentCodeFilePath?: string;
-  setCurrentCodeFilePath: (path: string) => void;
+
+  currentCodeFilePaths?: string[];
+  addCodeFilePaths: (path: string) => void;
+  removeCodeFilePath: (path: string) => void;
 
   setLiveProp: (
     entityId: string,
@@ -19,8 +21,27 @@ export const useSessionStore = create<SessionState>((set) => ({
   overrides: {},
   currentOnglet: "scene",
   setCurrentOnglet: (onglet) => set({ currentOnglet: onglet }),
-  currentCodeFilePath: undefined,
-  setCurrentCodeFilePath: (path) => set({ currentCodeFilePath: path }),
+  currentCodeFilePaths: [],
+  addCodeFilePaths: (path) =>
+    set((state) => {
+      if (state.currentCodeFilePaths?.includes(path)) {
+        return state;
+      }
+      return {
+        currentCodeFilePaths: [...(state.currentCodeFilePaths || []), path],
+      };
+    }),
+  removeCodeFilePath: (path) =>
+    set((state) => {
+      if (!state.currentCodeFilePaths?.includes(path)) {
+        return state;
+      }
+      return {
+        currentCodeFilePaths: state.currentCodeFilePaths.filter(
+          (p) => p !== path,
+        ),
+      };
+    }),
   setLiveProp: (entityId, componentId, newProps) =>
     set((state) => {
       const current = state.overrides[entityId]?.[componentId];
