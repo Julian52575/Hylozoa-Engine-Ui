@@ -14,6 +14,7 @@ interface Component {
   type: string;
   label: string;
   icon: string;
+  color?: string;
   requires?: string;
   schema: Record<string, PropertyDefinition>;
   values: Record<string, any>;

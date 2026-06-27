@@ -1,7 +1,8 @@
 {
   "type": "camera",
   "label": "Camera",
-  "icon": "lucide:camera",
+  "icon": "tabler:camera",
+  "color": "#dc2626",
   "schema": {
     "offset": { "type": "vector2", "label": "Offset" },
     "viewportSize": { "type": "vector2", "label": "Viewport Size" },

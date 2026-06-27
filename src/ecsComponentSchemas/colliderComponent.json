@@ -1,7 +1,8 @@
 {
     "type": "collider",
     "label": "Base Collider",
-    "icon": "lucide:crosshair",
+    "icon": "tabler:layers-intersect",
+    "color": "#f97316",
     "schema":{
         "density" : { "type" : "number", "label" : "Density" },
         "friction" : { "type" : "number", "label" : "Friction" },

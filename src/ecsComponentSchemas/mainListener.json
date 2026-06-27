@@ -1,7 +1,8 @@
 {
     "type": "mainlistener",
     "label": "Main Listener",
-    "icon": "lucide:volume-2",
+    "icon": "tabler:speakerphone",
+    "color": "#059669",
     "schema": {},
     "values": {}
 }

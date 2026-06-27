@@ -1,7 +1,8 @@
 {
     "type": "script",
     "label": "Script",
-    "icon": "lucide:code",
+    "icon": "tabler:code",
+    "color": "#f59e0b",
     "schema": {
         "scriptFile":{"type":"file","label":"Script File","accept":"script"}
     },

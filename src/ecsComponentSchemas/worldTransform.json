@@ -1,7 +1,8 @@
 {
     "type": "worldtransform",
     "label": "World Transform",
-    "icon": "lucide:globe",
+    "icon": "tabler:world",
+    "color": "#3b82f6",
     "schema": {
         "position": { "type": "vector2", "label": "Position" },
         "scale": { "type": "vector2", "label": "Scale" },

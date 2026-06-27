@@ -1,7 +1,8 @@
 {
     "type" : "boxcollider",
     "label" : "Box Collider",
-    "icon": "lucide:box",
+    "icon": "tabler:square",
+    "color": "#f97316",
     "schema":{
         "size" : { "type" : "vector2", "label" : "Size" }
     },

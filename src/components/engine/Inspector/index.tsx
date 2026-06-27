@@ -54,6 +54,10 @@ function ComponentManager({ component }: { component: any }) {
     }
   };
 
+  const getColor = (schema: any) => {
+   return schema.color || "#000000";
+  };
+
   return (
     <AccordionItem
       value={component.id || ""}
@@ -61,7 +65,7 @@ function ComponentManager({ component }: { component: any }) {
     >
       <AccordionTrigger className="px-3 py-2 hover:no-underline hover:bg-accent/50 hover:cursor-pointer transition-colors">
         <div className="flex items-center gap-2">
-          <Icon icon={schema.icon} className="w-4 h-4" />
+          <Icon icon={schema.icon} className="w-4 h-4" style={{color : getColor(schema)}}/>
           <span>{schema.label || component.name}</span>
         </div>
       </AccordionTrigger>

@@ -1,7 +1,8 @@
 {
   "type": "sprite",
   "label": "Sprite",
-  "icon": "lucide:image",
+  "color": "#8b5cf6",
+  "icon": "tabler:photo",
   "schema": {
     "texture": { "type": "file", "label": "Texture", "accept": "image" },
     "scale": { "type": "vector2", "label": "Scale" }

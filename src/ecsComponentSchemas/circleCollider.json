@@ -1,7 +1,8 @@
 {
     "type" : "circlecollider",
     "label" : "Circle Collider",
-    "icon": "lucide:circle",
+    "icon": "tabler:circle",
+    "color": "#f97316",
     "schema": {
         "radius": { "type": "number", "label": "Radius","min": 0 },
         "offset": { "type": "vector2", "label": "Offset" }

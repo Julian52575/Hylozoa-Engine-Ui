@@ -44,6 +44,10 @@ export default function ComponentModal({
         schema.label.toLowerCase().includes(search.toLowerCase())
     );
 
+    const getColor = (schema: any) => {
+        return schema.color || "#000000"; // Default color if not specified
+    };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -75,7 +79,7 @@ export default function ComponentModal({
                         onClick={() => setSelected(schema.type)}
                         onDoubleClick={handleAddComponent}
                     >
-                        <Icon icon={schema.icon} className="w-4 h-4 mr-2" />
+                        <Icon icon={schema.icon} className="w-4 h-4 mr-2" style={{color : getColor(schema)}} />
                         <span>{schema.label}</span>
                     </div>
                 ))}

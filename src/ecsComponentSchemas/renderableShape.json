@@ -1,7 +1,8 @@
 {
   "type": "renderableshape",
   "label": "Shape",
-  "icon": "mdi:shape-outline",
+  "icon": "tabler:shape",
+  "color": "#8b5cf6",
   "schema": {
     "shapeType": {
       "type": "enum",

@@ -1,7 +1,8 @@
 {
   "type": "rigidbody",
   "label": "Rigid Body",
-  "icon": "lucide:git-branch",
+  "icon": "tabler:bounce-right",
+  "color": "#f97316",
   "schema": {
     "bodyType": {
       "type": "enum",

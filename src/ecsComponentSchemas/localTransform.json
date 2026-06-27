@@ -1,7 +1,8 @@
 {
   "type": "localtransform",
   "label": "Local Transform",
-  "icon": "lucide:move",
+  "icon": "tabler:transform",
+  "color": "#3b82f6",
   "schema": {
     "position": { "type": "vector2", "label": "Position" },
     "scale": { "type": "vector2", "label": "Scale" },

@@ -1,7 +1,8 @@
 {
     "type" : "capsulecollider",
     "label" : "Capsule Collider",
-    "icon": "lucide:disc",
+    "icon": "tabler:pill",
+    "color": "#f97316",
     "schema": {
         "center1" : { "type" : "vector2", "label" : "Center 1" },
         "center2" : { "type" : "vector2", "label" : "Center 2" },

@@ -1,7 +1,8 @@
 {
   "type": "renderable",
   "label": "Renderable",
-  "icon": "lucide:eye",
+  "icon": "tabler:eye",
+  "color": "#8b5cf6",
   "schema": {
     "color": { "type": "color", "label": "Color" },
     "visible": { "type": "boolean", "label": "Visible" },

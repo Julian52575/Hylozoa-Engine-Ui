@@ -1,7 +1,8 @@
 {
     "type": "noiselistener",
     "label": "Noise Listener",
-    "icon": "lucide:ear",
+    "icon": "tabler:ear",
+    "color": "#059669",
     "schema": {
         "hearingRange": { "type": "number", "label": "Hearing Range" }
     },

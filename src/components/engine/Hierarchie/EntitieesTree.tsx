@@ -53,6 +53,14 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
     return schema?.icon || "lucide:puzzle";
   };
 
+  const getColor = () => {
+    if (node.data.type === "entity" || node.data.type === "prefab") {
+      return "#000000"; // Default color for entities and prefabs
+    }
+    const schema = schemas[node.data.type];
+    return schema?.color || "#000000"; // Default color if not specified
+  };
+
   const [isRenaming, setIsRenaming] = useState(false);
   const [cpyName, setCopyName] = useState(
     schemas[node.data.type]?.label || node.data.name,
@@ -179,7 +187,7 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
                 icon={
                   node.isOpen ? "lucide:chevron-down" : "lucide:chevron-right"
                 }
-                className="w-4 h-4 cursor-pointer"
+                className="w-4 h-4 cursor-pointer ml-0.5"
                 onClick={(e) => {
                   e.stopPropagation();
                   node.toggle();
@@ -190,14 +198,16 @@ function Node({ node, style, dragHandle }: NodeRendererProps<NodeData>) {
           <div
             className={`
                   flex flex-row overflow-hidden 
-                  text-sm px-1 py-0.5 text-ellipsis whitespace-nowrap 
-                  items-center gap-1 justify-start font-normal  rounded-md
+                  w-full
+                  text-sm py-0.5 text-ellipsis whitespace-nowrap 
+                  items-center gap-1 justify-start font-normal
                   hover:bg-primary/10 hover:cursor-pointer
+                  ${node.isLeaf ? "pl-4 border-l-2 border-primary/30" : ""}
                   ${isSelected ? "bg-gray-200" : "bg-transparent"}
               `}
             onClick={handleNodeClick}
           >
-            <Icon icon={getIcon()} className="w-4 h-4 min-w-4 min-h-4" />
+            <Icon icon={getIcon()} className="w-4 h-4 min-w-4 min-h-4" style={{ color: getColor() }}/>
             {!isRenaming && (
               <div
                 className="overflow-hidden text-ellipsis whitespace-nowrap"
@@ -286,6 +296,7 @@ export function EntitiesTree({
                 data={treeData}
                 height={height}
                 width={width}
+                indent={9}
                 idAccessor="id"
               >
                 {Node}
