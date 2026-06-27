@@ -303,7 +303,7 @@ jobs:
                 --repo="$GITHUB_REPOSITORY" \
                 --title="${GITHUB_REPOSITORY#*/}_Release#${VERSION_TAG}" \
                 --generate-notes \
-                --clobber
+                --clobber \
                 --$RELEASE_TYPE \
                 --target "$GITHUB_SHA" \
                 $FILES
