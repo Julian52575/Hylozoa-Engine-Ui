@@ -263,7 +263,7 @@ jobs:
           path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
 
   expose_version_tag:
-      needs: build_windows
+      needs: [build_windows, build_linux]
       if: always()
       runs-on: ubuntu-latest
       outputs:
