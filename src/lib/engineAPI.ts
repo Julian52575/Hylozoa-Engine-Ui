@@ -6,6 +6,7 @@ import {
   readTextFile
 } from "@tauri-apps/plugin-fs";
 import { SaveProjectFile } from "./utils";
+import { useEngineStore } from "@/store/engineStore";
 
 export const generateUint64Id = async (): Promise<string> => {
   const command = Command.sidecar("binaries/hylozoa", ["generate-uuid"]);
@@ -36,6 +37,8 @@ export const createHylozoaCommand = async (projectPath: string) => {
       throw new Error("Failed to save project file");
     }
 
+    const tags = useEngineStore.getState().tags;
+
     const settingsPath = await resolveResource(
       "ressources/EngineSettings.json",
     );
@@ -46,6 +49,8 @@ export const createHylozoaCommand = async (projectPath: string) => {
     if (!settings.ProjectLocation.endsWith("/")) {
       settings.ProjectLocation += "/";
     }
+    settings.Tags = tags;
+
     const tempSettingsPath = await join(await tempDir(), "EngineSettings.json");
     await writeTextFile(tempSettingsPath, JSON.stringify(settings, null, 2));
 

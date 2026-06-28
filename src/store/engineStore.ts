@@ -36,7 +36,11 @@ interface EngineState {
   scenes: Record<string, SceneState>;
   mainSceneId: string;
   prefabs: Record<string, Entity>;
+  tags: string[];
 
+  addTag: (tag: string) => void;
+  removeTag: (tag: string) => void;
+  renameTag: (oldTag: string, newTag: string) => void;
   addPrefab: (name: string, prefab: Entity) => Promise<string>;
   addComponentToPrefab: (
     prefabId: string,
@@ -111,6 +115,7 @@ export const exportToEngine = (state: EngineState) => {
   return {
     version: state.version,
     MainScene: state.mainSceneId,
+    tags : state.tags,
     prefabs: Object.values(state.prefabs).map((prefab) => {
       const transformedComponents = Object.fromEntries(
         Object.values(prefab.components).map((comp) => [
@@ -181,6 +186,7 @@ export const loadEngineState = (data: any): void => {
     version: data.version || "1.0.0",
     scenes: {},
     mainSceneId: data.MainScene || "",
+    tags: data.tags || [],
     prefabs: {},
   });
 
@@ -325,7 +331,27 @@ export const useEngineStore = create<EngineState>()(
         scenes: {},
         mainSceneId: "",
         prefabs: {},
-
+        tags: [],
+        addTag: (tag: string) => {
+          set((state: EngineState) => {
+            if (!state.tags.includes(tag)) {
+              state.tags.push(tag);
+            }
+          });
+        },
+        removeTag: (tag: string) => {
+          set((state: EngineState) => {
+            state.tags = state.tags.filter((t) => t !== tag);
+          });
+        },
+        renameTag: (oldTag: string, newTag: string) => {
+          set((state: EngineState) => {
+            const index = state.tags.indexOf(oldTag);
+            if (index !== -1 && !state.tags.includes(newTag)) {
+              state.tags[index] = newTag;
+            }
+          });
+        },
         addPrefab: async (name: string, prefab: Entity) => {
           const id = await generateUint64Id();
           set((state: EngineState) => {

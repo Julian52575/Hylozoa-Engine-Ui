@@ -1,27 +1,26 @@
-// ProjectPanel.tsx
-import { useState } from "react";
-import { SceneManager } from "@/components/engine/SceneManager";
-import { PrefabsManager } from "@/components/engine/PrefabsManager";
+import { SceneManager } from "@/components/engine/ProjectPanel/SceneManager";
+import { PrefabsManager } from "@/components/engine/ProjectPanel/PrefabsManager";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import { TagsManager } from "@/components/engine/ProjectPanel/TagsManager";
 
-type Tab = "scenes" | "prefabs";
 
 export function ProjectPanel() {
-  const [activeTab, setActiveTab] = useState<Tab>("scenes");
-
   return (
-    <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as Tab)} className="h-full">
+    <Tabs className="h-full">
         <TabsList className="w-full h-full">
-            <TabsTrigger value="scenes" className="w-1/2">
+            <TabsTrigger value="scenes" className="w-1/3">
                 Scenes
             </TabsTrigger>
-            <TabsTrigger value="prefabs" className="w-1/2">
+            <TabsTrigger value="prefabs" className="w-1/3">
                 Prefabs
+            </TabsTrigger>
+            <TabsTrigger value="tags" className="w-1/3">
+                Tags
             </TabsTrigger>
         </TabsList>
         <TabsContent value="scenes" className="h-full">
@@ -29,6 +28,9 @@ export function ProjectPanel() {
         </TabsContent>
         <TabsContent value="prefabs" className="h-full">
             <PrefabsManager />
+        </TabsContent>
+        <TabsContent value="tags" className="h-full">
+            <TagsManager />
         </TabsContent>
     </Tabs>
   );
