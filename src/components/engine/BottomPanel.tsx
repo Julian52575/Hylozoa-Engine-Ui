@@ -44,6 +44,19 @@ function Console() {
     return typeClassMap[type] ?? typeClassMap.info;
   }, []);
 
+  const parseMessage = (text: string) => {
+    const match = text.trim().match(/^(\[.*?\])\s(.+)$/s);
+    if (!match) return <span>{text}</span>;
+
+    const [, tag, info] = match;
+    return (
+      <>
+        <span className="text-yellow-400 font-semibold">{tag}</span>
+        <span className="text-slate-300"> {info}</span>
+      </>
+    );
+  }
+
   return (
     <pre
       ref={containerRef}
@@ -65,7 +78,7 @@ function Console() {
               style={{ position: "absolute", top: item.start, width: "100%" }}
               className={getTypeClass(message.type) + " text-sm font-mono mb-1"}
             >
-              {message.text}
+              {parseMessage(message.text)}
             </div>
           );
         })}
