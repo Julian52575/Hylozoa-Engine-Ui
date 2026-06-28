@@ -9,11 +9,7 @@
     "layer": {
       "type": "enum",
       "label": "Layer",
-      "options": [
-        { "label": "Default", "value": "Default" },
-        { "label": "UI", "value": "UI" },
-        { "label": "Background", "value": "Background" }
-      ]
+      "optionsSource": "layers"
     },
     "zindex": { "type": "number", "label": "Z-Index" },
     "transparency": { "type": "number", "label": "Transparency" },

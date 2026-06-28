@@ -6,6 +6,7 @@ import { NumberOption } from "./Options/Number";
 import { FileOption } from "./Options/File";
 import { ColorOption } from "./Options/Color";
 import { ArrayOption } from "./Options/Array";
+import { useEngineStore } from "@/store/engineStore";
 
 interface OptionsManagerProps {
   propConfig: Record<string, any>;
@@ -22,7 +23,8 @@ export default function OptionsManager({
   onValueChange,
   onCommit,
 }: OptionsManagerProps) {
-  const { type, label, options, dependency, min, max, step, accept } =
+  const layers = useEngineStore((s) => s.layers);
+  const { type, label, options, optionsSource, dependency, min, max, step, accept } =
     propConfig;
 
   if (dependency && allValues) {
@@ -31,6 +33,8 @@ export default function OptionsManager({
       return null;
     }
   }
+
+  const resolvedOptions = optionsSource === "layers" ? layers.map((l) => ({ label: l, value: l })) : options;
 
   switch (type) {
     case "vector2":
@@ -48,7 +52,7 @@ export default function OptionsManager({
       return (
         <EnumOption
           label={label}
-          options={options || []}
+          options={resolvedOptions}
           value={value}
           onChange={onCommit}
         />
@@ -93,7 +97,7 @@ export default function OptionsManager({
       return (
         <ArrayOption
           label={label}
-          options={options || []}
+          options={resolvedOptions}
           values={value}
           min={min}
           onChange={onCommit}

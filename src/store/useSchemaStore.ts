@@ -5,6 +5,7 @@ interface PropertyDefinition {
   label: string;
   dependency?: string;
   options?: { label: string; value: any }[];
+  optionsSource?: string;
   min?: number;
   max?: number;
   step?: number;

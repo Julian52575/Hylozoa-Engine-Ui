@@ -37,6 +37,11 @@ interface EngineState {
   mainSceneId: string;
   prefabs: Record<string, Entity>;
   tags: string[];
+  layers: string[];
+
+  addLayer: (layer: string) => void;
+  removeLayer: (layer: string) => void;
+  renameLayer: (oldLayer: string, newLayer: string) => void;
 
   addTag: (tag: string) => void;
   removeTag: (tag: string) => void;
@@ -116,6 +121,7 @@ export const exportToEngine = (state: EngineState) => {
     version: state.version,
     MainScene: state.mainSceneId,
     tags : state.tags,
+    layers: state.layers,
     prefabs: Object.values(state.prefabs).map((prefab) => {
       const transformedComponents = Object.fromEntries(
         Object.values(prefab.components).map((comp) => [
@@ -188,6 +194,7 @@ export const loadEngineState = (data: any): void => {
     mainSceneId: data.MainScene || "",
     tags: data.tags || [],
     prefabs: {},
+    layers: data.layers || ["Default"],
   });
 
   const schemas = useSchemaStore.getState().schemas;
@@ -332,6 +339,72 @@ export const useEngineStore = create<EngineState>()(
         mainSceneId: "",
         prefabs: {},
         tags: [],
+        layers: [],
+        addLayer: (layer: string) => {
+          set((state: EngineState) => {
+            if (!state.layers.includes(layer)) {
+              state.layers.push(layer);
+            }
+          });
+        },
+        removeLayer: (layer: string) => {
+          set((state: EngineState) => {
+            state.layers = state.layers.filter((l) => l !== layer);
+
+            const fallbackLayer = state.layers[0];
+            Object.values(state.scenes).forEach((scene) => {
+              Object.values(scene.entities).forEach((entity) => {
+                Object.values(entity.components).forEach((component) => {
+                  if (component.type === "renderable") {
+                    if (component.props.layer === layer) {
+                      component.props.layer = fallbackLayer || "Default";
+                    }
+                  }
+                });
+              });
+            });
+
+            Object.values(state.prefabs).forEach((prefab) => {
+              Object.values(prefab.components).forEach((component) => {
+                if (component.type === "renderable") {
+                  if (component.props.layer === layer) {
+                    component.props.layer = fallbackLayer || "Default";
+                  }
+                }
+              });
+            });
+          });
+        },
+        renameLayer: (oldLayer: string, newLayer: string) => {
+          set((state: EngineState) => {
+            const index = state.layers.indexOf(oldLayer);
+            if (index !== -1 && !state.layers.includes(newLayer)) {
+              state.layers[index] = newLayer;
+
+              Object.values(state.scenes).forEach((scene) => {
+                Object.values(scene.entities).forEach((entity) => {
+                  Object.values(entity.components).forEach((component) => {
+                    if (component.type === "renderable") {
+                      if (component.props.layer === oldLayer) {
+                        component.props.layer = newLayer;
+                      }
+                    }
+                  });
+                });
+              });
+
+              Object.values(state.prefabs).forEach((prefab) => {
+                Object.values(prefab.components).forEach((component) => {
+                  if (component.type === "renderable") {
+                    if (component.props.layer === oldLayer) {
+                      component.props.layer = newLayer;
+                    }
+                  }
+                });
+              });
+            }
+          });
+        },
         addTag: (tag: string) => {
           set((state: EngineState) => {
             if (!state.tags.includes(tag)) {

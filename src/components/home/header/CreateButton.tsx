@@ -20,6 +20,7 @@ import { Icon } from "@iconify/react";
 
 
 import { useProjectStore, Project } from "@/store/projectStore";
+import { generateUint64Id } from "@/lib/engineAPI";
 
 function TriggerButton() {
   return (
@@ -114,11 +115,25 @@ export default function CreateButton() {
         await mkdir(assetsPath);
       }
       const filePath = `${folderPath}/${projectName || defaultName}.hlz`;
+      const mainId = await generateUint64Id();
       const fileContent = JSON.stringify(
-        { name: projectName || defaultName, created: new Date() },
+        { 
+          version: "1.0.0",
+          scenes: [{
+            sceneID: mainId,
+            name: "Main Scene",
+            entities: []
+          }],
+          MainScene: mainId,
+          tags: [],
+          prefabs: [],
+          layers: ["Default"]
+        },
         null,
         2,
       );
+      console.log(fileContent);
+      
       await writeTextFile(filePath, fileContent);
 
       const newProject: Project = {
