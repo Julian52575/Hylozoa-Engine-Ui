@@ -38,6 +38,7 @@ export const createHylozoaCommand = async (projectPath: string) => {
     }
 
     const tags = useEngineStore.getState().tags;
+    const layers = useEngineStore.getState().layers;
 
     const settingsPath = await resolveResource(
       "ressources/EngineSettings.json",
@@ -50,6 +51,7 @@ export const createHylozoaCommand = async (projectPath: string) => {
       settings.ProjectLocation += "/";
     }
     settings.Tags = tags;
+    settings.Layers = layers;
 
     const tempSettingsPath = await join(await tempDir(), "EngineSettings.json");
     await writeTextFile(tempSettingsPath, JSON.stringify(settings, null, 2));
