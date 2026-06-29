@@ -10,6 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@iconify/json": "^2.2.493",
     "@iconify/react": "^6.0.2",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-context-menu": "^2.2.16",
