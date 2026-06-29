@@ -1,6 +1,6 @@
 import { open } from "@tauri-apps/plugin-dialog";
 import { Label } from "@/components/ui/label";
-import { FileCode, UploadCloud,FolderOpen } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { useProjectStore } from "@/store/projectStore";
 import { isPathInside } from "@/lib/utils";
 
@@ -74,7 +74,7 @@ export function ScriptAccept({ label, value, origin = "Assets", onChange }: Scri
         >
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="p-2 bg-zinc-100 rounded-md text-zinc-600 shrink-0">
-              <FileCode className="h-4 w-4" />
+              <Icon icon="lucide:file-code" className="h-4 w-4" />
             </div>
             <div className="flex flex-col min-w-0">
               <span
@@ -90,7 +90,7 @@ export function ScriptAccept({ label, value, origin = "Assets", onChange }: Scri
                 {value}
               </span>
             </div>
-            <FolderOpen className="ml-auto h-4 w-4 text-zinc-400 transition-colors group-hover:text-primary" />
+            <Icon icon="lucide:folder-open" className="ml-auto h-4 w-4 text-zinc-400 transition-colors group-hover:text-primary" />
           </div>
         </button>
       ) : (
@@ -99,7 +99,7 @@ export function ScriptAccept({ label, value, origin = "Assets", onChange }: Scri
           onClick={handleSelectFile}
           className="flex flex-col items-center justify-center gap-1.5 w-full bg-white border border-dashed border-zinc-300 rounded-lg py-4 px-3 text-center cursor-pointer transition-all hover:border-zinc-400 hover:bg-zinc-50/50 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2"
         >
-          <UploadCloud className="h-5 w-5 text-zinc-400" />
+          <Icon icon="lucide:upload-cloud" className="h-5 w-5 text-zinc-400" />
           <div className="flex flex-col gap-0.5">
             <span className="text-xs font-semibold text-zinc-700">
               Choisir un script

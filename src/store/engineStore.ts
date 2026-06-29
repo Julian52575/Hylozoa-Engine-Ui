@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { temporal } from "zundo";
-import { Component } from "lucide-react";
 import { generateUint64Id } from "@/lib/engineAPI";
 
 import { writeTextFile } from "@tauri-apps/plugin-fs";

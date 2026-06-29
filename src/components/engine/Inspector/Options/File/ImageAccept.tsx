@@ -1,5 +1,4 @@
 import { Label } from "@/components/ui/label";
-import { ImageIcon, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { open } from "@tauri-apps/plugin-dialog";
 import { useState, useEffect } from "react";
@@ -7,6 +6,7 @@ import { getAssetUrl } from "@/lib/utils";
 import { useProjectStore } from "@/store/projectStore";
 import { resolveAssetPath } from "@/lib/utils";
 import { isPathInside } from "@/lib/utils";
+import { Icon } from "@iconify/react";
 
 
 function ImageInput({
@@ -106,7 +106,7 @@ function ImageInput({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <ImageIcon className="h-5 w-5 text-muted-foreground" />
+            <Icon icon="lucide:image" className="h-5 w-5 text-muted-foreground" />
           </div>
         )}
       </div>
@@ -121,7 +121,7 @@ function ImageInput({
           {previewUrl ? "Changer l'image" : "Aucune image sélectionnée"}
         </span>
       </div>
-      <FolderOpen className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+      <Icon icon="lucide:folder-open" className="ml-auto h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
     </Button>
   );
 }

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { open } from "@tauri-apps/plugin-dialog";
 import { useProjectStore } from "@/store/projectStore";
 import { useSessionStore } from "@/store/useSessionStore";
-import { Loader2 } from "lucide-react";
 import { Icon } from "@iconify/react";
 
 interface EditorManagerProps {
@@ -294,7 +293,7 @@ function FileEditor({ filePath, language = "lua" }: EditorManagerProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-6 text-sm text-zinc-400 gap-2">
-        <Loader2 className="h-4 w-4 animate-spin" /> Chargement du script...
+        <Icon icon="lucide:loader-2" className="h-4 w-4 animate-spin" /> Chargement du script...
       </div>
     );
   }
