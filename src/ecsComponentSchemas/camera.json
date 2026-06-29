@@ -13,11 +13,7 @@
       "type": "array",
       "label": "Culling Mask",
       "min": 1,
-      "options": [
-        { "label": "All", "value": "All" },
-        { "label": "Default", "value": "Default" },
-        { "label": "Nothing", "value": "Nothing" }
-      ]
+      "optionsSource": "layers"
     }
   },
   "values": {

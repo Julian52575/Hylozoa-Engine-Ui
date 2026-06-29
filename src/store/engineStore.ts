@@ -360,6 +360,16 @@ export const useEngineStore = create<EngineState>()(
                       component.props.layer = fallbackLayer || "Default";
                     }
                   }
+                  if (component.type === "camera") {
+                    if (component.props.cullingMask?.includes(layer)) {
+                      component.props.cullingMask = component.props.cullingMask.filter(
+                        (l: string) => l !== layer,
+                      );
+                      if (fallbackLayer && !component.props.cullingMask.includes(fallbackLayer)) {
+                        component.props.cullingMask.push(fallbackLayer);
+                      }
+                    }
+                  }
                 });
               });
             });
@@ -369,6 +379,16 @@ export const useEngineStore = create<EngineState>()(
                 if (component.type === "renderable") {
                   if (component.props.layer === layer) {
                     component.props.layer = fallbackLayer || "Default";
+                  }
+                }
+                if (component.type === "camera") {
+                  if (component.props.cullingMask?.includes(layer)) {
+                    component.props.cullingMask = component.props.cullingMask.filter(
+                      (l: string) => l !== layer,
+                    );
+                    if (fallbackLayer && !component.props.cullingMask.includes(fallbackLayer)) {
+                      component.props.cullingMask.push(fallbackLayer);
+                    }
                   }
                 }
               });
@@ -389,6 +409,13 @@ export const useEngineStore = create<EngineState>()(
                         component.props.layer = newLayer;
                       }
                     }
+                    if (component.type === "camera") {
+                      if (component.props.cullingMask?.includes(oldLayer)) {
+                        component.props.cullingMask = component.props.cullingMask.map(
+                          (l: string) => (l === oldLayer ? newLayer : l),
+                        );
+                      }
+                    }
                   });
                 });
               });
@@ -398,6 +425,13 @@ export const useEngineStore = create<EngineState>()(
                   if (component.type === "renderable") {
                     if (component.props.layer === oldLayer) {
                       component.props.layer = newLayer;
+                    }
+                  }
+                  if (component.type === "camera") {
+                    if (component.props.cullingMask?.includes(oldLayer)) {
+                      component.props.cullingMask = component.props.cullingMask.map(
+                        (l: string) => (l === oldLayer ? newLayer : l),
+                      );
                     }
                   }
                 });

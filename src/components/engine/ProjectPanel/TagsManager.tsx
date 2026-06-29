@@ -8,14 +8,16 @@ import {
 } from "@/components/ui/context-menu";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function TagItem({
   tag,
+  forbiddenTags,
   onRemove,
   onRename,
 }: {
   tag: string;
+  forbiddenTags?: string[];
   onRemove: () => void;
   onRename: (newTag: string) => void;
 }) {
@@ -24,13 +26,18 @@ function TagItem({
   const [isRenaming, setIsRenaming] = useState(false);
 
   const handleRename = () => {
-    if (cpyName.trim() === "") {
+    if (cpyName.trim() === "" || cpyName.trim() === tag || forbiddenTags?.includes(cpyName.trim())) {
       setCopyName(tag);
+      setIsRenaming(false);
       return;
     }
     setIsRenaming(false);
-    onRename(cpyName);
+    onRename(cpyName.trim());
   };
+
+  useEffect(() => {
+    setCopyName(tag);
+  }, [tag]);
 
   return (
     <ContextMenu>
@@ -113,6 +120,7 @@ export function TagsManager() {
             {tags.map((tag) => (
               <TagItem
                 key={tag}
+                forbiddenTags={tags.filter((t) => t !== tag)}
                 tag={tag}
                 onRemove={() => removeTag(tag)}
                 onRename={(newTag) => renameTag(tag, newTag)}

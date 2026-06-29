@@ -8,15 +8,17 @@ import {
 } from "@/components/ui/context-menu";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function LayerItem({
   layer,
+  forbiddenLayers,
   onRemove,
   onRename,
   isDeletable,
 }: {
   layer: string;
+  forbiddenLayers?: string[];
   onRemove: () => void;
   onRename: (newLayer: string) => void;
   isDeletable: boolean;
@@ -25,13 +27,18 @@ function LayerItem({
   const [isRenaming, setIsRenaming] = useState(false);
 
   const handleRename = () => {
-    if (cpyName.trim() === "") {
+    if (cpyName.trim() === "" || cpyName.trim() === layer || forbiddenLayers?.includes(cpyName.trim())) {
       setCopyName(layer);
+      setIsRenaming(false);
       return;
     }
     setIsRenaming(false);
-    onRename(cpyName);
+    onRename(cpyName.trim());
   };
+
+  useEffect(() => {
+    setCopyName(layer);
+  }, [layer]);
 
   return (
     <ContextMenu>
@@ -121,6 +128,7 @@ export function LayersManager() {
               <LayerItem
                 key={layer}
                 layer={layer}
+                forbiddenLayers={layers.filter((l) => l !== layer)}
                 onRemove={() => removeLayer(layer)}
                 onRename={(newLayer) => renameLayer(layer, newLayer)}
                 isDeletable={layers.length > 1}
