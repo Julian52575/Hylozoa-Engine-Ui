@@ -38,7 +38,9 @@
   },
   "bundle": {
     "active": true,
-    "resources": ["ressources/EngineSettings.json"],
+    "resources": {
+      "binaries/libs/libhylozoa_engine.so": "libs/libhylozoa_engine.so"
+    },
     "externalBin": ["binaries/hylozoa"],
     "targets": ["deb", "rpm", "nsis", "msi", "dmg", "app"],
     "icon": [

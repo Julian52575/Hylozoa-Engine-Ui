@@ -1,9 +1,7 @@
 import { Command } from "@tauri-apps/plugin-shell";
-import { resolveResource } from "@tauri-apps/api/path";
 import { tempDir, join } from "@tauri-apps/api/path";
 import {
   writeTextFile,
-  readTextFile
 } from "@tauri-apps/plugin-fs";
 import { SaveProjectFile } from "./utils";
 import { useEngineStore } from "@/store/engineStore";
@@ -40,18 +38,16 @@ export const createHylozoaCommand = async (projectPath: string) => {
     const tags = useEngineStore.getState().tags;
     const layers = useEngineStore.getState().layers;
 
-    const settingsPath = await resolveResource(
-      "ressources/EngineSettings.json",
-    );
-    const raw = await readTextFile(settingsPath);
-    const settings = JSON.parse(raw);
+   
 
-    settings.ProjectLocation = projectPath;
-    if (!settings.ProjectLocation.endsWith("/")) {
-      settings.ProjectLocation += "/";
-    }
-    settings.Tags = tags;
-    settings.Layers = layers;
+    const settings = {
+      ProjectLocation: projectPath.endsWith("/") ? projectPath : projectPath + "/",
+      Tags: tags,
+      Layers: layers,
+      debugLevel: 1,
+      name:"EngineSettings.json",
+      verbose: true,
+    };
 
     const tempSettingsPath = await join(await tempDir(), "EngineSettings.json");
     await writeTextFile(tempSettingsPath, JSON.stringify(settings, null, 2));

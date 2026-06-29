@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(engine_host)
-
 set(CMAKE_CXX_STANDARD 17)
+
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,$ORIGIN/libs:$ORIGIN/../lib/hylozoa-ui/libs")
+
 
 # --- ARCH ---
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|amd64|AMD64")
@@ -29,15 +32,16 @@ set(TARGET_TRIPLET ${ARCH}-unknown-${OS})
 
 # --- BINARY NAME ---
 set(BINARY_NAME hylozoa-${TARGET_TRIPLET})
-add_executable(${BINARY_NAME} host/main.cpp)
 
-target_link_directories(${BINARY_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/lib)
+add_executable(${BINARY_NAME} host/main.cpp)
+target_link_directories(${BINARY_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/libs)
 target_link_libraries(${BINARY_NAME} PRIVATE hylozoa_engine)
 
 set_target_properties(${BINARY_NAME} PROPERTIES
     SKIP_BUILD_RPATH FALSE
-    BUILD_WITH_INSTALL_RPATH FALSE
-    INSTALL_RPATH "$ORIGIN/lib"
+    BUILD_WITH_INSTALL_RPATH TRUE
+    INSTALL_RPATH "$ORIGIN/libs"
+    INSTALL_RPATH_USE_LINK_PATH TRUE 
 )
 
 

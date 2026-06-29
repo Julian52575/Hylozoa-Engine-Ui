@@ -110,10 +110,8 @@ export default function CreateButton() {
         }
       }
       const assetsPath = `${folderPath}/Assets`;
-      const assetsExists = await exists(assetsPath);
-      if (!assetsExists) {
-        await mkdir(assetsPath);
-      }
+      await mkdir(assetsPath, { recursive: true });
+      
       const filePath = `${folderPath}/${projectName || defaultName}.hlz`;
       const mainId = await generateUint64Id();
       const fileContent = JSON.stringify(
@@ -132,7 +130,6 @@ export default function CreateButton() {
         null,
         2,
       );
-      console.log(fileContent);
       
       await writeTextFile(filePath, fileContent);
 
@@ -151,7 +148,6 @@ export default function CreateButton() {
     } catch (error) {
       setErrorFolder("Failed to access the specified folder path.");
       console.error("Error accessing folder path:", error);
-      return;
     }
   };
 
