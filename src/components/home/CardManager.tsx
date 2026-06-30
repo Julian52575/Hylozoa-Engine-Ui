@@ -1,4 +1,4 @@
-import { Project } from "@/store/projectStore";
+import { Project, useProjectStore } from "@/store/projectStore";
 import { Icon } from "@iconify/react";
 
 interface ProjectCardProps {
@@ -12,6 +12,9 @@ export function ProjectCard({
   onClick,
   isSelected,
  }: ProjectCardProps) {
+
+  const projectStore = useProjectStore();
+
   return (
     <div 
       className={`
@@ -20,7 +23,18 @@ export function ProjectCard({
       `} 
       onClick={() => onClick(project)}
     >
-      <Icon icon="fa6-solid:star" className={`inline hover:text-yellow-500 ${project.isFavorite ? "text-yellow-500" : "text-gray-500"}`} />
+      <Icon 
+        icon="fa6-solid:star" 
+        className={
+          `inline hover:text-yellow-500
+          active:scale-90 transition-transform
+          ${project.isFavorite ? "text-yellow-500" : "text-gray-500"}
+        `}
+        onClick={(e) => {
+          e.stopPropagation();
+          projectStore.updateProject(project.folderPath, { isFavorite: !project.isFavorite });
+        }}
+      />
       <img
         src={project.logo}
         alt="Project Thumbnail"

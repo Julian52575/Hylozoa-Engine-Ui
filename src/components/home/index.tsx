@@ -15,10 +15,8 @@ import { runHylozoa } from "@/lib/engineAPI";
 
 export function Home({
   onEditProject,
-  onRemoveProject,
 }: {
   onEditProject?: () => void;
-  onRemoveProject?: () => void;
 }) {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortOption, setSortOption] = useState<string>("name");
@@ -87,11 +85,10 @@ export function Home({
     }
   };
 
-  const handleRemoveProject = () => {
+  const handleRemoveProject = async (deleteFolder: boolean) => {
     if (projectSelected) {
-      removeProject(projectSelected.folderPath);
+      await removeProject(projectSelected.folderPath, deleteFolder);
       setProjectSelected(null);
-      onRemoveProject && onRemoveProject();
     } else {
       toast.error("Please select a project to remove.");
     }
