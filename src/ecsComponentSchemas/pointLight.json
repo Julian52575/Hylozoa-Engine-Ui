@@ -1,0 +1,20 @@
+{
+    "type": "pointLight",
+    "label": "Point Light",
+    "icon": "lucide:lightbulb",
+    "schema": {
+        "color": { "type": "color", "label": "Color" },
+        "radius": { "type": "number", "label": "Radius" },
+        "intensity": { "type": "number", "label": "Intensity" }
+    },
+    "values": {
+        "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 1
+        },
+        "radius": 150,
+        "intensity": 1
+    }
+}

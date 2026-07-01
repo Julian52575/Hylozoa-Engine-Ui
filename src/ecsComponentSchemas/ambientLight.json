@@ -1,0 +1,18 @@
+{
+    "type": "ambientLight",
+    "label": "Ambient Light",
+    "icon": "lucide:sun",
+    "schema": {
+        "color": { "type": "color", "label": "Color" },
+        "intensity": { "type": "number", "label": "Intensity" }
+    },
+    "values": {
+        "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 1
+        },
+        "intensity": 1
+    }
+}
