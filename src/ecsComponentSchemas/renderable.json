@@ -12,7 +12,6 @@
       "optionsSource": "layers"
     },
     "zindex": { "type": "number", "label": "Z-Index" },
-    "transparency": { "type": "number", "label": "Transparency" },
     "origin": {
       "type": "enum",
       "label": "Origin",
@@ -35,7 +34,6 @@
     "visible": true,
     "layer": "Default",
     "zindex": 0,
-    "transparency": 255,
     "origin": { "x": 0, "y": 0 }
   }
 }
