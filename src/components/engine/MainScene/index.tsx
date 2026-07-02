@@ -63,7 +63,7 @@ interface EntityProps extends Konva.NodeConfig {
     };
   };
   renderableShape?: {
-    shapeType: "rectangle" | "circle";
+    type: "rectangle" | "circle";
     "specs.width"?: number;
     "specs.height"?: number;
     "specs.radius"?: number;
@@ -156,7 +156,7 @@ const Entity = ({
       {camera && <CameraShow size={camera.viewportSize} />}
       {renderable && renderableShape && (
         <RenderableShapeShow
-          type={renderableShape.shapeType}
+          type={renderableShape.type}
           width={renderableShape["specs.width"]}
           height={renderableShape["specs.height"]}
           radius={renderableShape["specs.radius"]}

@@ -88,31 +88,34 @@ export default function CreateButton() {
   }, [openDialog]);
 
   const handleCreateProject = async () => {
-    if (!folderPath.trim()) {
+    const folderPathTrimmed = folderPath.trim();
+    const projectNameTrimmed = projectName.trim();
+
+    if (!folderPathTrimmed) {
       setErrorFolder("Folder path cannot be empty.");
       return;
     }
-    if (projectStore.projects.map((p) => p.folderPath).includes(folderPath)) {
+    if (projectStore.projects.map((p) => p.folderPath).includes(folderPathTrimmed)) {
       setErrorFolder("A project with this folder path already exists.");
       return;
     }
 
     try {
-      const folderExists = await exists(folderPath);
+      const folderExists = await exists(folderPathTrimmed);
       if (!folderExists) {
-        await mkdir(folderPath, { recursive: true });
+        await mkdir(folderPathTrimmed, { recursive: true });
       }
       else {
-        const entries = await readDir(folderPath);
+        const entries = await readDir(folderPathTrimmed);
         if (entries && entries.length > 0) {
           setErrorFolder("The selected folder is not empty. Please choose an empty folder or a new path.");
           return;
         }
       }
-      const assetsPath = `${folderPath}/Assets`;
+      const assetsPath = `${folderPathTrimmed}/Assets`;
       await mkdir(assetsPath, { recursive: true });
       
-      const filePath = `${folderPath}/${projectName || defaultName}.hlz`;
+      const filePath = `${folderPathTrimmed}/${projectNameTrimmed || defaultName}.hlz`;
       const mainId = await generateUint64Id();
       const fileContent = JSON.stringify(
         { 
@@ -134,8 +137,8 @@ export default function CreateButton() {
       await writeTextFile(filePath, fileContent);
 
       const newProject: Project = {
-        name: projectName || defaultName,
-        folderPath: folderPath,
+        name: projectNameTrimmed || defaultName,
+        folderPath: folderPathTrimmed,
         version: "1.0.0",
         modifiedDate: new Date(),
         logo: "assets/logo.webp",

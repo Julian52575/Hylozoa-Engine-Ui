@@ -4,7 +4,7 @@
   "icon": "tabler:shape",
   "color": "#8b5cf6",
   "schema": {
-    "shapeType": {
+    "type": {
       "type": "enum",
       "label": "Shape Type",
       "options": [
@@ -15,26 +15,26 @@
     "specs.width": {
       "type": "number",
       "label": "Width",
-      "dependency": "shapeType-rectangle",
+      "dependency": "type-rectangle",
       "min": 0
     },
     "specs.height": {
       "type": "number",
       "label": "Height",
-      "dependency": "shapeType-rectangle",
+      "dependency": "type-rectangle",
       "min": 0
     },
     "specs.radius": {
       "type": "number",
       "label": "Radius",
-      "dependency": "shapeType-circle",
+      "dependency": "type-circle",
       "min": 0
     },
     "outlineColor": { "type": "color", "label": "Outline Color" },
     "outlineThickness": { "type": "number", "label": "Outline Thickness", "min": 0}
   },
     "values": {
-      "shapeType": "rectangle",
+      "type": "rectangle",
       "specs.width": 30,
       "specs.height": 30,
       "specs.radius": 30,

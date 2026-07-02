@@ -1,5 +1,5 @@
 import { Label } from "@/components/ui/label";
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useEffect, useMemo, useState } from "react";
 import { HexColorPicker, RgbaColorPicker } from "react-colorful";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -37,7 +37,7 @@ interface ButtonProps
 
 const colorToCss = (color: string | RGBA) => {
   if (typeof color === "string") return color;
-  return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+  return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`;
 };
 
 const ColorPicker = forwardRef<
@@ -63,9 +63,40 @@ const ColorPicker = forwardRef<
 
     const isRgba = typeof localValue === "object" && localValue !== null;
 
-    const handleColorChange = (newColor: string | RGBA) => {
+    const handlePickerChange = (newColor: RGBA) => {
+      const convertedColor: RGBA = {
+        r: Math.round(newColor.r),
+        g: Math.round(newColor.g),
+        b: Math.round(newColor.b),
+        a: Math.round(newColor.a * 255),
+      };
+
+      setLocalValue((prev) => {
+        if (
+          typeof prev === "object" &&
+          prev !== null &&
+          prev.r === convertedColor.r &&
+          prev.g === convertedColor.g &&
+          prev.b === convertedColor.b &&
+          prev.a === convertedColor.a
+        ) {
+          return prev;
+        }
+        onChange?.(convertedColor);
+        return convertedColor;
+      });
+    };
+
+    const handleHexChange = (newColor: string) => {
       setLocalValue(newColor);
       onChange?.(newColor);
+    };
+
+    const handleRgbaFieldChange = (key: keyof RGBA, val: number) => {
+      const clampedVal = Math.min(255, Math.max(0, Math.round(val)));
+      const updated = { ...(localValue as RGBA), [key]: clampedVal };
+      setLocalValue(updated);
+      onChange?.(updated);
     };
 
     const handleOpenChange = (newOpen: boolean) => {
@@ -74,6 +105,18 @@ const ColorPicker = forwardRef<
         onBlur?.(localValue);
       }
     };
+
+    const pickerColor = useMemo(() => {
+      if (!isRgba) return { r: 255, g: 255, b: 255, a: 1 };
+      const rgba = localValue as RGBA;
+      return { r: rgba.r, g: rgba.g, b: rgba.b, a: rgba.a / 255 };
+    }, [
+      isRgba,
+      isRgba ? (localValue as RGBA).r : null,
+      isRgba ? (localValue as RGBA).g : null,
+      isRgba ? (localValue as RGBA).b : null,
+      isRgba ? (localValue as RGBA).a : null,
+    ]);
 
     return (
       <Popover onOpenChange={handleOpenChange} open={open}>
@@ -96,9 +139,15 @@ const ColorPicker = forwardRef<
         </PopoverTrigger>
         <PopoverContent className="w-fit flex flex-col items-center p-2">
           {isRgba ? (
-            <RgbaColorPicker color={localValue} onChange={handleColorChange} />
+            <RgbaColorPicker
+              color={pickerColor}
+              onChange={handlePickerChange}
+            />
           ) : (
-            <HexColorPicker color={localValue} onChange={handleColorChange} />
+            <HexColorPicker
+              color={localValue as string}
+              onChange={handleHexChange}
+            />
           )}
           {!isRgba && (
             <InputGroup className="mt-2">
@@ -107,7 +156,7 @@ const ColorPicker = forwardRef<
                 maxLength={6}
                 onChange={(e) => {
                   const val = e.currentTarget.value;
-                  handleColorChange(val.startsWith("#") ? val : `#${val}`);
+                  handleHexChange(val.startsWith("#") ? val : `#${val}`);
                 }}
                 onBlur={() => onBlur?.(localValue)}
                 className="h-8 font-mono text-xs uppercase"
@@ -128,21 +177,18 @@ const ColorPicker = forwardRef<
                   </label>
                   <input
                     type="number"
-                    min={key === "a" ? 0 : 0}
-                    max={key === "a" ? 1 : 255}
-                    step={key === "a" ? 0.01 : 1}
+                    min={0}
+                    max={255}
+                    step={1}
                     value={localValue[key]}
                     onChange={(e) => {
                       const val = parseFloat(e.target.value) || 0;
-                      const clampedVal =
-                        key === "a"
-                          ? Math.min(1, Math.max(0, val))
-                          : Math.min(255, Math.max(0, Math.round(val)));
+                      const clampedVal = Math.min(
+                        255,
+                        Math.max(0, Math.round(val)),
+                      );
 
-                      handleColorChange({
-                        ...localValue,
-                        [key]: clampedVal,
-                      });
+                      handleRgbaFieldChange(key, clampedVal);
                     }}
                     className="w-full bg-muted border-none rounded p-1 text-center focus:ring-1 focus:ring-ring outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
