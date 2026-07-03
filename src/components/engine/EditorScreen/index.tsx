@@ -7,6 +7,9 @@ import { useProjectStore } from "@/store/projectStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { Icon } from "@iconify/react";
 
+import { registerHylozoaLuaProvider } from "./luaCompletions";
+import { registerHylozoaLuaTheme } from "./luaSyntaxTheme";
+
 interface EditorManagerProps {
   filePath: string | null;
   language?: string;
@@ -69,231 +72,23 @@ function FileEditor({ filePath, language = "lua" }: EditorManagerProps) {
     }
   };
 
-  const luaKeywords = [
-    "and",
-    "break",
-    "do",
-    "else",
-    "elseif",
-    "end",
-    "false",
-    "for",
-    "function",
-    "goto",
-    "if",
-    "in",
-    "local",
-    "nil",
-    "not",
-    "or",
-    "repeat",
-    "return",
-    "then",
-    "true",
-    "until",
-    "while",
-  ];
+  const handleEditorWillMount = (monaco: Monaco) => {
+    if (!(monaco as any).__hylozoaLuaThemeRegistered) {
+      (monaco as any).__hylozoaLuaThemeRegistered = true;
+      registerHylozoaLuaTheme(monaco);
+    }
 
-  const luaBuiltins = [
-    "print",
-    "pairs",
-    "ipairs",
-    "tostring",
-    "tonumber",
-    "type",
-    "table",
-    "string",
-    "math",
-    "pcall",
-    "error",
-    "assert",
-    "require",
-    "select",
-    "setmetatable",
-    "getmetatable",
-    "rawget",
-    "rawset",
-    "next",
-    "unpack",
-    "os",
-  ];
-
-  const handleEditorDidMount = (_: any, monaco: Monaco) => {
-    if ((monaco as any).__hylozoaLuaProviderRegistered) return;
-    (monaco as any).__hylozoaLuaProviderRegistered = true;
-
-    monaco.languages.registerCompletionItemProvider("lua", {
-      provideCompletionItems: (model, position) => {
-        const word = model.getWordUntilPosition(position);
-        const range = {
-          startLineNumber: position.lineNumber,
-          endLineNumber: position.lineNumber,
-          startColumn: word.startColumn,
-          endColumn: word.endColumn,
-        };
-        const keywordSuggestions = luaKeywords.map((kw) => ({
-          label: kw,
-          kind: monaco.languages.CompletionItemKind.Keyword,
-          insertText: kw,
-          range: range,
-        }));
-
-        const builtinSuggestions = luaBuiltins.map((fn) => ({
-          label: fn,
-          kind: monaco.languages.CompletionItemKind.Function,
-          insertText: fn,
-          range: range,
-        }));
-
-        const suggestions = [
-          ...keywordSuggestions,
-          ...builtinSuggestions,
-          {
-            label: "log_message",
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: "log_message('${1:message}')",
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            range: range,
-            detail: "Moteur Hylozoa API",
-            documentation: {
-              value:
-                "Enregistre un message dans la console du moteur Hylozoa.\n\n**Exemple :**\n```lua\nlog_message('${1:message}')\n```",
-            },
-          },
-          {
-            label: "get_transform",
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: "get_transform('${1:entity}')",
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            range: range,
-            detail: "Moteur Hylozoa API",
-            documentation: {
-              value:
-                "Récupère la transformation d'une entité.\n\n**Exemple :**\n```lua\nget_transform('${1:entity}')\n```",
-            },
-          },
-          {
-            label: "get_name",
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: "get_name('${1:entity}')",
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            range: range,
-            detail: "Moteur Hylozoa API",
-            documentation: {
-              value:
-                "Récupère le nom d'une entité.\n\n**Exemple :**\n```lua\nget_name('${1:entity}')\n```",
-            },
-          },
-          {
-            label: "destroy_entity",
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: "destroy_entity(${1:entity})",
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            range: range,
-            detail: "Moteur Hylozoa API",
-            documentation: {
-              value:
-                "Supprime instantanément l'entité spécifiée de la scène active et libère ses composants de la mémoire.\n\n**Exemple :**\n```lua\ndestroy_entity(${1:entity})\n```",
-            },
-          },
-          {
-            label: "onUpdate",
-            kind: monaco.languages.CompletionItemKind.Method,
-            insertText: "onUpdate(entity,dt)\n\t${1:-- code here}\nend",
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            range: range,
-            detail: "Callback Moteur (Optionnel)",
-            documentation: {
-              value:
-                "Fonction de cycle de vie appelée automatiquement par le moteur à chaque frame si elle est présente dans le script.\n\n**Paramètres :**\n* `dt` (number) : Le *Delta Time* (temps écoulé depuis la dernière frame en secondes).\n\n**Exemple :**\n```lua\nfunction onUpdate(dt)\n  -- Faire tourner l'entité de 90 degrés par seconde\n  self.rotation = self.rotation + 90 * dt\nend\n```",
-            },
-          },
-          {
-            label: "onNoise",
-            kind: monaco.languages.CompletionItemKind.Method,
-            insertText:
-              "onNoise(entity,source,noiseInfo)\n\t${1:-- code here}\nend",
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            range: range,
-            detail: "Callback Moteur (Optionnel)",
-            documentation: {
-              value:
-                "Called when this entity hears a noise event. Requires the entity to have a noise listener component.\n\n**Parameters:**\n* `source` (Entity) : The entity that emitted the noise.\n* `noiseInfo` (table) : A table containing information about the noise event, such as its type and intensity.\n\n**Example:**\n```lua\nfunction onNoise(source, noiseInfo)\n  if noiseInfo.type == 'footstep' then\n    print('Heard a footstep from entity: ' .. source.id)\n  end\nend\n```",
-            },
-          },
-          {
-            label: "onCollisionBegin",
-            kind: monaco.languages.CompletionItemKind.Method,
-            insertText:
-              "onCollisionBegin(entity,other)\n\t${1:-- code here}\nend",
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            range: range,
-            detail: "Callback Moteur (Optionnel)",
-
-            documentation: {
-              value:
-                "Called when this entity begins colliding with another entity.\n\n**Parameters:**\n* `other` (Entity) : The entity with which this entity has begun colliding.\n\n**Example:**\n```lua\nfunction onCollisionBegin(other)\n  print('Collision started with entity: ' .. other.id)\nend\n```",
-            },
-          },
-          {
-            label: "onCollisionEnd",
-            kind: monaco.languages.CompletionItemKind.Method,
-            insertText:
-              "onCollisionEnd(entity,other)\n\t${1:-- code here}\nend",
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            range: range,
-            detail: "Callback Moteur (Optionnel)",
-            documentation: {
-              value:
-                "Called when this entity ends colliding with another entity.\n\n**Parameters:**\n* `other` (Entity) : The entity with which this entity has ended colliding.\n\n**Example:**\n```lua\nfunction onCollisionEnd(other)\n  print('Collision ended with entity: ' .. other.id)\nend\n```",
-            },
-          },
-          {
-            label: "onSensorEnter",
-            kind: monaco.languages.CompletionItemKind.Method,
-            insertText: "onSensorEnter(entity,other)\n\t${1:-- code here}\nend",
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            range: range,
-            detail: "Callback Moteur (Optionnel)",
-            documentation: {
-              value:
-                "Called when this entity enters a sensor area.\n\n**Parameters:**\n* `other` (Entity) : The entity that triggered the sensor.\n\n**Example:**\n```lua\nfunction onSensorEnter(other)\n  print('Sensor entered by entity: ' .. other.id)\nend\n```",
-            },
-          },
-          {
-            label: "onSensorExit",
-            kind: monaco.languages.CompletionItemKind.Method,
-            insertText: "onSensorExit(entity,other)\n\t${1:-- code here}\nend",
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            range: range,
-            detail: "Callback Moteur (Optionnel)",
-            documentation: {
-              value:
-                "Called when this entity exits a sensor area.\n\n**Parameters:**\n* `other` (Entity) : The entity that triggered the sensor.\n\n**Example:**\n```lua\nfunction onSensorExit(other)\n  print('Sensor exited by entity: ' .. other.id)\nend\n```",
-            },
-          },
-        ];
-        return {
-          suggestions: suggestions as any[],
-        };
-      },
-    });
+    if (!(monaco as any).__hylozoaLuaCompletionRegistered) {
+      (monaco as any).__hylozoaLuaCompletionRegistered = true;
+      registerHylozoaLuaProvider(monaco);
+    }
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center p-6 text-sm text-zinc-400 gap-2">
-        <Icon icon="lucide:loader-2" className="h-4 w-4 animate-spin" /> Chargement du script...
+        <Icon icon="lucide:loader-2" className="h-4 w-4 animate-spin" />{" "}
+        Chargement du script...
       </div>
     );
   }
@@ -302,9 +97,10 @@ function FileEditor({ filePath, language = "lua" }: EditorManagerProps) {
     <div className="w-full h-full">
       <Editor
         defaultLanguage={language}
+        theme="hylozoa-lua-theme"
         value={fileContent}
         onChange={handleEditorChange}
-        onMount={handleEditorDidMount}
+        beforeMount={handleEditorWillMount}
         options={{
           wordBasedSuggestions: "currentDocument",
           quickSuggestions: true,
