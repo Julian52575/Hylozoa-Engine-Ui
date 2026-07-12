@@ -5,15 +5,14 @@ import EnginePage from "@/pages/Engine";
 
 
 function App() {
-
-
-
   return (
-    <Routes>
-      <Route index element={<HomePage />} />
-      <Route path="/graph" element={<GraphPage />} />
-      <Route path="/engine" element={<EnginePage />} />
-    </Routes>
+    <main>
+      <Routes>
+        <Route index element={<HomePage />} />
+        <Route path="/graph" element={<GraphPage />} />
+        <Route path="/engine" element={<EnginePage />} />
+      </Routes>
+    </main>
   );
 }
 

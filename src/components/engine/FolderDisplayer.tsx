@@ -108,7 +108,7 @@ const items = [
     icon: "lucide:folder-open",
     label: "Ouvrir dans l'explorateur",
     action: "open",
-    targets: ["file", "dir"],
+    targets: ["file", "dir", "code"],
     function: async (path: string) => {
       await openPath(path);
     },

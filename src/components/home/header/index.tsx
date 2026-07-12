@@ -27,11 +27,11 @@ export default function Header({searchTerm, setSearchTerm, sortOption, setSortOp
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
             <div className="flex items-center gap-1">
-                <Label className="text-sm">
+                <Label className="text-sm" htmlFor="sort-select">
                     Sort:
                 </Label>
                 <Select value={sortOption} onValueChange={setSortOption}>
-                    <SelectTrigger className="w-[150px] bg-white border-zinc-200 focus:ring-1 focus:ring-zinc-400 focus:ring-offset-0 transition-all font-medium h-8 text-sm">
+                    <SelectTrigger id="sort-select" className="w-[150px] bg-white border-zinc-200 focus:ring-1 focus:ring-zinc-400 focus:ring-offset-0 transition-all font-medium h-8 text-sm">
                         <SelectValue placeholder="Select option" />
                     </SelectTrigger>
                     <SelectContent 

@@ -19,6 +19,7 @@ function HistoryButtons() {
         variant="outline"
         size={"icon-sm"}
         className="cursor-pointer"
+        aria-label="Undo"
         onClick={() => temporal.getState().undo()}
       >
         <Icon icon="lucide:undo-2" className="w-4 h-4" />
@@ -27,6 +28,7 @@ function HistoryButtons() {
         variant="outline"
         size={"icon-sm"}
         className="cursor-pointer"
+        aria-label="Redo"
         onClick={() => temporal.getState().redo()}
       >
         <Icon icon="lucide:redo-2" className="w-4 h-4" />
