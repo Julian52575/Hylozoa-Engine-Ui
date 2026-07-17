@@ -244,6 +244,7 @@ export const loadEngineState = (data: any): void => {
             type: type,
             props: compProps,
           };
+          console.log(`Loaded component "${compName}" for entity "${name}" with ID "${componentId}" and type "${type}".`);
         },
       );
 

@@ -1,5 +1,5 @@
 {
-    "type" : "boxcollider",
+    "type" : "boxcollidercomponent",
     "label" : "Box Collider",
     "icon": "tabler:square",
     "color": "#f97316",

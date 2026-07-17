@@ -24,6 +24,7 @@ export default function OptionsManager({
   onCommit,
 }: OptionsManagerProps) {
   const layers = useEngineStore((s) => s.layers);
+  const tags = useEngineStore((s) => s.tags);
   const { type, label, options, optionsSource, dependency, min, max, step, accept } =
     propConfig;
 
@@ -34,7 +35,12 @@ export default function OptionsManager({
     }
   }
 
-  const resolvedOptions = optionsSource === "layers" ? layers.map((l) => ({ label: l, value: l })) : options;
+  const resolvedOptions =
+  optionsSource === "layers"
+    ? layers.map((l) => ({ label: l, value: l }))
+    : optionsSource === "tags"
+    ? tags.map((t) => ({ label: t, value: t }))
+    : options;
 
   switch (type) {
     case "vector2":

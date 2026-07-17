@@ -1,0 +1,17 @@
+{
+  "type": "tags",
+  "label": "Tag",
+  "icon": "tabler:tag",
+  "color": "#dc2626",
+  "schema": {
+    "tags": {
+      "type": "array",
+      "label": "Tags",
+      "min": 1,
+      "optionsSource": "tags"
+    }
+  },
+  "values": {
+    "tags": ["Default"]
+  }
+}

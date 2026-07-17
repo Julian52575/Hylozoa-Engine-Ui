@@ -1,10 +1,10 @@
 {
-  "type": "rigidbody",
+  "type": "rigidbodycomponent",
   "label": "Rigid Body",
   "icon": "tabler:bounce-right",
   "color": "#f97316",
   "schema": {
-    "bodyType": {
+    "type": {
       "type": "enum",
       "label": "Body Type",
       "options": [
@@ -47,7 +47,7 @@
     }
   },
   "values": {
-    "bodyType": "static",
+    "type": "static",
     "gravityScale": 1,
     "linearDamping": 0,
     "angularDamping": 0,

@@ -59,7 +59,9 @@ export const createHylozoaCommand = async (projectPath: string) => {
       "run",
       tempSettingsPath,
       fileProjectPath
-    ]);
+    ],{
+      cwd: projectPath 
+    });
 
     return command;
   } catch (error) {

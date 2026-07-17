@@ -126,7 +126,7 @@ export default function CreateButton() {
             entities: []
           }],
           MainScene: mainId,
-          tags: [],
+          tags: ["Default"],
           prefabs: [],
           layers: ["Default"]
         },

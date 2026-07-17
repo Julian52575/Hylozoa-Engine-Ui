@@ -1,5 +1,5 @@
 {
-    "type" : "capsulecollider",
+    "type" : "capsulecollidercomponent",
     "label" : "Capsule Collider",
     "icon": "tabler:pill",
     "color": "#f97316",

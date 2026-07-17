@@ -1,5 +1,5 @@
 {
-    "type": "collider",
+    "type": "collidercomponent",
     "label": "Base Collider",
     "icon": "tabler:layers-intersect",
     "color": "#f97316",

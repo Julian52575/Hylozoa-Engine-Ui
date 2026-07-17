@@ -1,5 +1,5 @@
 {
-    "type" : "circlecollider",
+    "type" : "circlecollidercomponent",
     "label" : "Circle Collider",
     "icon": "tabler:circle",
     "color": "#f97316",
