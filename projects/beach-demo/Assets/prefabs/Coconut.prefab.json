@@ -1,0 +1,48 @@
+{
+  "Entities": [
+    {
+      "Components": {
+        "localtransform": {
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "rotation": 0,
+          "scale": {
+            "x": 1,
+            "y": 1
+          }
+        },
+        "renderable": {
+          "color": {
+            "a": 255,
+            "b": 0,
+            "g": 0,
+            "r": 255
+          },
+          "layer": "Default",
+          "origin": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "transparency": 1,
+          "visible": true
+        },
+        "sprite": {
+          "scale": {
+            "x": 1,
+            "y": 1
+          },
+          "texture": "textures/coconut32.png"
+        },
+        "script": {
+          "scriptFile": "scripts/coconut.lua"
+        },
+        "Name": {
+          "name": "Coconut"
+        }
+      },
+      "id": 0
+    }
+  ]
+}
